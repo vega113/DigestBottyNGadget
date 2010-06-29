@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field='res'
+		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<g:HTMLPanel>
+		<g:CaptionPanel captionText='Select Digest'>
+					<g:HorizontalPanel>
+						<g:HTML width="10px"></g:HTML>
+						<g:ListBox ui:field="prjList"></g:ListBox>
+					</g:HorizontalPanel>
+				</g:CaptionPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

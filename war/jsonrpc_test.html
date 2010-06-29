@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>JSON RPC Test</title>
+<script type="text/javascript" src="js/jquery-1.3.2.js"></script>
+<script type="text/javascript" src="js/json2.js"></script>
+<script type="text/javascript" src="js/jsonrpc.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function() {  
+  jQuery('#returnJson').val("");
+  jQuery('#submit').click(function() {
+    var command = jQuery('#command').val();
+    var params = JSON.parse(jQuery('#params').val());
+    jsonrpc.makeRequest(command, params, function(data) {
+      try {
+	      var json = JSON.parse(data);
+	      if(json.error != null){
+	    	  jQuery('#returnJson').val(json.error );
+	      }else{
+		      json = JSON.parse(json.result);
+		      var installerUrl = json.installerUrl;
+		      var digestWaveId = json.digestWaveId;
+		      var projectName = json.projectName;
+		      var robotId = json.robotId;
+	    	  jQuery('#returnJson').val("installerUrl: " + installerUrl + "\n" + "digestWaveId: " + digestWaveId + "\n" + "projectName: " + projectName + "\n" + "robotId: " + robotId);
+	      }
+      } catch (exception) {
+         // var error = data.error != null ? data.error : "";
+        jQuery('#returnJson').val('json parse exception: ' + "respnse: " + data + "; " + exception);
+      }
+    }); 
+  });
+  try{
+		var o = {};
+		o.projectId="digest" + new Date().getTime();
+		o.domain = "googlewave.com";
+		o.digestWaveId = "";
+		o.name = "my blah " + o.projectId;
+		o.description = "best digest ever";
+		o.installerThumbnailUrl = "http://aggfiwave.appspot.com/images/forumbotty_thumb_old_2.png";
+		o.installerIconUrl = "http://aggfiwave.appspot.com/images/forumbotty_thumb_old_2.png";
+		o.robotThumbnailUrl = "http://aggfiwave.appspot.com/images/forumbotty_thumb_old_2.png";
+		o.forumSiteUrl = "http://ugolki.blogspot.com";
+		o.googlegroupsId = "aggfi";
+		o.ownerId="vega113@googlewave.com";
+		o.author="vega";
+		var str = JSON.stringify(o);
+		jQuery('#params').val(str);
+	    //jQuery('#returnJson').val(str);
+	}catch (exception) {
+	  jQuery('#returnJson').val('my problem: ' + data);
+	}
+});
+</script>
+</head>
+<style>
+</style>
+<body>
+
+command: <input style="width: 400px;" id="command" type="text" value="CREATE_DIGEST"></input>
+<br><br>
+input params:<br>
+<input style="width: 100%;" id="params" value='{}' />
+<br><br>
+<input id="submit" type="button" value="submit request"/>
+<br><br>
+output:<br>
+<textarea id="returnJson" cols="100" rows="5"></textarea>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+  <filter>
+    <filter-name>guiceFilter</filter-name>
+    <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>guiceFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <listener>
+    <listener-class>com.aggfi.digest.server.botty.google.forumbotty.guice.GuiceServletConfig</listener-class>
+<!--    <listener-class>com.aggfi.portfolio.wave.server.guice.AggfiGuiceServiceConfig</listener-class>-->
+  </listener>
+  
+  <servlet>
+    <servlet-name>install</servlet-name>
+    <jsp-file>/install.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>install</servlet-name>
+    <url-pattern>/install</url-pattern>
+  </servlet-mapping>    
+  
+  <servlet>
+    <servlet-name>admin</servlet-name>
+    <jsp-file>/admin.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>admin</servlet-name>
+    <url-pattern>/admin</url-pattern>
+  </servlet-mapping>     
+  
+    <servlet>
+    <servlet-name>report</servlet-name>
+    <jsp-file>/report.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>report</servlet-name>
+    <url-pattern>/report</url-pattern>
+  </servlet-mapping> 
+  
+  <!--<security-constraint>
+    <web-resource-collection>
+      <url-pattern>/admin*</url-pattern>
+      <url-pattern>/report*</url-pattern>      
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>   
+  -->
+</web-app>

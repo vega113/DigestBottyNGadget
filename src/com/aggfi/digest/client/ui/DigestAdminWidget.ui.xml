@@ -1,0 +1,70 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field='res'
+		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<g:HTMLPanel>
+		<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
+		<g:CaptionPanel  captionText='Set up Default Participants'>
+			<g:VerticalPanel>
+				<g:HorizontalPanel>
+					<g:TextBox ui:field="addDefaultParticipantBox"></g:TextBox>
+					<g:Button ui:field="addDefaultParticipantBtn">add</g:Button>
+				</g:HorizontalPanel>
+				<g:cell height="10px">
+					<g:HTML></g:HTML>
+				</g:cell>
+					<g:VerticalPanel ui:field="defaultParticipantsPanel" width='380px'>
+					</g:VerticalPanel>
+			</g:VerticalPanel>
+		</g:CaptionPanel>
+		
+		<g:CaptionPanel  captionText='Set up Default Tags'>
+			<g:VerticalPanel>
+				<g:HorizontalPanel>
+					<g:TextBox ui:field="addDefaultTagBox"></g:TextBox>
+					<g:Button ui:field="addDefaultTagBtn">add</g:Button>
+				</g:HorizontalPanel>
+				<g:cell height="10px">
+					<g:HTML></g:HTML>
+				</g:cell>
+					<g:VerticalPanel ui:field="defaultTagsPanel" width='380px'>
+					</g:VerticalPanel>
+			</g:VerticalPanel>
+		</g:CaptionPanel>
+		
+		<g:CaptionPanel  captionText='Set up Auto-tagging'>
+			<g:VerticalPanel>
+				<g:HorizontalPanel>
+					<g:Label>Tag:</g:Label>
+					<g:HTML width="4px"></g:HTML>
+					<g:TextBox ui:field="addAutoTagNameBox"></g:TextBox>
+					<g:HTML width="10px"></g:HTML>
+					<g:Label>Regex:</g:Label>
+					<g:HTML width="4px"></g:HTML>
+					<g:TextBox ui:field="addAutoTagValBox"></g:TextBox>
+					<g:Button ui:field="addAutoTagBtn">add</g:Button>
+				</g:HorizontalPanel>
+				<g:cell height="10px">
+					<g:HTML></g:HTML>
+				</g:cell>
+					<g:VerticalPanel ui:field="autoTagsPanel" width='380px'>
+					</g:VerticalPanel>
+			</g:VerticalPanel>
+		</g:CaptionPanel>
+		
+		<g:CaptionPanel  captionText='Set up Digest Managers'>
+			<g:VerticalPanel>
+				<g:HorizontalPanel>
+					<g:TextBox ui:field="addManagerBox"></g:TextBox>
+					<g:Button ui:field="addManagergBtn">add</g:Button>
+				</g:HorizontalPanel>
+				<g:cell height="10px">
+					<g:HTML></g:HTML>
+				</g:cell>
+					<g:VerticalPanel ui:field="managersPanel" width='380px'>
+					</g:VerticalPanel>
+			</g:VerticalPanel>
+		</g:CaptionPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

@@ -1,0 +1,33 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:digest="url:import:com.aggfi.digestbotty.gadget.client.ui">
+	<ui:with field='res'
+		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<g:HTMLPanel>
+		<g:DecoratorPanel>
+			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
+				<g:HTMLPanel>
+					<g:FlexTable ui:field="createGadgetFlexTbl"></g:FlexTable>
+				</g:HTMLPanel>
+				<g:HorizontalPanel>
+					<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
+						<g:HorizontalPanel>
+							<g:HTML ui:field="isPublicQuestion"></g:HTML>
+							<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
+							<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
+							<g:DecoratorPanel>
+								<g:HTMLPanel>
+									<g:PushButton ui:field="submitBtn"></g:PushButton>
+								</g:HTMLPanel>
+							</g:DecoratorPanel>
+						</g:HorizontalPanel>
+					</g:HTMLPanel>
+				</g:HorizontalPanel>
+				<g:CaptionPanel ui:field="outputTxtCaption"
+					stylePrimaryName='{res.globalCSS.pretty}'>
+					<g:HTML ui:field="outputTxt"></g:HTML>
+				</g:CaptionPanel>
+			</g:VerticalPanel>
+		</g:DecoratorPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

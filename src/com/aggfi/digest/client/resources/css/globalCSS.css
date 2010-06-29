@@ -1,0 +1,57 @@
+
+@CHARSET "UTF-8";
+
+.readonly{
+	color:#B8B8B8;
+	font-style: italic;	
+}
+.inputRegular{
+	font-style: italic;	
+}
+
+
+.readonlyPrime{
+	background-color: #F8F8F8;
+	border: solid;
+	border-color: 99CCFF;
+}
+
+.highlightRow {
+	background: #c9e2fc;
+}
+
+.regularRow {
+	background: #A3D1FF;
+}
+
+.gridHeader{
+	background: #66CCFF;
+}
+
+.gridStyle {
+	border-bottom: solid 1px #aaa;
+	margin-bottom: 3px;
+}
+
+.warning {
+	color: #D80000;
+}
+
+.message {
+	color: black;
+}
+
+.messageSuccess {
+	color: #006600;
+}
+
+.valueWidget{
+}
+
+.pretty {
+			background-color: #c9e2fc;
+			height: 32px;
+		}
+.alignRight{
+	width: 270px;
+}
