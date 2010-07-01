@@ -64,20 +64,25 @@ public class FieldVerifier {
 			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.digestNameStr()));
 		}
 		
-		//check owner id is of form: id@googlewave.com
-		if(digest.getOwnerId().indexOf("@googlewave.com") < 0){
-			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(constants.ownerStr(), "your_id@googlewave.com"));
-		}else{
-			String ownerStr = digest.getOwnerId().substring(0, digest.getOwnerId().indexOf("@"));
-			if(!FieldVerifier.isValidName(ownerStr)){
-				throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.ownerStr()));
-			}
-		}
+		verifyWaveId(digest.getOwnerId(), messages, constants.ownerStr());
 		
 		//check owner id is of form: id@googlewave.com
 		if(digest.getGooglegroupsId() != null && !"".equals(digest.getGooglegroupsId()) && digest.getGooglegroupsId().indexOf("@googlegroups.com") < 0){
 			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(constants.googlegroupsIdStr(), "your_group_id@googlegroups.com"));
 		}
 		
+	}
+
+	public static void verifyWaveId(String userWaveId,
+			SimpleMessages messages, String fieldName) throws IllegalArgumentException{
+		//check owner id is of form: id@googlewave.com
+		if(userWaveId.indexOf("@googlewave.com") < 0){
+			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com"));
+		}else{
+			String ownerStr = userWaveId.substring(0, userWaveId.indexOf("@"));
+			if(!FieldVerifier.isValidName(ownerStr)){
+				throw new IllegalArgumentException(messages.missingCreationParamExcptn(fieldName));
+			}
+		}
 	}
 }

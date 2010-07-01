@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class ProjectSelectWidget extends Composite {
 	@UiField
 	ListBox prjList;
-	
+
 	IDigestService digestService;
 	SimpleMessages messages;
 	SimpleConstants constants;
@@ -32,10 +32,10 @@ public class ProjectSelectWidget extends Composite {
 	IDigestUtils digestUtils;
 
 	private static ProjectSelectWidgetUiBinder uiBinder = GWT
-			.create(ProjectSelectWidgetUiBinder.class);
+	.create(ProjectSelectWidgetUiBinder.class);
 
 	interface ProjectSelectWidgetUiBinder extends
-			UiBinder<Widget, ProjectSelectWidget> {
+	UiBinder<Widget, ProjectSelectWidget> {
 	}
 
 
@@ -51,42 +51,43 @@ public class ProjectSelectWidget extends Composite {
 		this.digestUtils = digestUtils;
 
 		final String userId = digestUtils.retrUserId();
-
 		DeferredCommand.addCommand(new Command() {
+
 			@Override
 			public void execute() {
-				try {
-					digestService.retrPrjectsPerUserId(userId, new AsyncCallback<JSONValue>() {
+				
+				
+			}});
+		try {
+			digestService.retrPrjectsPerUserId(userId, new AsyncCallback<JSONValue>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							Log.error("", caught);
-						}
-
-						@Override
-						public void onSuccess(JSONValue resultJsonValue) {
-							JSONObject resultJson = (JSONObject)resultJsonValue;
-							if(resultJson.containsKey("none")){
-								prjList.addItem("none","none");
-								prjList.setEnabled(false);
-								//								reportPanel.add(new HTML("User " + userId + " doesn't have any digests"));
-							}else{
-								Set<String> keys = resultJson.keySet();
-								for(String key : keys){
-									prjList.addItem(key + " - " + resultJson.get(key).isString().stringValue(),key);
-								}
-								// Create a callback to be called when the visualization API
-								// has been loaded.
-								onProjectsRetrCallback.run();
-							}
-						}
-					});
-				} catch (RequestException e) {
-					Log.error("", e);
+				@Override
+				public void onFailure(Throwable caught) {
+					Log.error("", caught);
 				}
-			}
-		});
 
+				@Override
+				public void onSuccess(JSONValue resultJsonValue) {
+					JSONObject resultJson = (JSONObject)resultJsonValue;
+					if(resultJson.containsKey("none")){
+						prjList.addItem("none","");
+						prjList.setEnabled(false);
+						//								reportPanel.add(new HTML("User " + userId + " doesn't have any digests"));
+					}else{
+						prjList.clear();
+						Set<String> keys = resultJson.keySet();
+						for(String key : keys){
+							prjList.addItem(key + " - " + resultJson.get(key).isString().stringValue(),key);
+						}
+						// Create a callback to be called when the visualization API
+						// has been loaded.
+						onProjectsRetrCallback.run();
+					}
+				}
+			});
+		} catch (RequestException e) {
+			Log.error("", e);
+		}
 
 	}
 

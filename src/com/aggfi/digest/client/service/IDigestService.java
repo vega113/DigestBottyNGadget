@@ -30,4 +30,16 @@ public interface IDigestService {
 	void addDigestManager(String projectId, String managerId,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
+	void removeDigestManager(String projectId, String managerId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void addDefaultParticipant(String projectId, String participantId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void addDefaultTag(String projectId, String tag,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void addAutoTag(String projectId, String tag, String regex,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
 }

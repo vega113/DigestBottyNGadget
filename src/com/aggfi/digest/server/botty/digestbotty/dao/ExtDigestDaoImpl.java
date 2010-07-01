@@ -12,6 +12,7 @@ import javax.jdo.Query;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.DigestDaoImpl;
+import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.google.inject.Inject;
 
 public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
@@ -71,13 +72,26 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 	@Override
 	public List<ExtDigest> retrDigestsByOwnerOrManagerId(String userId) {
 		PersistenceManager pm = pmf.getPersistenceManager();
-		List<ExtDigest> extDigests = null;
+		List<AdminConfig> adminConfigs = null;
+		List<ExtDigest> extDigests = new LinkedList<ExtDigest>();
 		try {
-			Query query = pm.newQuery(ExtDigest.class);
+			Query query = pm.newQuery(AdminConfig.class);
 			query.declareParameters("String userId");
 			query.setFilter("managers.contains(userId)");
-			extDigests = new LinkedList((List<ExtDigest>) query.execute(userId));
+			adminConfigs = (List<AdminConfig>) query.execute(userId);
+			List projectIds = new LinkedList<String>();
+			for(AdminConfig adminConfig : adminConfigs){
+				projectIds.add(adminConfig.getId());
+			}
 			
+			Query query1 = pm.newQuery(ExtDigest.class);
+			query1.declareImports("import java.util.List");
+			query1.declareParameters("List projectIds");
+			query1.setFilter("projectIds.contains(projectId)");
+			if (projectIds.size() > 0) {
+				extDigests = new LinkedList((List<ExtDigest>) query1
+						.execute(projectIds));
+			}
 			List<ExtDigest> extDigestsOwnerList = retrDigestsByOwnerId(userId);
 			for(ExtDigest d : extDigestsOwnerList){
 				if(!extDigests.contains(d)){

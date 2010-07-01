@@ -90,7 +90,7 @@ public class CreateDigest extends Command {
 			createFAQ(extDigest,isPublicOnCreate);
 			
 			String message = "Success! You have " + numOfOwnerDigests + " digests. Maximum number of Digests per owner is: " + System.getProperty("MAX_DIGESTS") + 
-			".\nDigest wave was created and you were added as participant.";
+			".Digest wave was created and you were added as participant.";
 			output = new Output(installerUrl +extDigest.getProjectId(), digestWaveId, projectName, projectId,robotAddress , message );
 		} catch (IOException e) {
 			LOG.log(Level.SEVERE,"",e);
@@ -106,7 +106,7 @@ public class CreateDigest extends Command {
 			return json;
 		}
 		LOG.info("create_digest output: " + output.toString());
-		json.put("result", util.toJson(output));
+		json.put("result", util.toJson(output.message));
 		
 		LOG.exiting(this.getClass().getName(), "execute()");
 		return json;
@@ -248,6 +248,7 @@ public class CreateDigest extends Command {
 		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_CREATED_MSG",projectId + "-digest",rpcUrl);
 		if (isPublicOnCreate) {
 			newWavelet.getParticipants().add("public@a.gwave.com");
+			adminConfigDao.addDefaultParticipant(projectId, "public@a.gwave.com");
 		}
 		newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
 		newWavelet.setTitle(projectName  + " Digest Wave");

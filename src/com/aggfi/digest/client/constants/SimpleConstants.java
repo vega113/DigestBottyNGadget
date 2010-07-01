@@ -17,6 +17,7 @@
 package com.aggfi.digest.client.constants;
 
 import com.google.gwt.i18n.client.Constants;
+import com.google.gwt.i18n.client.Constants.DefaultIntValue;
 
 /**
  * Interface that can be used to read constants from a properties file.
@@ -26,8 +27,15 @@ import com.google.gwt.i18n.client.Constants;
  */
 public interface SimpleConstants extends Constants {
 
+	String createTabStr();
+	String adminTabStr();
+	String reportTabStr();
+	String aboutTabStr();
+	
+	String aboutDigestbottyStr();
 	String instructionsHeaderStr();
-	String instrutctionsStr();
+	String contactInfoValueStr();
+	String contactInfoCaptionStr();
 
 	
 	String ownerStr();
@@ -108,7 +116,12 @@ public interface SimpleConstants extends Constants {
 
 	String googlegroupsIdExmpl();
 	
-	
+	@DefaultStringValue(value="Manager Wave Id")
+	String managerWaveIdFieldName();
+	@DefaultStringValue(value="Default Participant Wave Id")
+	String defaultParticipantWaveIdFieldName();
+	@DefaultStringValue(value="The field should be in the form of \"your_wave_id@googlewave.com\"")
+	String waveIdFromExmpl();
 
 	String isPublicQuestion();
 
@@ -132,4 +145,36 @@ public interface SimpleConstants extends Constants {
 	//ui titles
 	
 	String removeMeStr();
+	@DefaultStringValue(value="add")
+	String addBtnName();
+	
+	String selectDigestStr();
+	String selectReportTypeStr();
+	String setUpDefaultParticipantsStr();
+	String setUpDefaultTagsStr();
+	String setUpAutoTagging();
+	String setUpDigestManagers();
+	
+	String tagStr();
+	String regexStr();
+	
+	String newWavesLast14Days();
+	String breakDown4AllTags();
+	
+	String retrieveingDataStr();
+	
+	String defaultTagExpl();
+	String autoTagExpl();
+	String managersExpl();
+	String defaultParticipantExpl();
+	
+	//size
+	@DefaultStringValue(value="520px")
+	String basicWidthStr();
+	
+	@DefaultIntValue(value=520)
+	int basicWidthInt();
+	@DefaultIntValue(value=380)
+	int basicReportHeightInt();
+	
 }

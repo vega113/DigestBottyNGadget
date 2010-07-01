@@ -4,12 +4,14 @@
 	xmlns:my="urn:import:com.aggfi.digest.client.ui">
 	<ui:with field='res'
 		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.SimpleConstants' />
 	<g:HTMLPanel>
-		<g:VerticalPanel width="400px">
+		<g:VerticalPanel width='{constants.basicWidthStr}' stylePrimaryName='{res.globalCSS.highlightRow}'>
 			<g:VerticalPanel>
 				<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
 				<g:HorizontalPanel>
-					<g:CaptionPanel captionText='Select Report type'>
+					<g:CaptionPanel captionText='{constants.selectReportTypeStr}'>
 						<g:HorizontalPanel>
 							<g:HTML width="10px"></g:HTML>
 							<g:ListBox ui:field="reportTypesList"></g:ListBox>

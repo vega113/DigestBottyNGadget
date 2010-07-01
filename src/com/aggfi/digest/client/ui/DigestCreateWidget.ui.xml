@@ -3,12 +3,14 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:digest="url:import:com.aggfi.digestbotty.gadget.client.ui">
 	<ui:with field='res'
 		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.SimpleConstants' />
 	<g:HTMLPanel>
 		<g:DecoratorPanel>
-			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
-				<g:HTMLPanel>
+			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}' width='{constants.basicWidthStr}'>
+				<g:cell>
 					<g:FlexTable ui:field="createGadgetFlexTbl"></g:FlexTable>
-				</g:HTMLPanel>
+				</g:cell>
 				<g:HorizontalPanel>
 					<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
 						<g:HorizontalPanel>

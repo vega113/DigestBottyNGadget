@@ -1,0 +1,20 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:digest="url:import:com.aggfi.digestbotty.gadget.client.ui">
+	<ui:with field='res'
+		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.SimpleConstants' />
+	<g:HTMLPanel>
+
+		<g:VerticalPanel width='{constants.basicWidthStr}'
+			stylePrimaryName='{res.globalCSS.highlightRow}'>
+			<g:CaptionPanel captionText='About DigestBotty'>
+				<g:HTML ui:field="aboutDigestBottyPnl"></g:HTML>
+			</g:CaptionPanel>
+			<g:CaptionPanel captionText='{constants.contactInfoCaptionStr}'>
+				<g:HTML ui:field="contactInfoPnl"></g:HTML>
+			</g:CaptionPanel>
+		</g:VerticalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

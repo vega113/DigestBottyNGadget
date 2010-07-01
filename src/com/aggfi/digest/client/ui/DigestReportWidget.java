@@ -44,8 +44,10 @@ import com.google.gwt.visualization.client.visualizations.PieChart;
 import com.google.gwt.visualization.client.visualizations.PieChart.Options;
 import com.google.inject.Inject;
 
-public class DigestReportWidget extends Composite {
+public class DigestReportWidget extends Composite implements RunnableOnTabSelect{
 
+	private static final String NEW_WAVES = "NEW_WAVES";
+	private static final String TAGS_BREAKDOWN = "TAGS_BREAKDOWN";
 	private static DigestReportWidgetUiBinder uiBinder = GWT
 			.create(DigestReportWidgetUiBinder.class);
 
@@ -67,6 +69,8 @@ public class DigestReportWidget extends Composite {
 	SimpleConstants constants;
 	GlobalResources resources;
 	IDigestUtils digestUtils;
+	protected Runnable onProjectsLoadCallback;
+	private Runnable runOnTabSelect;
 	
 	
 
@@ -81,11 +85,11 @@ public class DigestReportWidget extends Composite {
 		this.resources = resources;
 		this.digestUtils = digestUtils;
 		
-		reportTypesList.addItem("New Waves from Last 14 Days","NEW_WAVES");
-		reportTypesList.addItem("Breakdown for All Tags","TAGS_BREAKDOWN");
+		reportTypesList.addItem(constants.newWavesLast14Days(),NEW_WAVES);
+		reportTypesList.addItem(constants.breakDown4AllTags(),TAGS_BREAKDOWN);
 		reportTypesList.setItemSelected(1, true);
 		
-		Runnable onProjectsLoadCallback = new Runnable() {
+		onProjectsLoadCallback = new Runnable() {
 			
 			@Override
 			public void run() {
@@ -94,7 +98,21 @@ public class DigestReportWidget extends Composite {
 			}
 		};
 		
+		runOnTabSelect = new Runnable() {
+			
+			@Override
+			public void run() {
+				initReportWidget();
+				
+			}
+		};
+		
+	}
+
+
+	private void initReportWidget() {
 		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, digestUtils, onProjectsLoadCallback);
+		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
 		prjList = this.projectSelectWidget.getPrjList();
 		prjList.addChangeHandler(new ChangeHandler() {
@@ -103,7 +121,6 @@ public class DigestReportWidget extends Composite {
 				handleOnSelectPrjList(event);
 			}
 		});
-		
 	}
 	
 
@@ -162,10 +179,10 @@ public class DigestReportWidget extends Composite {
 
 	private Options createTagsBreakdownOptions(SimpleConstants constants) {
 	    Options options = Options.create();
-	    options.setWidth(520);
-	    options.setHeight(440);
+	    options.setWidth(constants.basicWidthInt() - 10);
+	    options.setHeight(constants.basicReportHeightInt());
 	    options.set3D(true);
-	    options.setTitle("Breakdown for All Tags");
+	    options.setTitle(constants.breakDown4AllTags());
 	    return options;
 	  }
 
@@ -302,9 +319,9 @@ public class DigestReportWidget extends Composite {
 
 					private com.google.gwt.visualization.client.visualizations.LineChart.Options createPostCountsOptions(SimpleConstants constants) {
 						com.google.gwt.visualization.client.visualizations.LineChart.Options options = com.google.gwt.visualization.client.visualizations.LineChart.Options.create();
-					    options.setWidth(520);
-					    options.setHeight(440);
-					    options.setTitle("New Waves from Last 14 Days");
+					    options.setWidth(constants.basicWidthInt());
+					    options.setHeight(constants.basicReportHeightInt());
+					    options.setTitle(constants.newWavesLast14Days());
 					    return options;
 					  }
 
@@ -325,13 +342,13 @@ public class DigestReportWidget extends Composite {
 	  
 
 	  void handleOnSelectPrjList(ChangeEvent event){
-		  if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals("TAGS_BREAKDOWN") ){
+		  if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(TAGS_BREAKDOWN) ){
 			  reportPanel.clear();
-			  reportPanel.add(new HTML("Retrieving data..."));
+			  reportPanel.add(new HTML(constants.retrieveingDataStr()));
 			  createTagsBreakdownPieChart(messages,constants,resources,digestService,digestUtils,reportPanel);
-		  }else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals("NEW_WAVES") ){
+		  }else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(NEW_WAVES) ){
 			  reportPanel.clear();
-			  reportPanel.add(new HTML("Retrieving data..."));
+			  reportPanel.add(new HTML(constants.retrieveingDataStr()));
 			  drawPostCountsLineChart(messages,constants,resources,digestService,digestUtils,reportPanel);
 		  }
 	  }
@@ -357,5 +374,11 @@ public class DigestReportWidget extends Composite {
 		// Load the visualization api, passing the onLoadCallback to be called
 		// when loading is done.
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, PieChart.PACKAGE,LineChart.PACKAGE );
+	}
+
+
+	@Override
+	public Runnable getRunOnTabSelect() {
+		return runOnTabSelect;
 	}
 }

@@ -5,7 +5,6 @@
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/aopalliance.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gson-1.4.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-2.0.jar" sourcepath="/home/vega/Downloads/q/guice/guice-2.0-src.zip"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-assistedinject-2.0.jar"/>
@@ -22,14 +21,10 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guice-throwingproviders-2.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jsonrpc.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/oauth-20090617.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mail.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/activation.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-model-20100129.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-robot-api-20100408.jar" sourcepath="war/WEB-INF/lib/wave-robot-api-20100408-src.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jdo2-api-2.3-eb.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jsr107cache-1.1.jar"/>
-	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 	<classpathentry kind="lib" path="/home/vega/eclipse/plugins/com.google.gwt.eclipse.sdkbundle.2.0.3_2.0.3.v201002191036/gwt-2.0.3/gwt-user.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/home/vega/eclipse/plugins/com.google.gwt.eclipse.sdkbundle.2.0.3_2.0.3.v201002191036/gwt-2.0.3/doc/javadoc/"/>
@@ -44,5 +39,10 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/DigestAdminGadget/war/WEB-INF/lib/gwt-visualization-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-codec-1.4.jar" sourcepath="war/WEB-INF/lib/commons-codec-1.4-src.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gson.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/oauth-20090617.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-model-20100528.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-robot-api-20100528.jar" sourcepath="war/WEB-INF/lib/wave-robot-api-20100528-src.jar"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

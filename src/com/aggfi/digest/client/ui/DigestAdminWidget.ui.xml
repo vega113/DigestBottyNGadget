@@ -3,68 +3,74 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:with field='res'
 		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.SimpleConstants' />
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
-		<g:CaptionPanel  captionText='Set up Default Participants'>
-			<g:VerticalPanel>
-				<g:HorizontalPanel>
-					<g:TextBox ui:field="addDefaultParticipantBox"></g:TextBox>
-					<g:Button ui:field="addDefaultParticipantBtn">add</g:Button>
-				</g:HorizontalPanel>
-				<g:cell height="10px">
-					<g:HTML></g:HTML>
-				</g:cell>
-					<g:VerticalPanel ui:field="defaultParticipantsPanel" width='380px'>
+		<g:VerticalPanel width='{constants.basicWidthStr}' stylePrimaryName='{res.globalCSS.highlightRow}'>
+			<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
+			<g:CaptionPanel captionText='{constants.setUpDefaultParticipantsStr}'>
+				<g:VerticalPanel>
+					<g:HorizontalPanel>
+						<g:TextBox ui:field="addDefaultParticipantBox" title='{constants.defaultParticipantExpl}'></g:TextBox>
+						<g:Button ui:field="addDefaultParticipantBtn" text='{constants.addBtnName}'></g:Button>
+					</g:HorizontalPanel>
+					<g:cell height="10px">
+						<g:HTML></g:HTML>
+					</g:cell>
+					<g:VerticalPanel ui:field="defaultParticipantsPanel">
 					</g:VerticalPanel>
-			</g:VerticalPanel>
-		</g:CaptionPanel>
-		
-		<g:CaptionPanel  captionText='Set up Default Tags'>
-			<g:VerticalPanel>
-				<g:HorizontalPanel>
-					<g:TextBox ui:field="addDefaultTagBox"></g:TextBox>
-					<g:Button ui:field="addDefaultTagBtn">add</g:Button>
-				</g:HorizontalPanel>
-				<g:cell height="10px">
-					<g:HTML></g:HTML>
-				</g:cell>
-					<g:VerticalPanel ui:field="defaultTagsPanel" width='380px'>
+				</g:VerticalPanel>
+			</g:CaptionPanel>
+
+			<g:CaptionPanel captionText='{constants.setUpDefaultTagsStr}'>
+				<g:VerticalPanel>
+					<g:HorizontalPanel>
+						<g:TextBox ui:field="addDefaultTagBox" title='{constants.defaultTagExpl}'></g:TextBox>
+						<g:Button ui:field="addDefaultTagBtn" text='{constants.addBtnName}'></g:Button>
+					</g:HorizontalPanel>
+					<g:cell height="10px">
+						<g:HTML></g:HTML>
+					</g:cell>
+					<g:VerticalPanel ui:field="defaultTagsPanel">
 					</g:VerticalPanel>
-			</g:VerticalPanel>
-		</g:CaptionPanel>
-		
-		<g:CaptionPanel  captionText='Set up Auto-tagging'>
-			<g:VerticalPanel>
-				<g:HorizontalPanel>
-					<g:Label>Tag:</g:Label>
-					<g:HTML width="4px"></g:HTML>
-					<g:TextBox ui:field="addAutoTagNameBox"></g:TextBox>
-					<g:HTML width="10px"></g:HTML>
-					<g:Label>Regex:</g:Label>
-					<g:HTML width="4px"></g:HTML>
-					<g:TextBox ui:field="addAutoTagValBox"></g:TextBox>
-					<g:Button ui:field="addAutoTagBtn">add</g:Button>
-				</g:HorizontalPanel>
-				<g:cell height="10px">
-					<g:HTML></g:HTML>
-				</g:cell>
-					<g:VerticalPanel ui:field="autoTagsPanel" width='380px'>
+				</g:VerticalPanel>
+			</g:CaptionPanel>
+
+			<g:CaptionPanel captionText='{constants.setUpAutoTagging}'>
+				<g:VerticalPanel>
+					<g:HorizontalPanel>
+						<g:Label text='{constants.tagStr}'></g:Label>
+						<g:Label>:</g:Label>
+						<g:HTML width="4px"></g:HTML>
+						<g:TextBox ui:field="addAutoTagNameBox" title='{constants.autoTagExpl}'></g:TextBox>
+						<g:HTML width="10px"></g:HTML>
+						<g:Label text='{constants.regexStr}'></g:Label>
+						<g:Label>:</g:Label>
+						<g:HTML width="4px"></g:HTML>
+						<g:TextBox ui:field="addAutoTagValBox" title='{constants.autoTagExpl}'></g:TextBox>
+						<g:Button ui:field="addAutoTagBtn" text='{constants.addBtnName}'></g:Button>
+					</g:HorizontalPanel>
+					<g:cell height="10px">
+						<g:HTML></g:HTML>
+					</g:cell>
+					<g:VerticalPanel ui:field="autoTagsPanel">
 					</g:VerticalPanel>
-			</g:VerticalPanel>
-		</g:CaptionPanel>
-		
-		<g:CaptionPanel  captionText='Set up Digest Managers'>
-			<g:VerticalPanel>
-				<g:HorizontalPanel>
-					<g:TextBox ui:field="addManagerBox"></g:TextBox>
-					<g:Button ui:field="addManagergBtn">add</g:Button>
-				</g:HorizontalPanel>
-				<g:cell height="10px">
-					<g:HTML></g:HTML>
-				</g:cell>
-					<g:VerticalPanel ui:field="managersPanel" width='380px'>
+				</g:VerticalPanel>
+			</g:CaptionPanel>
+
+			<g:CaptionPanel captionText='{constants.setUpDigestManagers}'>
+				<g:VerticalPanel>
+					<g:HorizontalPanel>
+						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}'></g:TextBox>
+						<g:Button ui:field="addManagergBtn" text='{constants.addBtnName}'></g:Button>
+					</g:HorizontalPanel>
+					<g:cell height="10px">
+						<g:HTML></g:HTML>
+					</g:cell>
+					<g:VerticalPanel ui:field="managersPanel">
 					</g:VerticalPanel>
-			</g:VerticalPanel>
-		</g:CaptionPanel>
+				</g:VerticalPanel>
+			</g:CaptionPanel>
+		</g:VerticalPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

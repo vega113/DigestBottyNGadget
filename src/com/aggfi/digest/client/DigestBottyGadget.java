@@ -52,7 +52,7 @@ public class DigestBottyGadget implements EntryPoint {
 	}
 	
 	public void initRemoteLogger(AbsolutePanel panel){
-		//		Log.setUncaughtExceptionHandler();
+		Log.setUncaughtExceptionHandler();
 		if (panel != null) {
 			panel.add (Log.getLogger(DivLogger.class).getWidget());
 			Log.info("Logger initialized: " + Log.class.getName());

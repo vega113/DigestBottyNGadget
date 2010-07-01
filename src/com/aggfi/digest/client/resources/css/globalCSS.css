@@ -18,6 +18,9 @@
 
 .highlightRow {
 	background: #c9e2fc;
+	font-family: fantasy;
+	font-size: 13;
+	color:  DarkSkyBlue ;
 }
 
 .regularRow {
@@ -50,8 +53,7 @@
 
 .pretty {
 			background-color: #c9e2fc;
-			height: 32px;
+			height: 38px;
 		}
 .alignRight{
-	width: 270px;
 }

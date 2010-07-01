@@ -3,6 +3,17 @@ package com.aggfi.digest.server.botty.google.forumbotty.admin;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddDigestManager;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
+import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.AddDefaultParticipant;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.AddDefaultTag;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.GetAdminConfig;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.GetPostCounts;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.GetTagCounts;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.RemoveAutoTag;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.RemoveDefaultParticipant;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.RemoveDefaultTag;
 
 
 public enum CommandType {
@@ -24,6 +35,7 @@ public enum CommandType {
   GET_POST_COUNTS(GetPostCounts.class),
   ADD_DIGEST_MANAGER(AddDigestManager.class),
   GET_PROJECTS_PER_USER(GetProjectsPerUser.class),
+  REMOVE_DIGEST_MANAGER(RemoveDigestManager.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

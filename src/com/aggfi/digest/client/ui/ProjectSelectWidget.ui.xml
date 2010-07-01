@@ -3,8 +3,10 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:with field='res'
 		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.SimpleConstants' />
 	<g:HTMLPanel>
-		<g:CaptionPanel captionText='Select Digest'>
+		<g:CaptionPanel captionText='{constants.selectDigestStr}'>
 					<g:HorizontalPanel>
 						<g:HTML width="10px"></g:HTML>
 						<g:ListBox ui:field="prjList"></g:ListBox>

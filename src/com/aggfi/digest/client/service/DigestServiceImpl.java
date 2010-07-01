@@ -116,7 +116,7 @@ public class DigestServiceImpl implements IDigestService {
 		paramsJson.put("projectId", new JSONString(projectId));
 		paramsJson.put("tag", new JSONString(tag));
 		postDataJson.put("params", paramsJson);
-		postDataJson.put("method", new JSONString("REMOVE_DEFAULT_TAG"));
+		postDataJson.put("method", new JSONString("REMOVE_AUTO_TAG"));
 		
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);
@@ -132,7 +132,23 @@ public class DigestServiceImpl implements IDigestService {
 		paramsJson.put("projectId", new JSONString(projectId));
 		paramsJson.put("tag", new JSONString(tag));
 		postDataJson.put("params", paramsJson);
-		postDataJson.put("method", new JSONString("REMOVE_AUTO_TAG"));
+		postDataJson.put("method", new JSONString("REMOVE_DEFAULT_TAG"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+		
+	}
+	
+	@Override
+	public void removeDigestManager(String projectId, String managerId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("managerId", new JSONString(managerId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("REMOVE_DIGEST_MANAGER"));
 		
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);
@@ -154,6 +170,35 @@ public class DigestServiceImpl implements IDigestService {
 		
 	}
 
+	@Override
+	public void addDefaultParticipant(String projectId,String participantId, AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("participantId", new JSONString(participantId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_DEFAULT_PARTICIPANT"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+		
+	}
+	
+	@Override
+	public void addDefaultTag(String projectId,String tag, AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("tag", new JSONString(tag));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_DEFAULT_TAG"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+		
+	}
 
 
 	@Override
@@ -164,5 +209,24 @@ public class DigestServiceImpl implements IDigestService {
 		postDataJson.put("method", new JSONString("CREATE_DIGEST"));
 		JsParams params = (JsParams) postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,callback,params);
+	}
+
+
+
+	@Override
+	public void addAutoTag(String projectId, String tag, String regex,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("tag", new JSONString(tag));
+		paramsJson.put("regex", new JSONString(regex));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_AUTO_TAG"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+		
 	}
 }

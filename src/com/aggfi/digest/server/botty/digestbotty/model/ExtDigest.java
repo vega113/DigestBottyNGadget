@@ -76,10 +76,6 @@ public class ExtDigest  extends Digest{
 	
 	@Persistent
 	@Expose
-	private Set<String> managers = new HashSet<String>();
-	
-	@Persistent
-	@Expose
 	private int maxDigests;
 
 	public String getDescription() {
@@ -146,22 +142,6 @@ public class ExtDigest  extends Digest{
 		this.ownerId = ownerId;
 	}
 
-	public Set<String> getManagers() {
-		return managers;
-	}
-
-	public void setManagers(Set<String> managers) {
-		this.managers = managers;
-	}
-	
-	public void addManager(String userId) {
-	    if (this.managers.contains(userId)) {
-	      return;
-	    }
-	    this.managers.add(userId);
-	  }
-
-
 	public String getAuthor() {
 		return author;
 	}
@@ -184,7 +164,7 @@ public class ExtDigest  extends Digest{
 				+ ", forumSiteUrl=" + forumSiteUrl + ", googlegroupsId="
 				+ googlegroupsId + ", installerIconUrl=" + installerIconUrl
 				+ ", installerThumbnailUrl=" + installerThumbnailUrl
-				+ ", installerUrl=" + installerUrl + ", managers=" + managers
+				+ ", installerUrl=" + installerUrl
 				+ ", name=" + name + ", ownerId=" + ownerId
 				+ ", robotThumbnailUrl=" + robotThumbnailUrl
 				+ ", getCreated()=" + getCreated() + ", getDomain()="

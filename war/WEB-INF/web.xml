@@ -18,6 +18,14 @@
     <servlet-name>install</servlet-name>
     <jsp-file>/install.jsp</jsp-file>
   </servlet>
+  <servlet>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
+</servlet>
+<servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/digestbottygadget/gwt-log</url-pattern>
+</servlet-mapping>
   <servlet-mapping>
     <servlet-name>install</servlet-name>
     <url-pattern>/install</url-pattern>

@@ -44,7 +44,7 @@ import com.google.inject.Inject;
  * @author vega
  *
  */
-public class DigestCreateWidget extends Composite {
+public class DigestCreateWidget extends Composite implements RunnableOnTabSelect{
 
 	private static DigestCreateWidgetUiBinder uiBinder = GWT
 	.create(DigestCreateWidgetUiBinder.class);
@@ -120,8 +120,10 @@ public class DigestCreateWidget extends Composite {
 							public void onSuccess(JSONValue resultJsonValue) {
 								JSONObject resultJson = resultJsonValue.isObject();
 								String outMessage = null;
-								if(resultJson.isObject().containsKey("message")){
+								if(resultJson != null && resultJson.isObject() != null && resultJson.isObject().containsKey("message")){
 									outMessage = resultJson.isObject().get("message").isString().stringValue();
+								}else if(resultJsonValue.isString() != null){
+									outMessage = resultJsonValue.isString().stringValue();
 								}else{
 									//cannot happen
 									throw new AssertionError ("No message body in create digest - it's cannot happen!");
@@ -163,30 +165,30 @@ public class DigestCreateWidget extends Composite {
 		int row = 0;
 		RowFormatter rowFormatter = tbl.getRowFormatter();
 		
-		SimplePanel parentDsPanel = new SimplePanel();
-		parentDsPanel.setStylePrimaryName(resources.globalCSS().highlightRow());
-		HTML innerDS = new HTML(constants.instrutctionsStr());
-		innerDS.setStylePrimaryName(resources.globalCSS().regularRow());
-//		innerDS.setWidth("575px");
-		instructionsDsPanel = new DisclosurePanel(constants.instructionsHeaderStr());
-		instructionsDsPanel.add(innerDS);
-		instructionsDsPanel.setAnimationEnabled(true);
-		parentDsPanel.add(instructionsDsPanel);
-		tbl.setWidget(0, 0, parentDsPanel);
-		tbl.getFlexCellFormatter().setColSpan(0, 0, 2);
-		row++;
-
-		Label fieldNameLbl = new Label(constants.fieldNameStr());
-//		fieldNameLbl.setWidth("80px");
-//		Label fieldValaueLbl = new Label(constants.fieldValueStr());
-//		fieldValaueLbl.setWidth("260px");
-//		Label fieldExampleLbl = new Label(constants.fieldExampleStr());
-		tbl.setWidget(row, 0, fieldNameLbl);
-//		tbl.setWidget(row, 1, fieldValaueLbl);
-//		tbl.setWidget(row, 2, fieldExampleLbl);
-		rowFormatter.addStyleName(row, resources.globalCSS().regularRow());
-		tbl.getFlexCellFormatter().setColSpan(1, 0, 2);
-		row++;
+//		SimplePanel parentDsPanel = new SimplePanel();
+//		parentDsPanel.setStylePrimaryName(resources.globalCSS().highlightRow());
+//		HTML innerDS = new HTML(constants.instrutctionsStr());
+//		innerDS.setStylePrimaryName(resources.globalCSS().regularRow());
+////		innerDS.setWidth("575px");
+//		instructionsDsPanel = new DisclosurePanel(constants.instructionsHeaderStr());
+//		instructionsDsPanel.add(innerDS);
+//		instructionsDsPanel.setAnimationEnabled(true);
+//		parentDsPanel.add(instructionsDsPanel);
+//		tbl.setWidget(0, 0, parentDsPanel);
+//		tbl.getFlexCellFormatter().setColSpan(0, 0, 2);
+//		row++;
+//
+//		Label fieldNameLbl = new Label(constants.fieldNameStr());
+////		fieldNameLbl.setWidth("80px");
+////		Label fieldValaueLbl = new Label(constants.fieldValueStr());
+////		fieldValaueLbl.setWidth("260px");
+////		Label fieldExampleLbl = new Label(constants.fieldExampleStr());
+//		tbl.setWidget(row, 0, fieldNameLbl);
+////		tbl.setWidget(row, 1, fieldValaueLbl);
+////		tbl.setWidget(row, 2, fieldExampleLbl);
+//		rowFormatter.addStyleName(row, resources.globalCSS().regularRow());
+//		tbl.getFlexCellFormatter().setColSpan(1, 0, 2);
+//		row++;
 		
 		ClearWarningClickHandler clearWarningClickHandler = new ClearWarningClickHandler(resources);
 		
@@ -312,21 +314,21 @@ public class DigestCreateWidget extends Composite {
 		tbl.setWidget(row, 1, googlegroupsIdVal);
 		//tbl.setWidget(row, 2, googlegroupsIdExmpl);
 		row++;
-
+		
 		String[] exampleStrs = {constants.ownerExmpl(),constants.authorExmpl(),constants.projectIdExmpl(),constants.domainExmpl(),
 					constants.digestNameExmpl(),constants.descriptionExmpl(),constants.installerThumbnailUrlExmpl(),
 					constants.toolbarIconUrlExmpl(),constants.robotThumbnailUrlExmpl(),constants.forumSiteUrlExmpl(),
 					constants.googlegroupsIdExmpl()};
 
-		for(int i = 2; i < row; i++){
+		for(int i = 0; i < row; i++){
 			if(i%2 == 0){
 				rowFormatter.addStyleName(i, resources.globalCSS().highlightRow());
 			}else{
 				rowFormatter.addStyleName(i, resources.globalCSS().regularRow());
 			}
 			Widget w = tbl.getWidget(i, 1);
-			w.setWidth(constants.valueWidgetSize() + "px");
-			w.setTitle( w.getTitle() + " " + constants.exampleWord() + "\"" +  exampleStrs[i-2] + "\"");
+			w.setWidth(((int)constants.basicWidthInt()/1.5) + "px");
+			w.setTitle( w.getTitle() + " " + constants.exampleWord() + "\"" +  exampleStrs[i] + "\"");
 		}
 		ColumnFormatter colFormatter = tbl.getColumnFormatter();
 		colFormatter.addStyleName(1, resources.globalCSS().inputRegular());
@@ -334,7 +336,7 @@ public class DigestCreateWidget extends Composite {
 
 	public static JsDigest initExtDigestFromFields(FlexTable w,CheckBox box) throws IllegalArgumentException{
 		
-		int row=2;
+		int row=0;
 		String ownerId = getStrFromTxtBox(row,w); row++;
 		String authorName = getStrFromTxtBox(row,w);row++;
 		String projectId = getStrFromTxtBox(row,w);row++;
@@ -375,5 +377,13 @@ public class DigestCreateWidget extends Composite {
 	private static String getStrFromTxtBox(int row,FlexTable widget ){
 		String out = ((TextBox)widget.getWidget(row, 1)).getText();
 		return out;
+	}
+
+
+
+	@Override
+	public Runnable getRunOnTabSelect() {
+		// no init on tab load here
+		return null;
 	}
 }

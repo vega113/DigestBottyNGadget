@@ -23,4 +23,6 @@ public interface AdminConfigDao {
 
   public abstract void addDigestManager(String projectId, String managerId);
 
+  public abstract void removeDigestManager(String projectId, String managerId);
+
 }
