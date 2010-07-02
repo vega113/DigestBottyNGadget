@@ -90,7 +90,7 @@ public class CreateDigest extends Command {
 			createFAQ(extDigest,isPublicOnCreate);
 			
 			String message = "Success! You have " + numOfOwnerDigests + " digests. Maximum number of Digests per owner is: " + System.getProperty("MAX_DIGESTS") + 
-			".Digest wave was created and you were added as participant.";
+			". Digest wave was created and you were added as participant.";
 			output = new Output(installerUrl +extDigest.getProjectId(), digestWaveId, projectName, projectId,robotAddress , message );
 		} catch (IOException e) {
 			LOG.log(Level.SEVERE,"",e);

@@ -29,7 +29,6 @@ public class InstallServlet extends HttpServlet{
 		this.extDigestDao = extDigestDao;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -42,7 +41,7 @@ public class InstallServlet extends HttpServlet{
 			String projectId = request.getParameter("id");
 			
 			if (util.isNullOrEmpty(projectId) ) {
-			  throw new IllegalArgumentException("Missing required param: id (project id)");
+			  throw new IllegalArgumentException("Missing required param: id (Digest id)");
 			}
 			List<ExtDigest> digests = extDigestDao.retrDigestsByProjectId(projectId);
 			if(digests.size() > 1 ){
@@ -108,17 +107,5 @@ public class InstallServlet extends HttpServlet{
 			LOG.severe(e.toString() + "\n" + e.getMessage());
 		}
 	}
-
-//	private String collection2Str(Enumeration attributeNames) {
-//		StringBuffer b = new StringBuffer();
-//		try{
-//			while(true){
-//				b.append(" " + attributeNames.nextElement().toString());
-//			}
-//		}catch(Exception e){}
-//		return b.toString();
-//	}
-
-	
 }
 

@@ -65,6 +65,8 @@ public class FieldVerifier {
 		}
 		
 		verifyWaveId(digest.getOwnerId(), messages, constants.ownerStr());
+		String digestId = digest.getProjectId().split("-")[1];//because projectId is automatically prefixed with 'ownerId-' 
+		isFieldAlphaNumeric(messages,digestId,constants.projectIdStr());
 		
 		//check owner id is of form: id@googlewave.com
 		if(digest.getGooglegroupsId() != null && !"".equals(digest.getGooglegroupsId()) && digest.getGooglegroupsId().indexOf("@googlegroups.com") < 0){
@@ -83,6 +85,12 @@ public class FieldVerifier {
 			if(!FieldVerifier.isValidName(ownerStr)){
 				throw new IllegalArgumentException(messages.missingCreationParamExcptn(fieldName));
 			}
+		}
+	}
+	
+	public static void isFieldAlphaNumeric(SimpleMessages messages, String field, String fieldname){
+		if(field.split("\\W").length > 1 ){
+			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname));
 		}
 	}
 }

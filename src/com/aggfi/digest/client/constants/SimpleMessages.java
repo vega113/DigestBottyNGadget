@@ -28,8 +28,13 @@ public interface SimpleMessages extends Messages {
 
   String missingCreationParamExcptn(String msg);
   
+  String newDigestPostMenuStr(String digestName);
+  String addDigestFromToolbarStr(String digestName);
+  
   String incorrectFormParamExcptn(String param, String tmplt);
   String removingMsg(String participant);
 
   String removalSuccessMsg(String participantId);
+
+  String fieldShouldBeAlphaNumericExcptn(String fieldname);
 }

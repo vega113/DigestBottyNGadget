@@ -3,8 +3,6 @@
  */
 package com.aggfi.digest.client.ui;
 
-import java.util.Date;
-
 import com.aggfi.digest.client.constants.SimpleConstants;
 import com.aggfi.digest.client.constants.SimpleMessages;
 import com.aggfi.digest.client.model.JsDigest;
@@ -12,8 +10,6 @@ import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.IDigestService;
 import com.aggfi.digest.shared.FieldVerifier;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.dev.jjs.ast.js.JsonObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -30,10 +26,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.HTMLTable.ColumnFormatter;
@@ -44,7 +38,7 @@ import com.google.inject.Inject;
  * @author vega
  *
  */
-public class DigestCreateWidget extends Composite implements RunnableOnTabSelect{
+public class DigestCreateWidget extends Composite{
 
 	private static DigestCreateWidgetUiBinder uiBinder = GWT
 	.create(DigestCreateWidgetUiBinder.class);
@@ -62,8 +56,6 @@ public class DigestCreateWidget extends Composite implements RunnableOnTabSelect
 	PushButton submitBtn;
 	@UiField
 	HTML outputTxt;
-	//	@UiField
-	//	Label outputLbl;
 	@UiField
 	CheckBox isPublicBox;
 	@UiField
@@ -165,72 +157,39 @@ public class DigestCreateWidget extends Composite implements RunnableOnTabSelect
 		int row = 0;
 		RowFormatter rowFormatter = tbl.getRowFormatter();
 		
-//		SimplePanel parentDsPanel = new SimplePanel();
-//		parentDsPanel.setStylePrimaryName(resources.globalCSS().highlightRow());
-//		HTML innerDS = new HTML(constants.instrutctionsStr());
-//		innerDS.setStylePrimaryName(resources.globalCSS().regularRow());
-////		innerDS.setWidth("575px");
-//		instructionsDsPanel = new DisclosurePanel(constants.instructionsHeaderStr());
-//		instructionsDsPanel.add(innerDS);
-//		instructionsDsPanel.setAnimationEnabled(true);
-//		parentDsPanel.add(instructionsDsPanel);
-//		tbl.setWidget(0, 0, parentDsPanel);
-//		tbl.getFlexCellFormatter().setColSpan(0, 0, 2);
-//		row++;
-//
-//		Label fieldNameLbl = new Label(constants.fieldNameStr());
-////		fieldNameLbl.setWidth("80px");
-////		Label fieldValaueLbl = new Label(constants.fieldValueStr());
-////		fieldValaueLbl.setWidth("260px");
-////		Label fieldExampleLbl = new Label(constants.fieldExampleStr());
-//		tbl.setWidget(row, 0, fieldNameLbl);
-////		tbl.setWidget(row, 1, fieldValaueLbl);
-////		tbl.setWidget(row, 2, fieldExampleLbl);
-//		rowFormatter.addStyleName(row, resources.globalCSS().regularRow());
-//		tbl.getFlexCellFormatter().setColSpan(1, 0, 2);
-//		row++;
-		
 		ClearWarningClickHandler clearWarningClickHandler = new ClearWarningClickHandler(resources);
 		
 		Label ownerLbl = new Label(constants.ownerStr());
 		TextBox ownerVal = new TextBox();
 		ownerVal.setText("@googlewave.com");
 		ownerVal.addClickHandler(clearWarningClickHandler);
-//		Label ownerExmpl = new Label(constants.ownerExmpl());
 		ownerVal.setTitle(constants.ownerTitle());
 		tbl.setWidget(row, 0, ownerLbl);
 		tbl.setWidget(row, 1, ownerVal);
-		//tbl.setWidget(row, 2, ownerExmpl);
 		row++;
 
 		Label authorLbl = new Label(constants.authorStr());
 		TextBox authorVal = new TextBox();
 		authorVal.addClickHandler(clearWarningClickHandler);
-//		Label authorExmpl= new Label(constants.authorExmpl());
 		authorVal.setTitle(constants.authorTitle());
 		tbl.setWidget(row, 0, authorLbl);
 		tbl.setWidget(row, 1, authorVal);
-		//tbl.setWidget(row, 2, authorExmpl);
 		row++;
 
 		Label projectIdLbl = new Label(constants.projectIdStr());
 		TextBox projectIdVal = new TextBox();
 		projectIdVal.addClickHandler(clearWarningClickHandler);
-//		Label projectIdExmpl = new Label(constants.projectIdExmpl());  
 		projectIdVal.setTitle(constants.projectIdTitle());
 		tbl.setWidget(row, 0, projectIdLbl);
 		tbl.setWidget(row, 1, projectIdVal);
-		//tbl.setWidget(row, 2, projectIdExmpl);
 		row++;
 
 		Label domainLbl = new Label(constants.domainStr());
 		TextBox domainVal = new TextBox();
 		domainVal.addClickHandler(clearWarningClickHandler);
-//		Label domainExmpl = new Label(constants.domainExmpl()); 
 		domainVal.setTitle(constants.domainTitle());
 		tbl.setWidget(row, 0, domainLbl);
 		tbl.setWidget(row, 1, domainVal);
-		//tbl.setWidget(row, 2, domainExmpl);
 		domainVal.setText("googlewave.com");
 		domainVal.setStyleName(resources.globalCSS().readonly());
 		domainVal.addKeyPressHandler(new KeyPressHandler() {
@@ -247,72 +206,58 @@ public class DigestCreateWidget extends Composite implements RunnableOnTabSelect
 		Label digestNameLbl = new Label(constants.digestNameStr());
 		TextBox digestNameVal = new TextBox();
 		digestNameVal.addClickHandler(clearWarningClickHandler);
-//		Label digestNameExmpl = new Label(constants.digestNameExmpl()); 
 		digestNameVal.setTitle(constants.digestNameTitle());
 		tbl.setWidget(row, 0, digestNameLbl);
 		tbl.setWidget(row, 1, digestNameVal);
-		//tbl.setWidget(row, 2, digestNameExmpl);
 		row++;
 
 		Label descriptionLbl = new Label(constants.descriptionStr());
 		TextBox descriptionVal = new TextBox();
 		descriptionVal.addClickHandler(clearWarningClickHandler);
-//		Label descriptionExmpl = new Label(constants.descriptionExmpl()); 
 		descriptionVal.setTitle(constants.descriptionTitle());
 		tbl.setWidget(row, 0, descriptionLbl);
 		tbl.setWidget(row, 1, descriptionVal);
-		//tbl.setWidget(row, 2, descriptionExmpl);
 		row++;
 
 		Label installerThumbnailUrlLbl = new Label(constants.installerThumbnailUrlStr());
 		TextBox installerThumbnailUrlVal = new TextBox();
 		installerThumbnailUrlVal.addClickHandler(clearWarningClickHandler);
-//		Label installerThumbnailUrlExmpl = new Label(constants.installerThumbnailUrlExmpl());  
 		installerThumbnailUrlVal.setTitle(constants.installerThumbnailUrlTitle());
 		tbl.setWidget(row, 0, installerThumbnailUrlLbl);
 		tbl.setWidget(row, 1, installerThumbnailUrlVal);
-		//tbl.setWidget(row, 2, installerThumbnailUrlExmpl);
 		row++;
 
 		Label toolbarIconUrlLbl = new Label(constants.toolbarIconUrlStr());
 		TextBox toolbarIconUrlVal = new TextBox();
 		toolbarIconUrlVal.addClickHandler(clearWarningClickHandler);
-//		Label toolbarIconUrlExmpl = new Label(constants.toolbarIconUrlExmpl()); 
 		toolbarIconUrlVal.setTitle(constants.toolbarIconUrlTitle());
 		tbl.setWidget(row, 0, toolbarIconUrlLbl);
 		tbl.setWidget(row, 1, toolbarIconUrlVal);
-		//tbl.setWidget(row, 2, toolbarIconUrlExmpl);
 		row++;
 
 		Label robotThumbnailUrlLbl = new Label(constants.robotThumbnailUrlStr());
 		TextBox robotThumbnailUrlVal = new TextBox();
 		robotThumbnailUrlVal.addClickHandler(clearWarningClickHandler);
-//		Label robotThumbnailUrlExmpl = new Label(constants.robotThumbnailUrlExmpl()); 
 		robotThumbnailUrlVal.setTitle(constants.robotThumbnailUrlTitle());
 		tbl.setWidget(row, 0, robotThumbnailUrlLbl);
 		tbl.setWidget(row, 1, robotThumbnailUrlVal);
-		//tbl.setWidget(row, 2, robotThumbnailUrlExmpl);
 		row++;
 
 		Label forumSiteUrlLbl = new Label(constants.forumSiteUrlStr());
 		TextBox forumSiteUrlVal = new TextBox();
 		forumSiteUrlVal.addClickHandler(clearWarningClickHandler);
-//		Label forumSiteUrlExmpl = new Label(constants.forumSiteUrlExmpl()); 
 		forumSiteUrlVal.setTitle(constants.forumSiteUrlTitle());
 		tbl.setWidget(row, 0, forumSiteUrlLbl);
 		tbl.setWidget(row, 1, forumSiteUrlVal);
-		//tbl.setWidget(row, 2, forumSiteUrlExmpl);
 		row++;
 
 		Label googlegroupsIdLbl = new Label(constants.googlegroupsIdStr());
 		TextBox googlegroupsIdVal = new TextBox();
 		googlegroupsIdVal.setText("@googlegroups.com");
 		googlegroupsIdVal.addClickHandler(clearWarningClickHandler);
-//		Label googlegroupsIdExmpl = new Label(constants.googlegroupsIdExmpl()); 
 		googlegroupsIdVal.setTitle(constants.googlegroupsIdTitle());
 		tbl.setWidget(row, 0, googlegroupsIdLbl);
 		tbl.setWidget(row, 1, googlegroupsIdVal);
-		//tbl.setWidget(row, 2, googlegroupsIdExmpl);
 		row++;
 		
 		String[] exampleStrs = {constants.ownerExmpl(),constants.authorExmpl(),constants.projectIdExmpl(),constants.domainExmpl(),
@@ -377,13 +322,5 @@ public class DigestCreateWidget extends Composite implements RunnableOnTabSelect
 	private static String getStrFromTxtBox(int row,FlexTable widget ){
 		String out = ((TextBox)widget.getWidget(row, 1)).getText();
 		return out;
-	}
-
-
-
-	@Override
-	public Runnable getRunOnTabSelect() {
-		// no init on tab load here
-		return null;
 	}
 }

@@ -220,8 +220,8 @@ public class DigestServiceImpl implements IDigestService {
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		
 		paramsJson.put("projectId", new JSONString(projectId));
-		paramsJson.put("tag", new JSONString(tag));
-		paramsJson.put("regex", new JSONString(regex));
+		paramsJson.put("tag", new JSONString(regex));
+		paramsJson.put("regex", new JSONString(tag));
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_AUTO_TAG"));
 		
