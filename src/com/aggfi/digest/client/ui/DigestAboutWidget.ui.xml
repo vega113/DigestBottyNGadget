@@ -4,7 +4,7 @@
 	<ui:with field='res'
 		type='com.aggfi.digest.client.resources.GlobalResources' />
 	<ui:with field='constants'
-		type='com.aggfi.digest.client.constants.SimpleConstants' />
+		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
 
 		<g:VerticalPanel width='{constants.basicWidthStr}'

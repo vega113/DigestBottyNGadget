@@ -252,7 +252,7 @@ public class CreateDigest extends Command {
 		}
 		newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
 		newWavelet.setTitle(projectName  + " Digest Wave");
-		String gadgetUrl = System.getProperty("GADGET_URL");
+		String gadgetUrl = System.getProperty("CLICK_GADGET_URL");
 		Gadget gadget = new Gadget(gadgetUrl);
 		gadget.setProperty("waveid", newWavelet.getWaveletId().getId());
 		newWavelet.getRootBlip().append(gadget);

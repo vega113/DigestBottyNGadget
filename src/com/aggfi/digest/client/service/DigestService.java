@@ -6,7 +6,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public interface IDigestService {
+public interface DigestService {
 	void createDigest(JsDigest digest, AsyncCallback<JSONValue> callback) throws RequestException;
 	
 	void retrTagsDistributions(String projectId, AsyncCallback<JSONValue> callback) throws RequestException;

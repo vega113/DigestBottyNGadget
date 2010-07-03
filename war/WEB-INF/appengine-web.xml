@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
   <application>aggfiwave</application>
-  <version>alpha1</version>
+  <version>alpha3</version>
   
   <!-- Configure java.util.logging -->
   <system-properties>
@@ -22,9 +22,10 @@
     <property name="DIGEST_WAVE_ID" value=""/>   
     <property name="MAX_DIGESTS" value="10"/>
     <property name="APP_DOMAIN" value="aggfiwave"/>
-    <property name="GADGET_URL" value="http://waveclick.appspot.com/waveclick/com.aggfi.wave.waveclick.client.WaveClick.gadget.xml"/>
-     <property name="PROFILE_URL" value="http://aggfiwave.appspot.com/create_digest.html"/>
-<!--    <property name="java.util.logging.config.file" value="WEB-INF/classes/logging.properties" />-->
+    <property name="CLICK_GADGET_URL" value="http://waveclick.appspot.com/waveclick/com.aggfi.wave.waveclick.client.WaveClick.gadget.xml"/>
+    <property name="ADMIN_GADGET_URL" value="http://aggfiwave.appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml"/>
+    <property name="PROFILE_URL" value="http://aggfiwave.appspot.com/create_digest.html"/>
+	<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
   </system-properties>
   <precompilation-enabled>false</precompilation-enabled>
 </appengine-web-app>

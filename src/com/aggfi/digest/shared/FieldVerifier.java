@@ -1,7 +1,7 @@
 package com.aggfi.digest.shared;
 
-import com.aggfi.digest.client.constants.SimpleConstants;
-import com.aggfi.digest.client.constants.SimpleMessages;
+import com.aggfi.digest.client.constants.DigestConstants;
+import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.shared.model.IExtDigest;
 
 
@@ -45,7 +45,7 @@ public class FieldVerifier {
 		return name.length() > 2;
 	}
 
-	public static void areValidDigestFields(IExtDigest digest, SimpleMessages messages, SimpleConstants constants) {
+	public static void areValidDigestFields(IExtDigest digest, DigestMessages messages, DigestConstants constants) {
 		//owner_id
 		
 		if(!FieldVerifier.isValidName(digest.getOwnerId())){
@@ -76,7 +76,7 @@ public class FieldVerifier {
 	}
 
 	public static void verifyWaveId(String userWaveId,
-			SimpleMessages messages, String fieldName) throws IllegalArgumentException{
+			DigestMessages messages, String fieldName) throws IllegalArgumentException{
 		//check owner id is of form: id@googlewave.com
 		if(userWaveId.indexOf("@googlewave.com") < 0){
 			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com"));
@@ -88,7 +88,7 @@ public class FieldVerifier {
 		}
 	}
 	
-	public static void isFieldAlphaNumeric(SimpleMessages messages, String field, String fieldname){
+	public static void isFieldAlphaNumeric(DigestMessages messages, String field, String fieldname){
 		if(field.split("\\W").length > 1 ){
 			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname));
 		}

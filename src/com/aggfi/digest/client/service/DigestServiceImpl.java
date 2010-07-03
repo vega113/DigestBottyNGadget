@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.aggfi.digest.client.constants.SimpleConstants;
+import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.model.JsDigest;
 import com.aggfi.digest.client.model.JsParams;
 import com.aggfi.digest.client.request.RequestService;
@@ -17,14 +17,14 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class DigestServiceImpl implements IDigestService {
+public class DigestServiceImpl implements DigestService {
 	
 	private RequestService requestService;
 	private String domain;
 	private String url;
 	
 	@Inject
-	public DigestServiceImpl(RequestService requestService, SimpleConstants constants){
+	public DigestServiceImpl(RequestService requestService, DigestConstants constants){
 		this.requestService = requestService;
 		this.domain = constants.appDomain();
 		
@@ -220,8 +220,8 @@ public class DigestServiceImpl implements IDigestService {
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		
 		paramsJson.put("projectId", new JSONString(projectId));
-		paramsJson.put("tag", new JSONString(regex));
-		paramsJson.put("regex", new JSONString(tag));
+		paramsJson.put("tag", new JSONString(tag));
+		paramsJson.put("regex", new JSONString(regex));
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_AUTO_TAG"));
 		

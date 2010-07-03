@@ -24,7 +24,7 @@ import com.google.gwt.i18n.client.Messages;
  * Instances of this interface can be requested/injected by Gin without an
  * explicit binding: Gin will internallt call GWT.create on the requested type.
  */
-public interface SimpleMessages extends Messages {
+public interface DigestMessages extends Messages {
 
   String missingCreationParamExcptn(String msg);
   

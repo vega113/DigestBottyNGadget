@@ -16,20 +16,12 @@
 
 package com.aggfi.digest.client.inject;
 
-import com.aggfi.digest.client.ui.DigestCreateWidget;
 import com.aggfi.digest.client.ui.DigestTabPanel;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
-/**
- * A ginjector that uses the
- * {@link com.google.gwt.inject.example.simple.client.SimpleGinModule} to
- * construct {@link com.google.gwt.inject.example.simple.client.SimpleWidget}s.
- *
- */
-@GinModules(SimpleGinModule.class)
-public interface SimpleGinjector extends Ginjector {
+@GinModules(DigestGinModule.class)
+public interface DigestGinjector extends Ginjector {
 
-	DigestCreateWidget getDigestCreateWidget();
 	DigestTabPanel getDigestCreatedTabPanel();
 }

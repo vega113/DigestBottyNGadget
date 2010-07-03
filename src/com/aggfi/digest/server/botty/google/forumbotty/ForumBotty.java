@@ -1,15 +1,22 @@
 package com.aggfi.digest.server.botty.google.forumbotty;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,21 +29,29 @@ import org.waveprotocol.wave.model.id.WaveletId;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.CommandType;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.JsonRpcRequest;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification.NotificationType;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.internal.ImmutableMap;
 import com.google.inject.servlet.RequestScoped;
 import com.google.wave.api.AbstractRobot;
 import com.google.wave.api.Blip;
 import com.google.wave.api.BlipContentRefs;
+import com.google.wave.api.Context;
 import com.google.wave.api.ElementType;
 import com.google.wave.api.FormElement;
+import com.google.wave.api.Gadget;
 import com.google.wave.api.Line;
 import com.google.wave.api.ParticipantProfile;
 import com.google.wave.api.Tags;
@@ -44,8 +59,12 @@ import com.google.wave.api.Wavelet;
 import com.google.wave.api.event.AbstractEvent;
 import com.google.wave.api.event.BlipSubmittedEvent;
 import com.google.wave.api.event.FormButtonClickedEvent;
+import com.google.wave.api.event.GadgetStateChangedEvent;
 import com.google.wave.api.event.OperationErrorEvent;
 import com.google.wave.api.event.WaveletSelfAddedEvent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Collections;
 
@@ -214,7 +233,9 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
   }
 
   @Override
+  @Capability(contexts = {Context.SELF})
   public void onBlipSubmitted(BlipSubmittedEvent event) {
+	  LOG.warning("Entering onBlipSubmitted");
     // If this is from the "*-notify" proxy, skip processing.
     if (isNotifyProxy(event.getBundle().getProxyingFor())) {
       return;
@@ -531,4 +552,64 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 	  super.onOperationError(event);
 	  LOG.severe(event.getMessage());
   }
+
+  @Override
+  @Capability(contexts = {Context.SELF})
+  public void onGadgetStateChanged(GadgetStateChangedEvent e) {
+	  LOG.log(Level.WARNING, "OnGadgetStateChanged: ");
+	  JSONObject json = new JSONObject();
+	  Blip blip = e.getBlip();
+	  String gadgetUrl = System.getProperty("ADMIN_GADGET_URL");
+	  Gadget gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
+	  try{
+		  if(gadget!=null)
+		  {
+			  Set<String> keys = new LinkedHashSet<String>( gadget.getProperties().keySet());
+			  for(String key : keys){
+				  String[] split = key.split("#");
+				  String postBody = gadget.getProperty(key);
+				  if(split != null && split.length == 3 && split[0].equalsIgnoreCase("request") && postBody != null){
+					  String responseKey = "response#" + split[1] + "#" +  split[2];
+					  LOG.info("Found request: " + key + ", body: " + postBody);
+					  Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+					  JsonRpcRequest jsonRpcRequest = gson.fromJson(postBody, JsonRpcRequest.class);
+					  if (jsonRpcRequest != null) {
+						  String method = jsonRpcRequest.getMethod();
+						  if (method != null) {
+							  LOG.info("processing method " + method);
+							  Class<? extends Command> commandClass = CommandType.valueOfIngoreCase(method).getClazz();
+							  Command command = injector.getInstance(commandClass);
+							  command.setParams(jsonRpcRequest.getParams());
+							  try{
+								  try {
+									  json = command.execute();
+								  } catch (JSONException e1) {
+									  json.put("error", e1.getMessage());
+								  } catch (IllegalArgumentException e2) {
+									  json.put("error", e2.getMessage());
+								  }
+							  }catch(JSONException e3){
+								  throw new RuntimeException(e3.getMessage());
+							  }
+							  Map<String,String> out = new HashMap<String, String>();
+							  out.put(key, null);
+							  out.put(responseKey, json.toString());
+							  blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).updateElement(out);
+						  }
+					  }
+				  }
+			  }
+		  }else{
+			  LOG.log(Level.WARNING, "\nGadget is null: ");
+		  }
+	  }catch(Exception e4){
+		  
+		  StringWriter sw = new StringWriter();
+		  PrintWriter pw = new PrintWriter(sw);
+		  e4.printStackTrace(pw);
+		  e.getWavelet().reply("\n" + "EXCEPTION !!!" + sw.toString() + " : " + e4.getMessage());
+		  LOG.severe(sw.toString());
+	  }
+  }
+  
 }

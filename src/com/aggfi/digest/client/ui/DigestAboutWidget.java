@@ -1,10 +1,9 @@
 package com.aggfi.digest.client.ui;
 
-import com.aggfi.digest.client.constants.SimpleConstants;
-import com.aggfi.digest.client.constants.SimpleMessages;
+import com.aggfi.digest.client.constants.DigestConstants;
+import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
-import com.aggfi.digest.client.service.IDigestService;
-import com.aggfi.digest.client.utils.IDigestUtils;
+import com.aggfi.digest.client.service.DigestService;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -29,7 +28,7 @@ public class DigestAboutWidget extends Composite {
 
 
 	@Inject
-	public DigestAboutWidget(final SimpleMessages messages, final SimpleConstants constants, final GlobalResources resources, final IDigestService digestService, final IDigestUtils digestUtils) {
+	public DigestAboutWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		aboutDigestBottyPnl.setHTML(constants.aboutDigestbottyStr());
 		contactInfoPnl.setHTML(constants.contactInfoValueStr());

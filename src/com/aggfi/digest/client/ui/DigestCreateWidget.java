@@ -3,11 +3,11 @@
  */
 package com.aggfi.digest.client.ui;
 
-import com.aggfi.digest.client.constants.SimpleConstants;
-import com.aggfi.digest.client.constants.SimpleMessages;
+import com.aggfi.digest.client.constants.DigestConstants;
+import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.model.JsDigest;
 import com.aggfi.digest.client.resources.GlobalResources;
-import com.aggfi.digest.client.service.IDigestService;
+import com.aggfi.digest.client.service.DigestService;
 import com.aggfi.digest.shared.FieldVerifier;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -47,7 +47,7 @@ public class DigestCreateWidget extends Composite{
 	UiBinder<Widget, DigestCreateWidget> {
 	}
 	
-	IDigestService digestService;
+	DigestService digestService;
 
 	DisclosurePanel instructionsDsPanel;
 	@UiField
@@ -80,7 +80,7 @@ public class DigestCreateWidget extends Composite{
 
 
 	@Inject
-	public DigestCreateWidget(final SimpleMessages messages, final SimpleConstants constants, final GlobalResources resources, final IDigestService digestService) {
+	public DigestCreateWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		resources.globalCSS().ensureInjected();
@@ -151,7 +151,7 @@ public class DigestCreateWidget extends Composite{
 	
 
 
-	private void initCreateGadgetFlexTbl(FlexTable tbl,SimpleConstants constants, GlobalResources resources) {
+	private void initCreateGadgetFlexTbl(FlexTable tbl,DigestConstants constants, GlobalResources resources) {
 		tbl.setStylePrimaryName(resources.globalCSS().gridStyle());
 
 		int row = 0;

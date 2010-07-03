@@ -1,7 +1,8 @@
 package com.aggfi.digest.client.ui;
-import com.aggfi.digest.client.constants.SimpleConstants;
-import com.aggfi.digest.client.constants.SimpleMessages;
+import com.aggfi.digest.client.constants.DigestConstants;
+import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
+import com.aggfi.digest.client.utils.DigestUtils;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
@@ -10,14 +11,14 @@ import com.google.inject.Inject;
 
 public class DigestTabPanel extends DecoratedTabPanel {
 
-	protected SimpleMessages messages;
-	protected SimpleConstants constants;
+	protected DigestMessages messages;
+	protected DigestConstants constants;
 	protected GlobalResources resources;
 	protected DigestCreateWidget digestCreateWidget;
 	
 	
 	@Inject
-	public DigestTabPanel(final SimpleMessages messages, final SimpleConstants constants, final GlobalResources resources,
+	public DigestTabPanel(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources,
 			DigestCreateWidget digestCreateWidget, final DigestReportWidget digestReportWidget,
 			final DigestAdminWidget digestAdminWidget, final DigestAboutWidget digestAboutWidget){
 		this.messages = messages;
@@ -43,6 +44,7 @@ public class DigestTabPanel extends DecoratedTabPanel {
 					RunnableOnTabSelect runnableOnTabSelect = ((RunnableOnTabSelect)currentSelectedWidget);
 					if(runnableOnTabSelect.getRunOnTabSelect() != null){
 						runnableOnTabSelect.getRunOnTabSelect().run();
+						DigestUtils.getInstance().adjustHeight();
 					}
 				}
 			}

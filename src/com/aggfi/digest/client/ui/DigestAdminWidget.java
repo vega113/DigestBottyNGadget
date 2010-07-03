@@ -2,11 +2,11 @@ package com.aggfi.digest.client.ui;
 
 import java.util.Set;
 
-import com.aggfi.digest.client.constants.SimpleConstants;
-import com.aggfi.digest.client.constants.SimpleMessages;
+import com.aggfi.digest.client.constants.DigestConstants;
+import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
-import com.aggfi.digest.client.service.IDigestService;
-import com.aggfi.digest.client.utils.IDigestUtils;
+import com.aggfi.digest.client.service.DigestService;
+import com.aggfi.digest.client.utils.DigestUtils;
 import com.aggfi.digest.shared.FieldVerifier;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
@@ -79,15 +79,15 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			UiBinder<Widget, DigestAdminWidget> {
 	}
 	
-	IDigestService digestService;
-	SimpleMessages messages;
-	SimpleConstants constants;
+	DigestService digestService;
+	DigestMessages messages;
+	DigestConstants constants;
 	GlobalResources resources;
-	IDigestUtils digestUtils;
+	DigestUtils digestUtils = null;
 	public Runnable runOnTabSelect;
 
 	@Inject
-	public DigestAdminWidget(final SimpleMessages messages, final SimpleConstants constants, final GlobalResources resources, final IDigestService digestService, final IDigestUtils digestUtils) {
+	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		resources.globalCSS().ensureInjected();
@@ -95,7 +95,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		this.messages = messages;
 		this.constants = constants;
 		this.resources = resources;
-		this.digestUtils = digestUtils;
+		this.digestUtils = DigestUtils.getInstance();
 		
 		//-------remove default participant
 		removeDefaultParticipantHandler = new RemoveHandler(messages, defaultTagsPanel) {
@@ -177,6 +177,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			
 			@Override
 			public void run() {
+				Log.debug("DigestAdminWidget::DigestReportWidget Running");
 				prjList = projectSelectWidget.getPrjList();
 				String projectId = getProjectId();
 				try {
@@ -208,12 +209,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 								String managerId = managers.get(i).isString().stringValue();
 								managersPanel.add(new AddRemDefLabel(removeManagerHandler, null, managerId, null, null)); 
 							}
+							digestUtils.adjustHeight();
 						}
 						
 						@Override
 						public void onFailure(Throwable caught) {
 							Log.error("", caught);
-							
+							digestUtils.adjustHeight();
 						}
 					});
 				} catch (RequestException e) {
@@ -235,7 +237,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 
 	private void initAdminWidget() {
 		clearAll();
-		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, digestUtils, onProjectsLoadCallback);
+		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback);
 		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
 		prjList = this.projectSelectWidget.getPrjList();

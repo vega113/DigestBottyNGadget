@@ -32,8 +32,8 @@
 }
 
 .gridStyle {
-	border-bottom: solid 1px #aaa;
-	margin-bottom: 3px;
+	border-bottom: solid 0px #aaa;
+	margin-bottom: 0px;
 }
 
 .warning {

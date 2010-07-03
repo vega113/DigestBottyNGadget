@@ -1,9 +1,8 @@
 package com.aggfi.digest.client;
 
-//import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
-
-import com.aggfi.digest.client.inject.SimpleGinjector;
+import com.aggfi.digest.client.inject.DigestGinjector;
 import com.aggfi.digest.client.ui.DigestTabPanel;
+import com.aggfi.digest.client.utils.DigestUtils;
 import com.allen_sauer.gwt.log.client.DivLogger;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
@@ -12,6 +11,7 @@ import com.google.gwt.core.client.GWT;
 //import com.google.gwt.gadgets.client.NeedsDynamicHeight;
 //import com.google.gwt.gadgets.client.UserPreferences;
 //import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
+//import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -26,8 +26,10 @@ public class DigestBottyGadget implements EntryPoint {
 	/*
 	@Override
 	protected void init(UserPreferences preferences) {
-		SimpleGinjector ginjector = GWT.create(SimpleGinjector.class);
-		DigestCreatedTabPanel widget = ginjector.getDigestCreatedTabPanel();
+		DigestUtils.getInstance().setHeight(dhFeature);
+		DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
+		DigestGinjector ginjector = GWT.create(DigestGinjector.class);
+		DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
 		dhFeature.getContentDiv().add(widget);
 		dhFeature.adjustHeight();
 		initRemoteLogger(RootPanel.get());
@@ -40,12 +42,13 @@ public class DigestBottyGadget implements EntryPoint {
 		dhFeature = feature;
 		
 	}
-	*/
+	
 	/**
 	 * This is the entry point method.
 	 */
+	
 	public void onModuleLoad() {
-		SimpleGinjector ginjector = GWT.create(SimpleGinjector.class);
+		DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 		DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
 	    RootPanel.get("mainPanel").add(widget);
 	    initRemoteLogger(RootPanel.get("logPanel"));
