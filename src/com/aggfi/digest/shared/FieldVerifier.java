@@ -57,7 +57,8 @@ public class FieldVerifier {
 		if(!FieldVerifier.isValidName(digest.getDomain())){
 			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.domainStr()));
 		}
-		if(!FieldVerifier.isValidName(digest.getProjectId())){
+		String[] prjIdSplit = digest.getProjectId().split("-");
+		if(prjIdSplit.length == 1 || !FieldVerifier.isValidName(digest.getProjectId().split("-")[1])){
 			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.projectIdStr()));
 		}
 		if(!FieldVerifier.isValidName(digest.getName())){
@@ -77,6 +78,15 @@ public class FieldVerifier {
 
 	public static void verifyWaveId(String userWaveId,
 			DigestMessages messages, String fieldName) throws IllegalArgumentException{
+		String[] idParts = userWaveId.split("@");
+		if(idParts.length > 2){
+			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com"));
+		}
+		isFieldAlphaNumeric(messages,idParts[0],fieldName);
+		String[] domain = idParts[0].split(".");
+		for(String str : domain){
+			isFieldAlphaNumeric(messages,str,fieldName);
+		}
 		//check owner id is of form: id@googlewave.com
 		if(userWaveId.indexOf("@googlewave.com") < 0){
 			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com"));
@@ -89,8 +99,9 @@ public class FieldVerifier {
 	}
 	
 	public static void isFieldAlphaNumeric(DigestMessages messages, String field, String fieldname){
-		if(field.split("\\W").length > 1 ){
-			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname));
+		String splitStr = field.split("\\W")[0];
+		if(field.split("\\W").length > 1 || splitStr.length() < field.length()){
+			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname,field));
 		}
 	}
 }

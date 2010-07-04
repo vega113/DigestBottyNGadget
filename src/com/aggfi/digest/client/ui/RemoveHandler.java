@@ -7,10 +7,11 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CellPanel;
+import com.google.gwt.user.client.ui.ComplexPanel;
 
 abstract class RemoveHandler {
 	private DigestMessages messages = null;
-	private CellPanel panel;
+	private ComplexPanel panel;
 	private AfterRemovalAsyncCallback afterRemovalAsyncCallback = new AfterRemovalAsyncCallback();
 	AddRemDefLabel widget = null;
 	
@@ -40,7 +41,7 @@ abstract class RemoveHandler {
 
 	}
 	
-	public RemoveHandler(DigestMessages messages,CellPanel panel) {
+	public RemoveHandler(DigestMessages messages,ComplexPanel panel) {
 		super();
 		this.messages = messages;
 		this.panel = panel;
@@ -52,7 +53,7 @@ abstract class RemoveHandler {
 	 */
 	public abstract void onRemove(AddRemDefLabel widget);
 
-	protected CellPanel getPanel() {
+	protected ComplexPanel getPanel() {
 		return panel;
 	}
 

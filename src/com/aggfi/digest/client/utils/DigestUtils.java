@@ -54,12 +54,20 @@ public class DigestUtils {
 //	public void setHeight(DynamicHeightFeature height) {
 //		this.height = height;
 //	}
+//	public String retrUserName() {
+//		return wave.;
+//		
+//	}
 	
 	
 	
 	
 	public String retrUserId() {
 		return "vega113@googlewave.com";
+		
+	}
+	public String retrUserName() {
+		return "Yuri Zelikov";
 		
 	}
 	public void adjustHeight(){

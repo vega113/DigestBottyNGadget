@@ -16,6 +16,7 @@
 
 package com.aggfi.digest.client.inject;
 
+import com.aggfi.digest.client.ui.DigestAboutWidget;
 import com.aggfi.digest.client.ui.DigestTabPanel;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
@@ -24,4 +25,5 @@ import com.google.gwt.inject.client.Ginjector;
 public interface DigestGinjector extends Ginjector {
 
 	DigestTabPanel getDigestCreatedTabPanel();
+	DigestAboutWidget getDigestAboutWidget();
 }

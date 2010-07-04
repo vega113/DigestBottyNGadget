@@ -155,12 +155,25 @@ public interface DigestConstants extends Constants {
 	String defaultParticipantExpl();
 	
 	//size
-	@DefaultStringValue(value="520px")
+	@DefaultStringValue(value="520px")//change both
 	String basicWidthStr();
-	
-	@DefaultIntValue(value=520)
+	@DefaultIntValue(value=520)//change both
 	int basicWidthInt();
-	@DefaultIntValue(value=380)
+	
+	/**
+	 * size of scroll panel
+	 * @return
+	 */
+	@DefaultStringValue(value="496px")
+	String smallerWidthStr();
+	
+	@DefaultIntValue(value=320)
 	int basicReportHeightInt();
+	@DefaultStringValue(value="72px")
+	String basicItemScrollHeightStr();
+	@DefaultStringValue(value="215px")
+	String basicItemWidthStr();
+	@DefaultStringValue(value="175px")
+	String basicTextBoxWidthStr();
 	
 }

@@ -6,33 +6,40 @@
 	<ui:with field='constants'
 		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
-		<g:VerticalPanel width='{constants.basicWidthStr}' stylePrimaryName='{res.globalCSS.highlightRow}'>
+		<g:VerticalPanel width='{constants.basicWidthStr}'
+			stylePrimaryName='{res.globalCSS.highlightRow}'>
 			<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
 			<g:CaptionPanel captionText='{constants.setUpDefaultParticipantsStr}'>
 				<g:VerticalPanel>
 					<g:HorizontalPanel>
-						<g:TextBox ui:field="addDefaultParticipantBox" title='{constants.defaultParticipantExpl}'></g:TextBox>
+						<g:TextBox ui:field="addDefaultParticipantBox" title='{constants.defaultParticipantExpl}' width='{constants.basicTextBoxWidthStr}'></g:TextBox>
 						<g:Button ui:field="addDefaultParticipantBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
 						<g:HTML></g:HTML>
 					</g:cell>
-					<g:VerticalPanel ui:field="defaultParticipantsPanel">
-					</g:VerticalPanel>
+					<g:ScrollPanel width='{constants.smallerWidthStr}'
+						height='{constants.basicItemScrollHeightStr}'>
+						<g:VerticalPanel ui:field="defaultParticipantsPanel">
+						</g:VerticalPanel>
+					</g:ScrollPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 
 			<g:CaptionPanel captionText='{constants.setUpDefaultTagsStr}'>
 				<g:VerticalPanel>
 					<g:HorizontalPanel>
-						<g:TextBox ui:field="addDefaultTagBox" title='{constants.defaultTagExpl}'></g:TextBox>
+						<g:TextBox ui:field="addDefaultTagBox" title='{constants.defaultTagExpl}' width='{constants.basicTextBoxWidthStr}'></g:TextBox>
 						<g:Button ui:field="addDefaultTagBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
 						<g:HTML></g:HTML>
 					</g:cell>
-					<g:VerticalPanel ui:field="defaultTagsPanel">
-					</g:VerticalPanel>
+					<g:ScrollPanel width='{constants.smallerWidthStr}'
+						height='{constants.basicItemScrollHeightStr}'>
+						<g:VerticalPanel ui:field="defaultTagsPanel">
+						</g:VerticalPanel>
+					</g:ScrollPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 
@@ -42,33 +49,39 @@
 						<g:Label text='{constants.tagStr}'></g:Label>
 						<g:Label>:</g:Label>
 						<g:HTML width="4px"></g:HTML>
-						<g:TextBox ui:field="addAutoTagNameBox" title='{constants.autoTagExpl}'></g:TextBox>
+						<g:TextBox ui:field="addAutoTagNameBox" title='{constants.autoTagExpl}' width='{constants.basicTextBoxWidthStr}'></g:TextBox>
 						<g:HTML width="10px"></g:HTML>
 						<g:Label text='{constants.regexStr}'></g:Label>
 						<g:Label>:</g:Label>
 						<g:HTML width="4px"></g:HTML>
-						<g:TextBox ui:field="addAutoTagValBox" title='{constants.autoTagExpl}'></g:TextBox>
+						<g:TextBox ui:field="addAutoTagValBox" title='{constants.autoTagExpl}' width='{constants.basicTextBoxWidthStr}'></g:TextBox>
 						<g:Button ui:field="addAutoTagBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
 						<g:HTML></g:HTML>
 					</g:cell>
-					<g:VerticalPanel ui:field="autoTagsPanel">
-					</g:VerticalPanel>
+					<g:ScrollPanel width='{constants.smallerWidthStr}'
+						height='{constants.basicItemScrollHeightStr}'>
+						<g:VerticalPanel ui:field="autoTagsPanel">
+						</g:VerticalPanel>
+					</g:ScrollPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 
 			<g:CaptionPanel captionText='{constants.setUpDigestManagers}'>
 				<g:VerticalPanel>
 					<g:HorizontalPanel>
-						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}'></g:TextBox>
+						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}' width='{constants.basicTextBoxWidthStr}'></g:TextBox>
 						<g:Button ui:field="addManagergBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
 						<g:HTML></g:HTML>
 					</g:cell>
-					<g:VerticalPanel ui:field="managersPanel">
-					</g:VerticalPanel>
+					<g:ScrollPanel width='{constants.smallerWidthStr}'
+						height='{constants.basicItemScrollHeightStr}'>
+						<g:VerticalPanel ui:field="managersPanel">
+						</g:VerticalPanel>
+					</g:ScrollPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 		</g:VerticalPanel>

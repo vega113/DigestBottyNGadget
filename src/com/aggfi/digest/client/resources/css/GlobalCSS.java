@@ -6,6 +6,7 @@ public interface GlobalCSS extends CssResource {
 
 	public String readonly();
 	public String highlightRow();
+	public String highlight();
 	public String regularRow();
 	public String gridHeader();
 	public String gridStyle();

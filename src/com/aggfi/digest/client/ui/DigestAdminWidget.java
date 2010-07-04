@@ -24,8 +24,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -85,6 +87,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	GlobalResources resources;
 	DigestUtils digestUtils = null;
 	public Runnable runOnTabSelect;
+	
+	JSONValue adminConfigJson = null;
 
 	@Inject
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
@@ -185,31 +189,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 						
 						@Override
 						public void onSuccess(JSONValue result) {
-							JSONArray defaultParticipants = result.isObject().get("defaultParticipants").isArray();
-							for(int i = 0; i< defaultParticipants.size(); i++){
-								String participantId = defaultParticipants.get(i).isString().stringValue();
-								defaultParticipantsPanel.add(new AddRemDefLabel(removeDefaultParticipantHandler, null, participantId, null, null));
-							}
-							
-							JSONArray defaultTags = result.isObject().get("defaultTags").isArray();
-							for(int i = 0; i< defaultTags.size(); i++){
-								String defaultTag = defaultTags.get(i).isString().stringValue();
-								defaultTagsPanel.add(new AddRemDefLabel(removeDefaultTagHandler, null, defaultTag, null, null)); 
-							}
-							
-							JSONObject autoTagRegexMap = result.isObject().get("autoTagRegexMap").isObject();
-							Set<String> keys = autoTagRegexMap.keySet();
-							for(String tag : keys){
-								String regex = autoTagRegexMap.get(tag).isString().stringValue();
-								autoTagsPanel.add(new AddRemDefLabel(removeAutoTagHandler, constants.tagStr(), tag, constants.regexStr(), regex)); 
-							}
-							
-							JSONArray managers = result.isObject().get("managers").isArray();
-							for(int i = 0; i< managers.size(); i++){
-								String managerId = managers.get(i).isString().stringValue();
-								managersPanel.add(new AddRemDefLabel(removeManagerHandler, null, managerId, null, null)); 
-							}
-							digestUtils.adjustHeight();
+							adminConfigJson = result;
+							initJsonArrayModule(adminConfigJson,"defaultParticipants",defaultParticipantsPanel,removeDefaultParticipantHandler);
+							initJsonArrayModule(adminConfigJson,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
+							initJsonMapModule(adminConfigJson,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
+							initJsonArrayModule(adminConfigJson,"managers",managersPanel,removeManagerHandler);
 						}
 						
 						@Override
@@ -262,21 +246,41 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		managersPanel.clear();
 	}
 	
+	/*
+	 * used in the onSucess methods in callbacks below
+	 */
+	private void onAddSuccess(JSONValue result,String name1, String val1, String name2, String val2,ComplexPanel panel, TextBox textBox1,TextBox textBox2, RemoveHandler removeHandler){
+		if(result != null && result.isString().stringValue().equals("true")){
+			Composite c = new AddRemDefLabel(removeHandler, name1, val1, name2, val2);
+			int widgetCount = panel.getWidgetCount();
+			if(widgetCount % 2 == 1){
+				HorizontalPanel p = (HorizontalPanel)panel.getWidget(widgetCount - 1);
+				p.add(c);
+			}else{
+				HorizontalPanel p = new HorizontalPanel();
+				p.add(c);
+				panel.add(p);
+			}
+			textBox1.setText("");
+			if(textBox2 != null){
+				textBox2.setText("");
+			}
+			clearAll();
+			onProjectsLoadCallback.run();
+		}
+	}
+	
 	@UiHandler("addManagergBtn")
 	protected void addManagerBtnClick(ClickEvent event){
-		final String userId = addManagerBox.getText();
+		final String userId = addManagerBox.getText().trim();
 		try{
-			FieldVerifier.verifyWaveId(userId, messages, constants.defaultParticipantWaveIdFieldName());
+			FieldVerifier.verifyWaveId(userId, messages, constants.managerWaveIdFieldName());
 			try {
 				digestService.addDigestManager(getProjectId(), userId, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
-						if(result != null && result.isString().stringValue().equals("true")){
-							managersPanel.add(new AddRemDefLabel(removeManagerHandler, null, userId, null, null)); 
-							addManagerBox.setText("");
-						}
-						
+						onAddSuccess(result,null,userId,null,null,managersPanel,addManagerBox,null,removeManagerHandler);
 					}
 					
 					@Override
@@ -293,20 +297,17 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		}
 	}
 	
+	
 	@UiHandler("addDefaultTagBtn")
 	protected void addDefaultTagBtnClick(ClickEvent event){
-		final String tag = addDefaultTagBox.getText();
+		final String tag = addDefaultTagBox.getText().trim();
 		try{
 			try {
 				digestService.addDefaultTag(getProjectId(), tag, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
-						if(result != null && result.isString().stringValue().equals("true")){
-							defaultTagsPanel.add(new AddRemDefLabel(removeDefaultTagHandler, null, tag, null, null)); 
-							addDefaultTagBox.setText("");
-						}
-						
+						onAddSuccess(result,null,tag,null,null,defaultTagsPanel,addDefaultTagBox,null,removeDefaultTagHandler);
 					}
 					
 					@Override
@@ -325,7 +326,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	@UiHandler("addDefaultParticipantBtn")
 	protected void addDefaultParticipantBtnClick(ClickEvent event){
-		final String participantId = addDefaultParticipantBox.getText();
+		final String participantId = addDefaultParticipantBox.getText().trim();
 		try{
 			FieldVerifier.verifyWaveId(participantId, messages, constants.defaultParticipantWaveIdFieldName());
 			try {
@@ -333,11 +334,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					
 					@Override
 					public void onSuccess(JSONValue result) {
-						if(result != null && result.isString().stringValue().equals("true")){
-							defaultParticipantsPanel.add(new AddRemDefLabel(removeDefaultParticipantHandler, null, participantId, null, null)); 
-							addDefaultParticipantBox.setText("");
-						}
-						
+						onAddSuccess(result,null,participantId,null,null,defaultParticipantsPanel,addDefaultParticipantBox,null,removeDefaultParticipantHandler);
 					}
 					
 					@Override
@@ -356,21 +353,15 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	@UiHandler("addAutoTagBtn")
 	protected void addAutoTagClick(ClickEvent event){
-		final String tag = addAutoTagNameBox.getText();
-		final String regex = addAutoTagValBox.getText();
+		final String tag = addAutoTagNameBox.getText().trim();
+		final String regex = addAutoTagValBox.getText().trim();
 		try{
-			//TODO verify correctness of regex?
 			try {
 				digestService.addAutoTag(getProjectId(), tag, regex, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
-						if(result != null && result.isString().stringValue().equals("true")){
-							autoTagsPanel.add(new AddRemDefLabel(removeDefaultParticipantHandler, constants.tagStr(), tag, constants.regexStr(), regex)); 
-							addAutoTagNameBox.setText("");
-							addAutoTagValBox.setText("");
-						}
-						
+						onAddSuccess(result,constants.tagStr(),tag,constants.regexStr(),regex,autoTagsPanel,addAutoTagNameBox,addAutoTagValBox,removeAutoTagHandler);
 					}
 					
 					@Override
@@ -386,7 +377,48 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			digestAlert(e);
 		}
 	}
-
+	
+	
+	
+	private void initJsonMapModule(JSONValue result,String jsonFieldName, ComplexPanel panel,RemoveHandler removeHandler) {
+		HorizontalPanel pat = new HorizontalPanel();
+		JSONObject jsonMap = result.isObject().get(jsonFieldName).isObject();
+		Set<String> keys = jsonMap.keySet();
+		int i = 0;
+		for(String key : keys){
+			if(i != 0 && i % 2 == 0){
+				panel.add(pat);
+				pat = new HorizontalPanel();
+			}
+			String value = jsonMap.get(key).isString().stringValue();
+			Composite c = new AddRemDefLabel(removeHandler, constants.tagStr(), key, constants.regexStr(), value);
+			pat.add(c);
+			if(i == keys.size() -1 && i % 2 == 1){
+				panel.add(pat);
+			}
+			i++;
+		}
+		digestUtils.adjustHeight();
+	}
+	
+	private void initJsonArrayModule(JSONValue result, String jsonFieldName, ComplexPanel panel, RemoveHandler removeHandler) {
+		HorizontalPanel p = new HorizontalPanel();
+		JSONArray jsonArray = result.isObject().get(jsonFieldName).isArray();
+		for(int i = 0; i< jsonArray.size(); i++){
+			if(i != 0 && i % 2 == 0){
+				panel.add(p);
+				p = new HorizontalPanel();
+			}
+			String jsonStrValue = jsonArray.get(i).isString().stringValue();
+			Composite c = new AddRemDefLabel(removeHandler, null, jsonStrValue, null, null);
+			p.add(c);
+			if(i == jsonArray.size() -1 && i % 2 == 1){
+				panel.add(p);
+			}
+		}
+		digestUtils.adjustHeight();
+	}
+	
 	public void digestAlert(IllegalArgumentException e) {
 		digestUtils.alert(e.getMessage());
 	}

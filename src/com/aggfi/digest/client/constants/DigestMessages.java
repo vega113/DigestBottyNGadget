@@ -36,5 +36,5 @@ public interface DigestMessages extends Messages {
 
   String removalSuccessMsg(String participantId);
 
-  String fieldShouldBeAlphaNumericExcptn(String fieldname);
+  String fieldShouldBeAlphaNumericExcptn(String fieldname, String field);
 }

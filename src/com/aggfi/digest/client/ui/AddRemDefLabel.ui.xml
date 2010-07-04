@@ -7,7 +7,7 @@
 		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
 		<g:CaptionPanel>
-			<g:HorizontalPanel>
+			<g:HorizontalPanel width='{constants.basicItemWidthStr}'>
 			<g:Image resource='{res.close}' ui:field="removeBtn" title='{constants.removeMeStr}'/>
 			<g:HTML width='10px'></g:HTML>
 			<g:Label ui:field="firstValLbl"></g:Label>

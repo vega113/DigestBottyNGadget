@@ -38,6 +38,8 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 		      if (extDigests.size() > 0) {
 		    	  if(extDigests.size() > 1){
 		    		  LOG.severe("Oops! more than one Digest for this project id: " + projectId);
+		    	  }else if(extDigests.size() == 0){
+		    		  LOG.severe("Oops! no Digest for this project id: " + projectId);
 		    	  }
 		      } else {
 //		    	  LOG.log(Level.SEVERE, "There's no Digest Wave for project id: " + projectId);

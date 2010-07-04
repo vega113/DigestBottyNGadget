@@ -8,6 +8,7 @@ import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.model.JsDigest;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
+import com.aggfi.digest.client.utils.DigestUtils;
 import com.aggfi.digest.shared.FieldVerifier;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -161,7 +162,8 @@ public class DigestCreateWidget extends Composite{
 		
 		Label ownerLbl = new Label(constants.ownerStr());
 		TextBox ownerVal = new TextBox();
-		ownerVal.setText("@googlewave.com");
+		ownerVal.setText(DigestUtils.getInstance().retrUserId());
+		ownerVal.setStyleName(resources.globalCSS().readonly());
 		ownerVal.addClickHandler(clearWarningClickHandler);
 		ownerVal.setTitle(constants.ownerTitle());
 		tbl.setWidget(row, 0, ownerLbl);
@@ -170,6 +172,7 @@ public class DigestCreateWidget extends Composite{
 
 		Label authorLbl = new Label(constants.authorStr());
 		TextBox authorVal = new TextBox();
+		authorVal.setText(DigestUtils.getInstance().retrUserName());
 		authorVal.addClickHandler(clearWarningClickHandler);
 		authorVal.setTitle(constants.authorTitle());
 		tbl.setWidget(row, 0, authorLbl);
@@ -272,7 +275,7 @@ public class DigestCreateWidget extends Composite{
 				rowFormatter.addStyleName(i, resources.globalCSS().regularRow());
 			}
 			Widget w = tbl.getWidget(i, 1);
-			w.setWidth(((int)constants.basicWidthInt()/1.5) + "px");
+			w.setWidth(((int)constants.basicWidthInt()/1.37) + "px");
 			w.setTitle( w.getTitle() + " " + constants.exampleWord() + "\"" +  exampleStrs[i] + "\"");
 		}
 		ColumnFormatter colFormatter = tbl.getColumnFormatter();
@@ -282,18 +285,18 @@ public class DigestCreateWidget extends Composite{
 	public static JsDigest initExtDigestFromFields(FlexTable w,CheckBox box) throws IllegalArgumentException{
 		
 		int row=0;
-		String ownerId = getStrFromTxtBox(row,w); row++;
-		String authorName = getStrFromTxtBox(row,w);row++;
-		String projectId = getStrFromTxtBox(row,w);row++;
-		String domain = getStrFromTxtBox(row,w);row++;
-		String digestName = getStrFromTxtBox(row,w);row++;
+		String ownerId = getStrFromTxtBox(row,w).trim(); row++;
+		String authorName = getStrFromTxtBox(row,w).trim();row++;
+		String projectId = getStrFromTxtBox(row,w).trim();row++;
+		String domain = getStrFromTxtBox(row,w).trim();row++;
+		String digestName = getStrFromTxtBox(row,w).trim();row++;
 		
-		String description = getStrFromTxtBox(row,w);row++;
-		String installerThumbnailUrl = getStrFromTxtBox(row,w);row++;
-		String installerIconUrl = getStrFromTxtBox(row,w);row++;
-		String robotThumbnailUrl = getStrFromTxtBox(row,w);row++;
-		String forumSiteUrl = getStrFromTxtBox(row,w);row++;
-		String googlegroupsId = getStrFromTxtBox(row,w);row++;
+		String description = getStrFromTxtBox(row,w).trim();row++;
+		String installerThumbnailUrl = getStrFromTxtBox(row,w).trim();row++;
+		String installerIconUrl = getStrFromTxtBox(row,w).trim();row++;
+		String robotThumbnailUrl = getStrFromTxtBox(row,w).trim();row++;
+		String forumSiteUrl = getStrFromTxtBox(row,w).trim();row++;
+		String googlegroupsId = getStrFromTxtBox(row,w).trim();row++;
 		boolean isPublicOnCreate = box.getValue();
 		
 		String ownerStr = ownerId.substring(0, ownerId.indexOf("@"));

@@ -113,7 +113,7 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 			adminConfig.setDefaultParticipants(participants);
 			save(adminConfig);
 		}else{
-			throw new IllegalArgumentException(participantId + " is already added!");
+			throw new IllegalArgumentException(participantId + " is already added to Default Participants!");
 		}
 	}
 

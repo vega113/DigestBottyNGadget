@@ -27,6 +27,11 @@
 	background: #A3D1FF;
 }
 
+.highlight {
+	background: #c9e2fc;
+	vertical-align: top;
+}
+
 .gridHeader{
 	background: #66CCFF;
 }
@@ -53,7 +58,7 @@
 
 .pretty {
 			background-color: #c9e2fc;
-			height: 20px;
+			height: 40px;
 		}
 .alignRight{
 }

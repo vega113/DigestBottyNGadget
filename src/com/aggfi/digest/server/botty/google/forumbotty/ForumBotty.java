@@ -476,25 +476,6 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
     return getServerName().replace(".appspot.com", "");
   }
   
-  class SeriallizableParticipantProfile  implements Serializable {
-	  /**
-	   * 
-	   */
-	  private static final long serialVersionUID = -6733612960773945769L;
-	  private String imageUrl;
-	  private String name;
-	  private String profileUrl;
-
-	  public SeriallizableParticipantProfile (ParticipantProfile profile){
-		  this.imageUrl  = profile.getImageUrl();
-		  this.name = profile.getName();
-		  this.profileUrl = profile.getProfileUrl();
-	  }
-	  public ParticipantProfile getProfile(){
-		  return new ParticipantProfile(name,imageUrl,profileUrl);
-	  }
-  };
-  
   @Override
   protected ParticipantProfile getCustomProfile(String name) {
 	  LOG.fine("requested profile for: " + name);
@@ -504,7 +485,7 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 	  profile = o != null ? ((SeriallizableParticipantProfile)o).getProfile() : null;
 	  if(profile != null)
 		  return profile;
-	  
+	  LOG.warning("Not found profile for: " + name);
 	  try {
 		  digests =  extDigestDao.retrDigestsByProjectId(name);
 	} catch (NullPointerException e) {
@@ -516,9 +497,10 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 	    		  digests.get(0).getForumSiteUrl() != null ? digests.get(0).getForumSiteUrl() : getRobotProfilePageUrl());
     	  
     	  // Put the value into the cache.
-	      cache.put(name, new SeriallizableParticipantProfile(profile));
+	      cache.put(name, new SeriallizableParticipantProfile(profile.getImageUrl(),profile.getName(), profile.getProfileUrl()));
 	      return profile; 
       }else{
+    	  LOG.warning("Not found even DB profile for: " + name);
     	  return new ParticipantProfile(getRobotName(),
     			  getRobotAvatarUrl(),
     			  getRobotProfilePageUrl());
