@@ -187,6 +187,10 @@ public class ForumBotty extends AbstractRobot {
       return;
     }     
     
+    if (isDigestAdmin(event.getBundle().getProxyingFor())) {
+      return;
+    }     
+    
     
     String projectId = getCurrentProjectId(event);
     if (projectId == null) {
@@ -245,6 +249,11 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
     if (isDigestWave(event.getBundle().getProxyingFor())) {
       return;
     } 
+    
+    // If this is from the "*-digest" proxy, skip processing.
+    if (isDigestAdmin(event.getBundle().getProxyingFor())) {
+      return;
+    } 
 
     // If this is unworthy wavelet (empty), skip processing.
     if (!isWorthy(event.getWavelet())) {
@@ -293,6 +302,14 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
       return false;
     }
   }
+  
+  private boolean isDigestAdmin(String proxyingFor) {
+	    if (proxyingFor != null && proxyingFor.equals("gadget")) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  }
 
   private void updateDigestWave(ForumPost entry) {
 	LOG.entering(this.getClass().getName(), "updateDigestWave", entry);
@@ -342,38 +359,41 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 
   @Override
   public void onFormButtonClicked(FormButtonClickedEvent event) {
-    if (isNotifyProxy(event.getBundle().getProxyingFor())) {
-      Wavelet wavelet = event.getWavelet();
-      String projectId = event.getBundle().getProxyingFor().replace("-notify", "");
-      Blip blip = event.getBlip();
-      if (event.getButtonName().equals("frequencySubmit")) {
+	  if (isDigestAdmin(event.getBundle().getProxyingFor())) {
+		  return;
+	  }    
+	  if (isNotifyProxy(event.getBundle().getProxyingFor())) {
+		  Wavelet wavelet = event.getWavelet();
+		  String projectId = event.getBundle().getProxyingFor().replace("-notify", "");
+		  Blip blip = event.getBlip();
+		  if (event.getButtonName().equals("frequencySubmit")) {
 
-        FormElement frequencyGroup = FormElement.class.cast(blip.first(
-            ElementType.RADIO_BUTTON_GROUP).value());
+			  FormElement frequencyGroup = FormElement.class.cast(blip.first(
+					  ElementType.RADIO_BUTTON_GROUP).value());
 
-        NotificationType notificationType = NotificationType.NONE;
+			  NotificationType notificationType = NotificationType.NONE;
 
-        if (frequencyGroup.getValue().equals("none")) {
-          notificationType = NotificationType.NONE;
-        } else if (frequencyGroup.getValue().equals("daily")) {
-          notificationType = NotificationType.DAILY;
-        } else if (frequencyGroup.getValue().equals("weekly")) {
-          notificationType = NotificationType.WEEKLY;
-        }
+			  if (frequencyGroup.getValue().equals("none")) {
+				  notificationType = NotificationType.NONE;
+			  } else if (frequencyGroup.getValue().equals("daily")) {
+				  notificationType = NotificationType.DAILY;
+			  } else if (frequencyGroup.getValue().equals("weekly")) {
+				  notificationType = NotificationType.WEEKLY;
+			  }
 
-        String userId = event.getModifiedBy();
-        String notificationId = userId + projectId;
-        UserNotification userNotification = userNotificationDao.getUserNotification(notificationId);
-        if (userNotification == null) {
-          userNotification = new UserNotification(userId, projectId);
-        }
-        userNotification.setNotificationType(notificationType);
-        userNotificationDao.save(userNotification);
+			  String userId = event.getModifiedBy();
+			  String notificationId = userId + projectId;
+			  UserNotification userNotification = userNotificationDao.getUserNotification(notificationId);
+			  if (userNotification == null) {
+				  userNotification = new UserNotification(userId, projectId);
+			  }
+			  userNotification.setNotificationType(notificationType);
+			  userNotificationDao.save(userNotification);
 
-        wavelet
-            .reply("\nYour notification frequency is now set to be " + frequencyGroup.getValue());
-      }
-    }
+			  wavelet
+			  .reply("\nYour notification frequency is now set to be " + frequencyGroup.getValue());
+		  }
+	  }
   }
 
   public void applyAutoTags(Blip blip, String projectId) {
@@ -468,7 +488,7 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
   public String getRobotProfilePageUrl() {
 	  String profileUrl = System.getProperty("PROFILE_URL");
 //    return "http://" + getServerName() + "/_wave/robot/profile"; 
-	  return profileUrl;
+	  return "http://" + getServerName() + ".appspot.com/" + profileUrl;
   }
 
   @Override
@@ -539,6 +559,13 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
   @Capability(contexts = {Context.SELF})
   public void onGadgetStateChanged(GadgetStateChangedEvent e) {
 	  LOG.log(Level.WARNING, "OnGadgetStateChanged: ");
+	// If this is from the "*-digest" proxy, skip processing.
+	    if (!isDigestAdmin(e.getBundle().getProxyingFor())) {
+	      LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " return!");
+	      return; //only gadget proxy allowed to react
+	    }else{
+	    	LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
+	    }
 	  JSONObject json = new JSONObject();
 	  Blip blip = e.getBlip();
 	  String gadgetUrl = System.getProperty("ADMIN_GADGET_URL");

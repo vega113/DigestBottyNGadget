@@ -7,6 +7,7 @@ import javax.jdo.PersistenceManagerFactory;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDaoImpl;
+import com.aggfi.digest.server.botty.digestbotty.install.InstallGadgetServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallServlet;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.*;
@@ -44,8 +45,8 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         serve("/feeds/get_latest_digest").with(GetLatestDigest.class);
         serve("/feeds/json").with(JsonGenerator.class);
         serve("/feeds/atom").with(AtomGenerator.class);       
-        serve("/installNew").with(InstallServlet.class);   
-        
+        serve("/installNew").with(InstallServlet.class); 
+        serve("/installGadget").with(InstallGadgetServlet.class); 
         
         
 //        serve("/info").with(InfoServlet.class);  //TODO remove

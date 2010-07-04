@@ -7,7 +7,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
+//FIXME this implementation doesn't work :( - some bug I guess
 public class GadgetRequestServiceImpl implements RequestService {
 	AsyncCallback<String> callback;
 	@SuppressWarnings("unchecked")
