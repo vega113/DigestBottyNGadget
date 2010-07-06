@@ -190,10 +190,14 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 						@Override
 						public void onSuccess(JSONValue result) {
 							adminConfigJson = result;
-							initJsonArrayModule(adminConfigJson,"defaultParticipants",defaultParticipantsPanel,removeDefaultParticipantHandler);
-							initJsonArrayModule(adminConfigJson,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
-							initJsonMapModule(adminConfigJson,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
-							initJsonArrayModule(adminConfigJson,"managers",managersPanel,removeManagerHandler);
+							initJsonArrayModule(result,"defaultParticipants",defaultParticipantsPanel,removeDefaultParticipantHandler);
+							Log.debug("Loaded: defaultParticipants");
+							initJsonArrayModule(result,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
+							Log.debug("Loaded: defaultTags");
+							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
+							Log.debug("Loaded: autoTags");
+							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
+							Log.debug("Loaded: managers");
 						}
 						
 						@Override
