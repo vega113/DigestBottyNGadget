@@ -15,13 +15,13 @@
  */
 
 package com.aggfi.digest.client.inject;
-//import com.aggfi.digest.client.request.GwtRequestServiceImpl;
+import com.aggfi.digest.client.request.GwtRequestServiceImpl;
 import com.aggfi.digest.client.request.RequestService;
 import com.aggfi.digest.client.request.WaveRequestServiceImpl;
 import com.aggfi.digest.client.service.DigestServiceImpl;
 import com.aggfi.digest.client.service.DigestService;
 import com.google.gwt.inject.client.AbstractGinModule;
-//import com.google.inject.Singleton;
+import com.google.inject.Singleton;
 
 /**
  * This gin module binds an implementation for the
@@ -39,7 +39,7 @@ public class DigestGinModule extends AbstractGinModule {
     bind(DigestService.class).to(DigestServiceImpl.class);
     
     //Gwt simulation
-    bind(RequestService.class).to(WaveRequestServiceImpl.class);
+    bind(RequestService.class).to(WaveRequestServiceImpl.class).in(Singleton.class);
 //    bind(RequestService.class).to(GwtRequestServiceImpl.class).in(Singleton.class);
   }
 }

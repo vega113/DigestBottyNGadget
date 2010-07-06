@@ -1,5 +1,8 @@
 package com.aggfi.digest.client;
 
+import com.aggfi.digest.client.feature.minimessages.MiniMessages;
+import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
+import com.aggfi.digest.client.feature.minimessages.NeedsMiniMessages;
 import com.aggfi.digest.client.inject.DigestGinjector;
 import com.aggfi.digest.client.ui.DigestTabPanel;
 import com.aggfi.digest.client.utils.DigestUtils;
@@ -20,13 +23,15 @@ import com.google.gwt.user.client.ui.RootPanel;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 //public class DigestBottyGadget implements EntryPoint {
-@ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=540, height=400)
-public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight{
+@ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=560, height=400)
+public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages{
 
 	
 	@Override
 	protected void init(UserPreferences preferences) {
 		try{
+			mmFeature.initMiniMessagesFeature();
+			DigestUtils.getInstance().setMiniMessages(mmFeature);
 			DigestUtils.getInstance().setHeight(dhFeature);
 			DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
@@ -47,6 +52,13 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 		dhFeature = feature;
 		
 	}
+	
+	MiniMessagesFeature mmFeature;
+	@Override
+	public void initializeFeature(MiniMessagesFeature feature) {
+		this.mmFeature = feature;
+	}
+	
 	
 	/**
 	 * This is the entry point method.
@@ -70,4 +82,5 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 	private void handleError(Throwable error) {
 		Log.error("", error);
 	}
+
 }

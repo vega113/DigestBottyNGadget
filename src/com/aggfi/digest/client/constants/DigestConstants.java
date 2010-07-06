@@ -148,6 +148,8 @@ public interface DigestConstants extends Constants {
 	String breakDown4AllTags();
 	
 	String retrieveingDataStr();
+	String waitingForResponseStr();
+	String loadingDataStr();
 	
 	String defaultTagExpl();
 	String autoTagExpl();
@@ -155,9 +157,9 @@ public interface DigestConstants extends Constants {
 	String defaultParticipantExpl();
 	
 	//size
-	@DefaultStringValue(value="520px")//change both
+	@DefaultStringValue(value="525px")//change both
 	String basicWidthStr();
-	@DefaultIntValue(value=520)//change both
+	@DefaultIntValue(value=525)//change both
 	int basicWidthInt();
 	
 	/**
@@ -175,5 +177,7 @@ public interface DigestConstants extends Constants {
 	String basicItemWidthStr();
 	@DefaultStringValue(value="175px")
 	String basicTextBoxWidthStr();
+	@DefaultIntValue(value=25)
+	int itemCreateHeight();
 	
 }

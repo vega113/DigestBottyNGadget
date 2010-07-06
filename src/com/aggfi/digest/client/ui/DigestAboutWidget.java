@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DigestAboutWidget extends Composite {
+public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 
 	@UiField
 	HTML aboutDigestBottyPnl;
@@ -32,6 +32,18 @@ public class DigestAboutWidget extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		aboutDigestBottyPnl.setHTML(constants.aboutDigestbottyStr());
 		contactInfoPnl.setHTML(constants.contactInfoValueStr());
+	}
+
+
+	@Override
+	public Runnable getRunOnTabSelect() {
+		return new Runnable() {
+			
+			@Override
+			public void run() {
+				
+			}
+		};
 	}
 
 

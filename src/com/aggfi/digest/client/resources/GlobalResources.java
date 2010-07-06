@@ -6,8 +6,6 @@ import com.google.gwt.resources.client.ImageResource;
 
 public interface GlobalResources extends ClientBundle {
 
-//	public static final GlobalResources INSTANCE =  GWT.create(GlobalResources.class);
-
 	@Source("css/globalCSS.css")
 	GlobalCSS globalCSS();
 	
@@ -16,6 +14,9 @@ public interface GlobalResources extends ClientBundle {
 	
 	@Source("images/close.jpg")
 	ImageResource close();
+	
+	@Source("images/images3.jpg")
+	ImageResource tooltip();
 
 
 }

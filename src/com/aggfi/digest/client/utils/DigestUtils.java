@@ -1,14 +1,22 @@
 package com.aggfi.digest.client.utils;
 
 import org.cobogw.gwt.waveapi.gadget.client.WaveFeature;
+
+import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gwt.user.client.Window;
 
 
 public class DigestUtils {
 	static DigestUtils instance = null;
-	WaveFeature wave;
-	DynamicHeightFeature height;
+	private WaveFeature wave;
+	private DynamicHeightFeature height;
+	private MiniMessagesFeature messages;
+	private static Map<String,String> state = new HashMap<String, String>();
+	
 	private DigestUtils(){}
 	
 	
@@ -18,10 +26,15 @@ public class DigestUtils {
 		}
 		return instance;
 	}
+
 	
-	public void alert(String msg) {
-	Window.alert(msg);
-}	
+	public String getCurrentDigestId(){
+		String id = state.get("digestId");
+		return id != null? id : "";
+	}
+	public void setCurrentDigestId(String id){
+		state.put("digestId", id);
+	}
 	
 	public String retrUserId() {
 		if(wave != null && wave.getViewer() != null){
@@ -45,9 +58,16 @@ public class DigestUtils {
 		}
 		
 	}
-//	
-//	
-//	
+	
+	public void alert(String msg) {
+		messages.alert(msg);
+	}	
+	public void showStaticMessage(String msg) {
+		messages.createStaticMessage(msg);
+	}	
+	public void dismissMessage() {
+		messages.dismissMessage();
+	}
 	public WaveFeature getWave() {
 		return wave;
 	}
@@ -60,22 +80,31 @@ public class DigestUtils {
 	public void setHeight(DynamicHeightFeature height) {
 		this.height = height;
 	}
+
+
+	public void setMiniMessages(MiniMessagesFeature mmFeature) {
+		this.messages = mmFeature;
+		
+	}
 	
 	
 	
-//	
-//	public String retrUserId() {
-//		return "vega113@googlewave.com";
-//		
-//	}
-//	public String retrUserName() {
-//		return "Yuri Zelikov";
-//		
-//	}
-//	public void adjustHeight(){
-//	}
 	
-	
+	/*
+	public String retrUserId() {
+		return "vega113@googlewave.com";
+		
+	}
+	public String retrUserName() {
+		return "Yuri Zelikov";
+		
+	}
+	public void adjustHeight(){
+	}
+	public void alert(String msg) {
+		Window.alert(msg);
+	}	
+	*/
 	
 	
 }

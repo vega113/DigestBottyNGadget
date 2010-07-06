@@ -9,12 +9,14 @@ import com.aggfi.digest.client.service.DigestService;
 import com.aggfi.digest.client.utils.DigestUtils;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -53,6 +55,7 @@ public class ProjectSelectWidget extends Composite {
 
 		final String userId = digestUtils.retrUserId();
 		try {
+			digestUtils.showStaticMessage(messages.loadingForumsListMsg(userId));
 			digestService.retrPrjectsPerUserId(userId, new AsyncCallback<JSONValue>() {
 
 				@Override
@@ -63,6 +66,7 @@ public class ProjectSelectWidget extends Composite {
 				@Override
 				public void onSuccess(JSONValue resultJsonValue) {
 					Log.debug("ProjectSelectWidget.onSuccess: " + resultJsonValue.toString());
+					digestUtils.dismissMessage();
 					if(resultJsonValue.isObject() != null){
 						JSONObject resultJson = resultJsonValue.isObject();
 						if(resultJson.containsKey("none")){
@@ -79,16 +83,22 @@ public class ProjectSelectWidget extends Composite {
 							}
 							// Create a callback to be called when the visualization API
 							// has been loaded.
+							String digestId = digestUtils.getCurrentDigestId();
+							if(digestId != null && !"".equals(digestId)){
+								int size = prjList.getItemCount();
+								for(int i = 0; i < size; i++){
+									if(prjList.getValue(i).equals(digestId)){
+										prjList.setSelectedIndex(i);
+									}
+								}
+							}
 							onProjectsRetrCallback.run();
 						}
 					}else{
-						Log.debug("resultJsonValue is not JSONObject" );
 						if(resultJsonValue.isString() != null){
-							Log.debug("resultJsonValue is a JSONString" );
 							try{
 								JSONObject tryjson = JSONParser.parse(resultJsonValue.isString().stringValue()).isObject();
 								if(tryjson != null){
-									Log.info("sucess in making object from json");
 								}
 							}catch (Exception e) {
 								Log.error("after try to parse to obj", e);
@@ -112,5 +122,11 @@ public class ProjectSelectWidget extends Composite {
 
 	public void setPrjList(ListBox prjList) {
 		this.prjList = prjList;
+	}
+	
+	@UiHandler(value="prjList")
+	public void onPrjIdSelectionChange(ChangeEvent event){
+		String currId = prjList.getValue(prjList.getSelectedIndex());
+		digestUtils.setCurrentDigestId(currId);
 	}
 }

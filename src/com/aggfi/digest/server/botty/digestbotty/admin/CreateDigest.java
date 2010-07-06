@@ -238,7 +238,12 @@ public class CreateDigest extends Command {
 	private Wavelet createDigestWave(String domain, String ownerId, String projectId, String projectName, String googlegroups, boolean isPublicOnCreate) throws IOException {
 		Set<String> participants = new HashSet<String>(); 
 		participants.add(ownerId);
-		adminConfigDao.addDefaultParticipant(projectId, ownerId);
+		try{
+			adminConfigDao.addDefaultParticipant(projectId, ownerId);
+		}catch (Exception e) {
+			//FIXME why this happens? it (sometime) says default participant already exists
+			LOG.log(Level.SEVERE,"",e);
+		}
 		if(!util.isNullOrEmpty(googlegroups)){
 			participants.add(googlegroups);
 			//add googlegroups to project default participants

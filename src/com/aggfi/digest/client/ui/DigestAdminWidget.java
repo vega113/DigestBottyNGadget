@@ -66,7 +66,6 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	Button addAutoTagBtn;
 	
 	ProjectSelectWidget projectSelectWidget;
-	ListBox prjList = null;
 	
 	private RemoveHandler removeDefaultParticipantHandler = null;
 	private RemoveHandler removeDefaultTagHandler = null;
@@ -88,8 +87,6 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	DigestUtils digestUtils = null;
 	public Runnable runOnTabSelect;
 	
-	JSONValue adminConfigJson = null;
-
 	@Inject
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -182,31 +179,27 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			@Override
 			public void run() {
 				Log.debug("DigestAdminWidget::DigestReportWidget Running");
-				prjList = projectSelectWidget.getPrjList();
 				String projectId = getProjectId();
 				try {
 					digestService.retrAdminConfig(projectId, new AsyncCallback<JSONValue>() {
 						
 						@Override
 						public void onSuccess(JSONValue result) {
-							adminConfigJson = result;
 							initJsonArrayModule(result,"defaultParticipants",defaultParticipantsPanel,removeDefaultParticipantHandler);
-							Log.debug("Loaded: defaultParticipants");
 							initJsonArrayModule(result,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
-							Log.debug("Loaded: defaultTags");
 							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
-							Log.debug("Loaded: autoTags");
 							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
-							Log.debug("Loaded: managers");
 						}
 						
 						@Override
 						public void onFailure(Throwable caught) {
 							Log.error("", caught);
 							digestUtils.adjustHeight();
+							digestUtils.dismissMessage();
 						}
 					});
 				} catch (RequestException e) {
+					digestUtils.dismissMessage();
 					Log.error("", e);
 				}
 			}
@@ -228,8 +221,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback);
 		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
-		prjList = this.projectSelectWidget.getPrjList();
-		prjList.addChangeHandler(new ChangeHandler() {
+		projectSelectWidget.getPrjList().addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
 				handleOnSelectPrjList(event);
@@ -239,6 +231,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 
 	protected void handleOnSelectPrjList(ChangeEvent event) {
 		clearAll();
+		digestUtils.setCurrentDigestId(getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
 		onProjectsLoadCallback.run();
 		
 	}
@@ -386,6 +379,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	private void initJsonMapModule(JSONValue result,String jsonFieldName, ComplexPanel panel,RemoveHandler removeHandler) {
 		HorizontalPanel pat = new HorizontalPanel();
+		panel.add(pat);
 		JSONObject jsonMap = result.isObject().get(jsonFieldName).isObject();
 		Set<String> keys = jsonMap.keySet();
 		int i = 0;
@@ -407,6 +401,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	private void initJsonArrayModule(JSONValue result, String jsonFieldName, ComplexPanel panel, RemoveHandler removeHandler) {
 		HorizontalPanel p = new HorizontalPanel();
+		panel.add(p);
 		JSONArray jsonArray = result.isObject().get(jsonFieldName).isArray();
 		for(int i = 0; i< jsonArray.size(); i++){
 			if(i != 0 && i % 2 == 0){
@@ -428,7 +423,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	}
 
 	protected String getProjectId() {
-		String projectId = prjList.getValue(prjList.getSelectedIndex() > -1 ? prjList.getSelectedIndex() : 0);
+		String projectId = projectSelectWidget.getPrjList().getValue(projectSelectWidget.getPrjList().getSelectedIndex() > -1 ? projectSelectWidget.getPrjList().getSelectedIndex() : 0);
 		return projectId;
 	}
 
