@@ -17,6 +17,14 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 	@UiField
 	HTML aboutDigestBottyPnl;
 	@UiField
+	HTML aboutHelpPnl;
+	@UiField
+	HTML aboutCreatePnl;
+	@UiField
+	HTML aboutAdminPnl;
+	@UiField
+	HTML aboutReportPnl;
+	@UiField
 	HTML contactInfoPnl;
 	
 	private static DigestAboutWidgetUiBinder uiBinder = GWT
@@ -30,10 +38,15 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 	@Inject
 	public DigestAboutWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
-		aboutDigestBottyPnl.setHTML(constants.aboutDigestbottyStr());
-		contactInfoPnl.setHTML(constants.contactInfoValueStr());
+		aboutDigestBottyPnl.setHTML(constants.aboutDigestBottyStr());
+		aboutHelpPnl.setHTML(constants.aboutHlpStr());
+		aboutCreatePnl.setHTML(constants.aboutCreateStr());
+		aboutAdminPnl.setHTML(constants.aboutAdminStr());
+		aboutReportPnl.setHTML(constants.aboutReportStr());
+		String cntMsg = messages.contactInfoValueMsg(constants.discussDigestBottyUrl(),constants.installDigestBottyUrl());
+		contactInfoPnl.setHTML(cntMsg);
 	}
-
+	
 
 	@Override
 	public Runnable getRunOnTabSelect() {

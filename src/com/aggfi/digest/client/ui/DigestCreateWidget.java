@@ -61,14 +61,14 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	FlexTable createGadgetFlexTbl;
 	@UiField
 	PushButton submitBtn;
-	@UiField
+//	@UiField
 	HTML outputTxt;
 	@UiField
 	CheckBox isPublicBox;
 	@UiField
 	HTML isPublicQuestion;
-	@UiField
-	CaptionPanel outputTxtCaption;
+//	@UiField
+//	CaptionPanel outputTxtCaption;
 
 	private Runnable onDigestCreateWidgetLoad;
 	
@@ -92,8 +92,9 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	public DigestCreateWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		resources.globalCSS().ensureInjected();
+		outputTxt = new HTML();//TODO remove later, I keep just in case i ll change my mind and will leave the caption with request info instead of minimessages
 		
+		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
 		
 		initCreateGadgetFlexTbl(createGadgetFlexTbl,constants,resources);
@@ -133,30 +134,34 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 								}
 								outputTxt.setStyleName(resources.globalCSS().messageSuccess());
 								outputTxt.setText(outMessage);
+								DigestUtils.getInstance().showSuccessMessage(outMessage, 5);
 							}
 							
 							@Override
 							public void onFailure(Throwable caught) {
 								outputTxt.setStyleName(resources.globalCSS().warning());
 								outputTxt.setText(caught.getMessage());
+								DigestUtils.getInstance().alert(caught.getMessage());
 							}
 						});
 					} catch (RequestException e) {
 						outputTxt.setText(e.getMessage());
+						DigestUtils.getInstance().alert(e.getMessage());
 						Log.error("",e);
 					}
 				}catch(IllegalArgumentException e){
 					Log.error("should be verification error!",e);
 					outputTxt.setText(e.getMessage());
 					outputTxt.setStyleName(resources.globalCSS().warning());
+					DigestUtils.getInstance().alert(e.getMessage());
 				}catch(Exception e){
 					Log.error("",e);
 					outputTxt.setText(e.getMessage());
 					outputTxt.setStyleName(resources.globalCSS().warning());
+					DigestUtils.getInstance().alert(e.getMessage());
 				}
 			}
 		});
-		outputTxtCaption.setCaptionText(constants.createDigestRequestStatus());
 	}
 	
 

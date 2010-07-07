@@ -18,10 +18,19 @@ public interface DigestConstants extends Constants {
 	String reportTabStr();
 	String aboutTabStr();
 	
-	String aboutDigestbottyStr();
-	String instructionsHeaderStr();
-	String contactInfoValueStr();
+	String aboutHlpStr();
+	String aboutCreateStr();
+	String aboutDigestBottyStr();
+	String aboutAdminStr();
+	String aboutReportStr();
+	
+	String aboutDigestBottyCaptionStr();
+	String aboutCreateCaptionStr();
+	String aboutHlpCaptionStr();
 	String contactInfoCaptionStr();
+	
+	String instructionsHeaderStr();
+	
 
 	
 	String ownerStr();
@@ -149,17 +158,20 @@ public interface DigestConstants extends Constants {
 	
 	String retrieveingDataStr();
 	String waitingForResponseStr();
-	String loadingDataStr();
 	
 	String defaultTagExpl();
 	String autoTagExpl();
 	String managersExpl();
 	String defaultParticipantExpl();
 	
+	//urls
+	String discussDigestBottyUrl();
+	String installDigestBottyUrl();
+	
 	//size
-	@DefaultStringValue(value="525px")//change both
+	@DefaultStringValue(value="520px")//change both
 	String basicWidthStr();
-	@DefaultIntValue(value=525)//change both
+	@DefaultIntValue(value=520)//change both
 	int basicWidthInt();
 	
 	/**
@@ -179,5 +191,7 @@ public interface DigestConstants extends Constants {
 	String basicTextBoxWidthStr();
 	@DefaultIntValue(value=25)
 	int itemCreateHeight();
+	@DefaultStringValue(value="90px")
+	String aboutTabScrollHeight();
 	
 }

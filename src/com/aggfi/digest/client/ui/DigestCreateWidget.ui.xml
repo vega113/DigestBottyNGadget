@@ -25,10 +25,10 @@
 						</g:HorizontalPanel>
 					</g:HTMLPanel>
 				</g:HorizontalPanel>
-				<g:CaptionPanel ui:field="outputTxtCaption"
-					stylePrimaryName='{res.globalCSS.pretty}'>
-					<g:HTML ui:field="outputTxt"></g:HTML>
-				</g:CaptionPanel>
+<!--				<g:CaptionPanel ui:field="outputTxtCaption" captionText='{constants.createDigestRequestStatus()}'-->
+<!--					stylePrimaryName='{res.globalCSS.pretty}' visible='false'>-->
+<!--					<g:HTML ui:field="outputTxt"></g:HTML>-->
+<!--				</g:CaptionPanel>-->
 			</g:VerticalPanel>
 		</g:DecoratorPanel>
 	</g:HTMLPanel>

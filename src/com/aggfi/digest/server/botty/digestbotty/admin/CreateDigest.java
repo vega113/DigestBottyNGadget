@@ -3,6 +3,7 @@ package com.aggfi.digest.server.botty.digestbotty.admin;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -20,6 +21,8 @@ import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.google.gson.annotations.Expose;
 import com.google.inject.Inject;
+import com.google.wave.api.Blip;
+import com.google.wave.api.BlipContentRefs;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.Installer;
 import com.google.wave.api.Participants;
@@ -87,7 +90,7 @@ public class CreateDigest extends Command {
 			String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
 			
 			//now create FAQ wave for the newly created Digest
-			createFAQ(extDigest,isPublicOnCreate);
+			createFAQ(extDigest,digestWaveId,isPublicOnCreate);
 			
 			String message = "Success! You have " + numOfOwnerDigests + " digests. Maximum number of Digests per owner is: " + System.getProperty("MAX_DIGESTS") + 
 			". Digest wave was created and you were added as participant.";
@@ -115,7 +118,7 @@ public class CreateDigest extends Command {
 	/*
 	 * add first post in the Digest - with installer
 	 */
-	private void createFAQ(ExtDigest extDigest, boolean isPublicOnCreate) throws IOException {
+	private void createFAQ(ExtDigest extDigest, String digestWaveId, boolean isPublicOnCreate) throws IOException {
 		String domain = extDigest.getDomain();
     	String projectId = extDigest.getProjectId();
     	String projectName= extDigest.getName();
@@ -148,10 +151,8 @@ public class CreateDigest extends Command {
 		newWavelet.setTitle(projectName  + " Installer and FAQ");
 		
 		newWavelet.getRootBlip().append(new Installer(installerUrl)); 
-		newWavelet.getRootBlip().append("Use the installer above to install " + projectName + ". ");
-		newWavelet.getRootBlip().append("After installation you will have a \"New " + projectName + " Post\" option in the \"New Wave\" menu. " );
 		
-		newWavelet.getRootBlip().append("The Digest owner is: " + ownerId + ".");
+		appendFaq2blip(projectName, digestWaveId,ownerId, newWavelet);
 		
 		newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
 	
@@ -160,6 +161,94 @@ public class CreateDigest extends Command {
 		
 		//add this post to the digest
 		robot.addPost2Digest(projectId, newWavelet);
+	}
+
+	protected void appendFaq2blip(String projectName, String digestWaveId,String ownerId,Wavelet newWavelet) {
+		StringBuilderAnnotater sba = new StringBuilderAnnotater(newWavelet.getRootBlip());
+		
+		String styleFontWeight = "style/fontWeight";
+		String styleFontStyle = "style/fontStyle";
+		//1
+		String q1 = "Q: How can I create posts in this Forum?\n";
+		sba.append(q1, styleFontWeight, "bold");
+		String a1 = "A: Use the installer above to install " + projectName + " Forum. " + 
+			"After installation you will have a \"New " + projectName + " Post\" option in the \"New Wave\" menu, use it to create new posts.\n\n";
+		sba.append(a1, styleFontStyle, "italic");
+		//2
+		String q2 = "Q: Who is the Forum owner?\n";
+		sba.append(q2, styleFontWeight, "bold");
+		String a2 = "A: This forum was created by: " + ownerId + " , use this id for questions regarding the \"" +projectName + "\" forum.\n\n";
+		sba.append(a2, styleFontStyle, "italic");
+		//3
+		String q3 = "Q: I have more questions regarding use of Forums Created by DigestBotty, where can I ask them?\n";
+		sba.append(q3, styleFontWeight, "bold");
+		String a3_1 = "A: Please visit the DigestBotty digest wave ";
+		sba.append(a3_1, styleFontStyle, "italic");
+		String a3_2 = "here";
+		sba.append(a3_2, "link/wave", System.getProperty("DIGESTBOTTY_DIGEST_LINK"));
+		String a3_3 = " and check if you can find your answer.";
+		sba.append(a3_3, styleFontStyle, "italic");
+		String a3_4 = " Also, you are welcome to install the DigestBotty Forum ";
+		sba.append(a3_4, styleFontStyle, "italic");
+		String a3_5 = "here";
+		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_LINK"));
+		String a3_6 = " and then create a new post with your question\n\n";
+		sba.append(a3_6, styleFontStyle, "italic");
+		//4
+		String q4 = "Q: How can I be notified about new posts in this Forum?\n";
+		sba.append(q4, styleFontWeight, "bold");
+		String a4_1 = "A: You can go to the \"" + projectName + "\" ";
+		sba.append(a4_1, styleFontStyle, "italic");
+		String a4_2 = "Digest wave";
+		sba.append(a4_2, "link/wave", "googlewave.com!" + digestWaveId);
+		String a4_3 = " and then \"Follow\" it.\n\n";
+		sba.append(a4_3, styleFontStyle, "italic");
+		
+		
+		sba.flush2Blip();
+	}
+	
+	class StringBuilderAnnotater{
+		private StringBuilder sb;
+		private ArrayList<Integer> annStarts;
+		private ArrayList<Integer> annEnds;
+		private ArrayList<String> annVal;
+		private ArrayList<String> annType;
+		private Blip blip;
+		int prevBlipLength;
+		
+		public StringBuilderAnnotater(Blip blip){
+			sb = new StringBuilder();
+			annStarts = new ArrayList<Integer>();
+			annEnds = new ArrayList<Integer>();
+			annVal = new ArrayList<String>();
+			annType = new ArrayList<String>();
+			this.blip = blip;
+			prevBlipLength = blip.length();
+		}
+		
+		public void append(String str, String annTypeStr, String annValStr){
+			int curLength = sb.length();
+			int strLength = str.length();
+			annStarts.add(curLength);
+			annEnds.add(curLength + strLength);
+			annVal.add(annValStr);
+			annType.add(annTypeStr);
+			sb.append(str);
+		}
+		
+		public Blip flush2Blip(){
+			blip.append(sb.toString());
+			int length = annStarts.size();
+			for(int i = 0; i < length; i++){
+				int annStart = annStarts.get(i);
+				int annEnd = annEnds.get(i);
+				if(annVal.get(i) != null && annType.get(i) != null){
+					BlipContentRefs.range(blip, prevBlipLength + annStart, prevBlipLength + annEnd).annotate( annType.get(i), annVal.get(i) );
+				}
+			}
+			return blip;
+		}
 	}
 
 	class Output {

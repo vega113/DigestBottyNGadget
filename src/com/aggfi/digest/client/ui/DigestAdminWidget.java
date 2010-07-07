@@ -13,7 +13,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -21,14 +20,11 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -90,7 +86,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@Inject
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
-		
+		hideAll();
 		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
 		this.messages = messages;
@@ -181,6 +177,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				Log.debug("DigestAdminWidget::DigestReportWidget Running");
 				String projectId = getProjectId();
 				try {
+					String msg = messages.loadingForumsMsg(constants.adminTabStr(), getProjectName());
+					Log.debug(msg);
+					digestUtils.showStaticMessage(msg);
 					digestService.retrAdminConfig(projectId, new AsyncCallback<JSONValue>() {
 						
 						@Override
@@ -189,17 +188,21 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 							initJsonArrayModule(result,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
 							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
 							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
+							Log.debug("dismissMessage");
+							digestUtils.dismissStaticMessage();
 						}
 						
 						@Override
 						public void onFailure(Throwable caught) {
 							Log.error("", caught);
 							digestUtils.adjustHeight();
-							digestUtils.dismissMessage();
+							digestUtils.dismissStaticMessage();
+							digestUtils.alert(caught.getMessage());
 						}
 					});
 				} catch (RequestException e) {
-					digestUtils.dismissMessage();
+					digestUtils.dismissStaticMessage();
+					digestUtils.alert(e.getMessage());
 					Log.error("", e);
 				}
 			}
@@ -231,6 +234,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 
 	protected void handleOnSelectPrjList(ChangeEvent event) {
 		clearAll();
+		hideAll();
 		digestUtils.setCurrentDigestId(getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
 		onProjectsLoadCallback.run();
 		
@@ -241,6 +245,12 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		defaultTagsPanel.clear();
 		autoTagsPanel.clear();
 		managersPanel.clear();
+	}
+	protected void hideAll(){
+		defaultParticipantsPanel.getParent().setVisible(false);
+		defaultTagsPanel.getParent().setVisible(false);
+		autoTagsPanel.getParent().setVisible(false);
+		managersPanel.getParent().setVisible(false);
 	}
 	
 	/*
@@ -396,6 +406,10 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 			i++;
 		}
+		if(keys.size() > 0){
+			panel.getParent().setVisible(true);
+			panel.setVisible(true);
+		}
 		digestUtils.adjustHeight();
 	}
 	
@@ -415,6 +429,10 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				panel.add(p);
 			}
 		}
+		if(jsonArray.size() > 0){
+			panel.getParent().setVisible(true);
+			panel.setVisible(true);
+		}
 		digestUtils.adjustHeight();
 	}
 	
@@ -425,6 +443,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	protected String getProjectId() {
 		String projectId = projectSelectWidget.getPrjList().getValue(projectSelectWidget.getPrjList().getSelectedIndex() > -1 ? projectSelectWidget.getPrjList().getSelectedIndex() : 0);
 		return projectId;
+	}
+	
+	protected String getProjectName() {
+		String projectName = projectSelectWidget.getPrjList().getItemText(projectSelectWidget.getPrjList().getSelectedIndex() > -1 ? projectSelectWidget.getPrjList().getSelectedIndex() : 0);
+		return projectName;
 	}
 
 	public Runnable getRunOnTabSelect() {

@@ -5,6 +5,8 @@ import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.utils.DigestUtils;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.inject.Inject;
@@ -47,6 +49,13 @@ public class DigestTabPanel extends DecoratedTabPanel {
 						DigestUtils.getInstance().adjustHeight();
 					}
 				}
+				DeferredCommand.addCommand(new Command() {
+					
+					@Override
+					public void execute() {
+						DigestUtils.getInstance().dismissAllStaticMessages();
+					}
+				});
 			}
 		});
 	}

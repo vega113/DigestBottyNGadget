@@ -66,7 +66,6 @@ public class ProjectSelectWidget extends Composite {
 				@Override
 				public void onSuccess(JSONValue resultJsonValue) {
 					Log.debug("ProjectSelectWidget.onSuccess: " + resultJsonValue.toString());
-					digestUtils.dismissMessage();
 					if(resultJsonValue.isObject() != null){
 						JSONObject resultJson = resultJsonValue.isObject();
 						if(resultJson.containsKey("none")){
@@ -92,6 +91,7 @@ public class ProjectSelectWidget extends Composite {
 									}
 								}
 							}
+							digestUtils.dismissStaticMessage();
 							onProjectsRetrCallback.run();
 						}
 					}else{
@@ -102,14 +102,16 @@ public class ProjectSelectWidget extends Composite {
 								}
 							}catch (Exception e) {
 								Log.error("after try to parse to obj", e);
+								digestUtils.alert(e.getMessage());
 							}
 						}
 					}
 				}
-					
 			});
 		} catch (RequestException e) {
 			Log.error("", e);
+			digestUtils.dismissStaticMessage();
+			digestUtils.alert(e.getMessage());
 		}
 
 	}

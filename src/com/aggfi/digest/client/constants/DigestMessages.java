@@ -38,6 +38,8 @@ public interface DigestMessages extends Messages {
 
   String fieldShouldBeAlphaNumericExcptn(String fieldname, String field);
 
-  String loadingForumsMsg(String projectId);
+  String loadingForumsMsg(String tabName, String forumName);
   String loadingForumsListMsg(String userWaveId);
+  
+  String contactInfoValueMsg(String discussDigestBottyUrl, String installDigestBottyUrl);
 }

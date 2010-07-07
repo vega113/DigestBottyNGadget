@@ -5,27 +5,42 @@ import com.google.gwt.core.client.JavaScriptObject;
 public final class MiniMessages extends JavaScriptObject {
 
 	protected MiniMessages(){}
-	//TODO need some stack implementation to store msgs
 	public native void createDismissibleMessage(String message) /*-{
-		$wnd.gwtHtmlMsg = this.createDismissibleMessage(message);
+		this.createDismissibleMessage(message);
 	}-*/;
 	
 	public native void createStaticMessage(String message) /*-{
-		$wnd.gwtHtmlMsg = this.createStaticMessage(message);
+		$wnd.msgCounter = $wnd.msgCounter + 1;
+		$wnd.gwtHtmlMsg[$wnd.msgCounter] = this.createStaticMessage(message);
 	}-*/;
 	
 	public native void createTimerMessage(String message) /*-{
-		$wnd.gwtHtmlMsg = this.createTimerMessage(message, seconds)
+		this.createTimerMessage(message, seconds);
 	}-*/;
 	
-	public native void dismissMessage() /*-{
-		this.dismissMessage($wnd.gwtHtmlMsg);
+	public native void dismissStaticMessage() /*-{
+		if($wnd.msgCounter > 0){
+			this.dismissMessage($wnd.gwtHtmlMsg[$wnd.msgCounter]);
+			$wnd.msgCounter = $wnd.msgCounter - 1;
+		}
 	}-*/;
 	
 	public native void alert(String message) /*-{
-		$wnd.gwtHtmlMsg = this.createDismissibleMessage(message);
-	  	statusMsg.style.backgroundColor = "red";
-	  	statusMsg.style.color = "white";
+		var msgElement = this.createDismissibleMessage(message);
+	  	msgElement.style.backgroundColor = "red";
+	  	msgElement.style.color = "white";
+	}-*/;
+	
+	public native void success(String message, int seconds) /*-{
+		var msgElement = this.createTimerMessage(message, seconds);
+	  	msgElement.style.color = "green";
+	}-*/;
+	
+	public native void dismissAllStaticMessages() /*-{
+		while($wnd.msgCounter > 0){
+			this.dismissMessage($wnd.gwtHtmlMsg[$wnd.msgCounter]);
+			$wnd.msgCounter = $wnd.msgCounter - 1;
+		}
 	}-*/;
 	
 }

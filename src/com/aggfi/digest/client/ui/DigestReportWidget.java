@@ -34,6 +34,7 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.visualization.client.AbstractDataTable;
+import com.google.gwt.visualization.client.LegendPosition;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.Selection;
@@ -62,7 +63,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	@UiField
 	SimplePanel prjListContainer;
 	ProjectSelectWidget projectSelectWidget;
-	ListBox prjList = null;
 	
 	DigestService digestService;
 	DigestMessages messages;
@@ -77,7 +77,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	@Inject
 	public DigestReportWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
-		
+		hideAll();
 		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
 		this.messages = messages;
@@ -109,12 +109,16 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	}
 
 
+	private void hideAll() {
+		reportPanel.setVisible(false);
+	}
+
+
 	private void initReportWidget() {
 		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback);
 		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
-		prjList = this.projectSelectWidget.getPrjList();
-		prjList.addChangeHandler(new ChangeHandler() {
+		projectSelectWidget.getPrjList().addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
 				handleOnSelectPrjList(event);
@@ -127,7 +131,9 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			final DigestConstants constants, GlobalResources resources,
 			DigestService digestService2, VerticalPanel reportPanel2 ) {
 		try {
-			digestUtils.showStaticMessage(constants.retrieveingDataStr());
+			String msg = messages.loadingForumsMsg(constants.reportTabStr(), getProjectName());
+			Log.debug(msg);
+			digestUtils.showStaticMessage(msg);
 			digestService2.retrTagsDistributions(getProjectId() , new AsyncCallback<JSONValue>() {
 				@Override
 				public void onSuccess(JSONValue result) {
@@ -146,8 +152,9 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 					pie.addSelectHandler(createSelectHandler(pie));
 					reportPanel.clear();
 					reportPanel.add(pie);
+					reportPanel.setVisible(true);
 					digestUtils.adjustHeight();
-					digestUtils.dismissMessage();
+					digestUtils.dismissStaticMessage();
 				}
 				
 				@Override
@@ -163,8 +170,12 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	}
 
 
+
 	private String getProjectId() {
-		return prjList.getValue(prjList.getSelectedIndex());
+		return projectSelectWidget.getPrjList().getValue(projectSelectWidget.getPrjList().getSelectedIndex());
+	}
+	private String getProjectName() {
+		return projectSelectWidget.getPrjList().getItemText(projectSelectWidget.getPrjList().getSelectedIndex());
 	}
 
 	private AbstractDataTable createTagsBreakdownTable(Map<String, Integer> tagsBreakdown) {
@@ -237,7 +248,9 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				final DigestConstants constants, GlobalResources resources,
 				DigestService digestService2, VerticalPanel reportPanel2 ) {
 			try {
-				digestUtils.showStaticMessage(constants.retrieveingDataStr());
+				String msg = messages.loadingForumsMsg(constants.reportTabStr(), getProjectName());
+				Log.debug(msg);
+				digestUtils.showStaticMessage(msg);
 				digestService2.retrPostCountsT(getProjectId() , new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -258,9 +271,10 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 						LineChart lineChart = new LineChart(dataTable,options);
 						lineChart.addSelectHandler(createPostCountsSelectHandler(lineChart));
 						reportPanel.clear();
+						reportPanel.setVisible(true);
 						reportPanel.add(lineChart);
 						digestUtils.adjustHeight();
-						digestUtils.dismissMessage();
+						digestUtils.dismissStaticMessage();
 					}
 					
 
@@ -330,6 +344,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 					    options.setWidth(constants.basicWidthInt());
 					    options.setHeight(constants.basicReportHeightInt());
 					    options.setTitle(constants.newWavesLast14Days());
+					    options.setLegend(LegendPosition.NONE);
 					    return options;
 					  }
 
@@ -347,7 +362,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		}
 	  
 	  void handleOnSelectPrjList(ChangeEvent event){
-		  digestUtils.showStaticMessage(constants.retrieveingDataStr());
+		  hideAll();
 		  digestUtils.setCurrentDigestId(getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
 		  if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(TAGS_BREAKDOWN) ){
 			  reportPanel.clear();
@@ -356,7 +371,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			  reportPanel.clear();
 			  drawPostCountsLineChart(messages,constants,resources,digestService,reportPanel);
 		  }
-		  digestUtils.dismissMessage();
 	  }
 	  
 	  @UiHandler("reportTypesList")
