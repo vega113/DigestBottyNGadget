@@ -61,14 +61,10 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	FlexTable createGadgetFlexTbl;
 	@UiField
 	PushButton submitBtn;
-//	@UiField
-	HTML outputTxt;
 	@UiField
 	CheckBox isPublicBox;
 	@UiField
 	HTML isPublicQuestion;
-//	@UiField
-//	CaptionPanel outputTxtCaption;
 
 	private Runnable onDigestCreateWidgetLoad;
 	
@@ -82,8 +78,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		
 		@Override
 		public void onClick(ClickEvent event) {
-			outputTxt.setText("");
-			outputTxt.setStyleName(resources.globalCSS().warning());
+			DigestUtils.getInstance().dismissAlert();
 		}
 	}
 
@@ -92,16 +87,12 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	public DigestCreateWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		outputTxt = new HTML();//TODO remove later, I keep just in case i ll change my mind and will leave the caption with request info instead of minimessages
-		
 		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
 		
 		initCreateGadgetFlexTbl(createGadgetFlexTbl,constants,resources);
 		submitBtn.setText(constants.submitBtnStr());
 		
-		outputTxt.setStyleName(resources.globalCSS().readonly());
-
 		isPublicQuestion.setText(constants.isPublicQuestion());
 		isPublicQuestion.setTitle(constants.isPublicQuestionTtl());
 		isPublicBox.setTitle(constants.isPublicQuestionTtl());
@@ -115,8 +106,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 					Log.debug("click on initExtDigestFromFields - over");
 					FieldVerifier.areValidDigestFields(digest,messages,constants);
 					Log.debug("click on areValidDigestFields - over");
-					outputTxt.setStyleName(resources.globalCSS().message());
-					outputTxt.setText("Sending request...");
+					DigestUtils.getInstance().showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
 					try {
 						digestService.createDigest(digest, new AsyncCallback<JSONValue>() {
 							
@@ -132,32 +122,25 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 									//cannot happen
 									throw new AssertionError ("No message body in create digest - it cannot happen!");
 								}
-								outputTxt.setStyleName(resources.globalCSS().messageSuccess());
-								outputTxt.setText(outMessage);
+								DigestUtils.getInstance().dismissStaticMessage();
+								outMessage = outMessage.substring(1).substring(0, outMessage.length()-1); //workaround to remove ""
 								DigestUtils.getInstance().showSuccessMessage(outMessage, 5);
 							}
 							
 							@Override
 							public void onFailure(Throwable caught) {
-								outputTxt.setStyleName(resources.globalCSS().warning());
-								outputTxt.setText(caught.getMessage());
 								DigestUtils.getInstance().alert(caught.getMessage());
 							}
 						});
 					} catch (RequestException e) {
-						outputTxt.setText(e.getMessage());
 						DigestUtils.getInstance().alert(e.getMessage());
 						Log.error("",e);
 					}
 				}catch(IllegalArgumentException e){
 					Log.error("should be verification error!",e);
-					outputTxt.setText(e.getMessage());
-					outputTxt.setStyleName(resources.globalCSS().warning());
 					DigestUtils.getInstance().alert(e.getMessage());
 				}catch(Exception e){
 					Log.error("",e);
-					outputTxt.setText(e.getMessage());
-					outputTxt.setStyleName(resources.globalCSS().warning());
 					DigestUtils.getInstance().alert(e.getMessage());
 				}
 			}
@@ -308,11 +291,13 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			w.setTitle( w.getTitle() + " " + constants.exampleWord() + "\"" +  exampleStrs[i] + "\"");
 			String title = w.getTitle();
 			tooltipImage.setTitle(title);
+			int textBoxWidth = (int)(constants.basicWidthInt()*0.64);
+			w.setWidth( textBoxWidth + "px");
+			w.setHeight(constants.itemCreateHeight() + "px");
+			hp.setWidth(textBoxWidth + 16 + "px");
 			hp.add(vp);
 			hp.add(w);
 			tbl.setWidget(i, 1, hp);
-			w.setWidth(((int)constants.basicWidthInt()/1.46) + "px");
-			w.setHeight(constants.itemCreateHeight() + "px");
 		}
 		ColumnFormatter colFormatter = tbl.getColumnFormatter();
 		colFormatter.addStyleName(1, resources.globalCSS().inputRegular());

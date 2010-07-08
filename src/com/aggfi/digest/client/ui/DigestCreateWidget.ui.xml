@@ -7,28 +7,27 @@
 		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
 		<g:DecoratorPanel>
-			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}' width='{constants.basicWidthStr}'>
+			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}'
+				width='{constants.basicWidthStr}'>
 				<g:cell>
 					<g:FlexTable ui:field="createGadgetFlexTbl"></g:FlexTable>
 				</g:cell>
-				<g:HorizontalPanel>
-					<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
-						<g:HorizontalPanel>
-							<g:HTML ui:field="isPublicQuestion"></g:HTML>
-							<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
-							<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
-							<g:DecoratorPanel>
-								<g:HTMLPanel>
-									<g:PushButton ui:field="submitBtn"></g:PushButton>
-								</g:HTMLPanel>
-							</g:DecoratorPanel>
-						</g:HorizontalPanel>
-					</g:HTMLPanel>
-				</g:HorizontalPanel>
-<!--				<g:CaptionPanel ui:field="outputTxtCaption" captionText='{constants.createDigestRequestStatus()}'-->
-<!--					stylePrimaryName='{res.globalCSS.pretty}' visible='false'>-->
-<!--					<g:HTML ui:field="outputTxt"></g:HTML>-->
-<!--				</g:CaptionPanel>-->
+				<g:cell>
+					<g:HorizontalPanel>
+						<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
+							<g:HorizontalPanel>
+								<g:HTML ui:field="isPublicQuestion"></g:HTML>
+								<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
+								<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
+								<g:DecoratorPanel>
+									<g:HTMLPanel>
+										<g:PushButton ui:field="submitBtn"></g:PushButton>
+									</g:HTMLPanel>
+								</g:DecoratorPanel>
+							</g:HorizontalPanel>
+						</g:HTMLPanel>
+					</g:HorizontalPanel>
+				</g:cell>
 			</g:VerticalPanel>
 		</g:DecoratorPanel>
 	</g:HTMLPanel>

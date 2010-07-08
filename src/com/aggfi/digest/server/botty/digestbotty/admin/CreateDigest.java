@@ -168,6 +168,9 @@ public class CreateDigest extends Command {
 		
 		String styleFontWeight = "style/fontWeight";
 		String styleFontStyle = "style/fontStyle";
+		//0
+		String faqStr = "FAQ:\n\n";
+		sba.append(faqStr, styleFontWeight, "bold");
 		//1
 		String q1 = "Q: How can I create posts in this Forum?\n";
 		sba.append(q1, styleFontWeight, "bold");
@@ -177,7 +180,7 @@ public class CreateDigest extends Command {
 		//2
 		String q2 = "Q: Who is the Forum owner?\n";
 		sba.append(q2, styleFontWeight, "bold");
-		String a2 = "A: This forum was created by: " + ownerId + " , use this id for questions regarding the \"" +projectName + "\" forum.\n\n";
+		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
 		//3
 		String q3 = "Q: I have more questions regarding use of Forums Created by DigestBotty, where can I ask them?\n";
@@ -192,7 +195,7 @@ public class CreateDigest extends Command {
 		sba.append(a3_4, styleFontStyle, "italic");
 		String a3_5 = "here";
 		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_LINK"));
-		String a3_6 = " and then create a new post with your question\n\n";
+		String a3_6 = " and then create a new post with your question.\n\n";
 		sba.append(a3_6, styleFontStyle, "italic");
 		//4
 		String q4 = "Q: How can I be notified about new posts in this Forum?\n";

@@ -18,7 +18,6 @@ public interface DigestConstants extends Constants {
 	String reportTabStr();
 	String aboutTabStr();
 	
-	String aboutHlpStr();
 	String aboutCreateStr();
 	String aboutDigestBottyStr();
 	String aboutAdminStr();

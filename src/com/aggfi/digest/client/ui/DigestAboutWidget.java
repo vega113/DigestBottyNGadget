@@ -39,7 +39,8 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 	public DigestAboutWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		aboutDigestBottyPnl.setHTML(constants.aboutDigestBottyStr());
-		aboutHelpPnl.setHTML(constants.aboutHlpStr());
+//		String imageUrl = "http://" + constants.appDomain()+ "/images/images3.jpg";
+		aboutHelpPnl.setHTML(messages.aboutHlpMsg(resources.tooltip().getURL()));
 		aboutCreatePnl.setHTML(constants.aboutCreateStr());
 		aboutAdminPnl.setHTML(constants.aboutAdminStr());
 		aboutReportPnl.setHTML(constants.aboutReportStr());
@@ -54,7 +55,7 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 			
 			@Override
 			public void run() {
-				
+				//TODO ? 
 			}
 		};
 	}

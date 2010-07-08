@@ -55,7 +55,10 @@ public class ProjectSelectWidget extends Composite {
 
 		final String userId = digestUtils.retrUserId();
 		try {
-			digestUtils.showStaticMessage(messages.loadingForumsListMsg(userId));
+			
+			String msg = messages.loadingForumsListMsg(userId);
+			Log.debug(msg);
+			digestUtils.showStaticMessage(msg);
 			digestService.retrPrjectsPerUserId(userId, new AsyncCallback<JSONValue>() {
 
 				@Override
@@ -98,8 +101,6 @@ public class ProjectSelectWidget extends Composite {
 						if(resultJsonValue.isString() != null){
 							try{
 								JSONObject tryjson = JSONParser.parse(resultJsonValue.isString().stringValue()).isObject();
-								if(tryjson != null){
-								}
 							}catch (Exception e) {
 								Log.error("after try to parse to obj", e);
 								digestUtils.alert(e.getMessage());
@@ -110,7 +111,6 @@ public class ProjectSelectWidget extends Composite {
 			});
 		} catch (RequestException e) {
 			Log.error("", e);
-			digestUtils.dismissStaticMessage();
 			digestUtils.alert(e.getMessage());
 		}
 

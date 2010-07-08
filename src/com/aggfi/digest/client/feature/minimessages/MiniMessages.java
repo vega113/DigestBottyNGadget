@@ -26,10 +26,18 @@ public final class MiniMessages extends JavaScriptObject {
 	}-*/;
 	
 	public native void alert(String message) /*-{
-		var msgElement = this.createDismissibleMessage(message);
+		$wnd.msgAlertCounter = $wnd.msgAlertCounter + 1;
+		$wnd.gwtAlertHtmlMsg[$wnd.msgAlertCounter] = this.createDismissibleMessage(message);
 	  	msgElement.style.backgroundColor = "red";
 	  	msgElement.style.color = "white";
 	}-*/;
+	
+	public native void dismissAlert() /*-{
+	if($wnd.msgAlertCounter > 0){
+		this.dismissMessage($wnd.gwtAlertHtmlMsg[$wnd.msgAlertCounter]);
+		$wnd.msgAlertCounter = $wnd.msgAlertCounter - 1;
+	}
+}-*/;
 	
 	public native void success(String message, int seconds) /*-{
 		var msgElement = this.createTimerMessage(message, seconds);

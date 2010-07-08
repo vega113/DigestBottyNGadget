@@ -53,7 +53,7 @@ public class DigestTabPanel extends DecoratedTabPanel {
 					
 					@Override
 					public void execute() {
-						DigestUtils.getInstance().dismissAllStaticMessages();
+//						DigestUtils.getInstance().dismissAllStaticMessages();
 					}
 				});
 			}
