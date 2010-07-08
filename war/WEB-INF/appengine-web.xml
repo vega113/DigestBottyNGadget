@@ -24,7 +24,7 @@
     <property name="APP_DOMAIN" value="digestbotty"/>
     <property name="CLICK_GADGET_URL" value="http://waveclick.appspot.com/waveclick/com.aggfi.wave.waveclick.client.WaveClick.gadget.xml"/>
     <property name="DIGESTBOTTY_FORUM_LINK" value="googlewave.com!w+UHTNXwQOA"/>
-    <property name="DIGESTBOTTY_DIGEST_LINK" value="googlewave.com!w+HlpZ97ZkCWl"/>
+    <property name="DIGESTBOTTY_DIGEST_LINK" value="googlewave.com!w+PGKlZLZkBRf"/>
     <property name="PROFILE_URL" value="AboutDigestBotty.html"/>
 	<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
   </system-properties>

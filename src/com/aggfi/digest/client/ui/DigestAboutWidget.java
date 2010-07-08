@@ -4,9 +4,12 @@ import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
+import com.aggfi.digest.client.utils.DigestUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,9 +57,7 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 		return new Runnable() {
 			
 			@Override
-			public void run() {
-				//TODO ? 
-			}
+			public void run() {}
 		};
 	}
 

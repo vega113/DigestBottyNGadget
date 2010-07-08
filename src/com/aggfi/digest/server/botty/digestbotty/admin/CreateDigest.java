@@ -92,7 +92,7 @@ public class CreateDigest extends Command {
 			//now create FAQ wave for the newly created Digest
 			createFAQ(extDigest,digestWaveId,isPublicOnCreate);
 			
-			String message = "Success! You have " + (numOfOwnerDigests + 1) + " forums\\s. Maximum number of Forums per owner is: " + System.getProperty("MAX_DIGESTS") + 
+			String message = "Success! You have " + (numOfOwnerDigests + 1) + " forum(s). Maximum number of Forums per owner is: " + System.getProperty("MAX_DIGESTS") + 
 			". Forum wave was created and you were added as participant.";
 			output = new Output(installerUrl +extDigest.getProjectId(), digestWaveId, projectName, projectId,robotAddress , message );
 		} catch (IOException e) {
@@ -183,7 +183,7 @@ public class CreateDigest extends Command {
 		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
 		//3
-		String q3 = "Q: I have more questions regarding use of Forums Created by DigestBotty, where can I ask them?\n";
+		String q3 = "Q: I have more questions regarding using forums created by DigestBotty, where can I ask them?\n";
 		sba.append(q3, styleFontWeight, "bold");
 		String a3_1 = "A: Please visit the DigestBotty digest wave ";
 		sba.append(a3_1, styleFontStyle, "italic");

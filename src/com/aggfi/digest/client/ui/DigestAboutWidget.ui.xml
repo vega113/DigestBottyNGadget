@@ -5,7 +5,7 @@
 		type='com.aggfi.digest.client.resources.GlobalResources' />
 	<ui:with field='constants'
 		type='com.aggfi.digest.client.constants.DigestConstants' />
-		
+
 	<g:HTMLPanel>
 
 		<g:VerticalPanel width='{constants.basicWidthStr}'
@@ -16,17 +16,19 @@
 			<g:CaptionPanel captionText='{constants.aboutHlpCaptionStr}'>
 				<g:HTML ui:field="aboutHelpPnl"></g:HTML>
 			</g:CaptionPanel>
-			<g:CaptionPanel captionText='{constants.aboutCreateCaptionStr}'>
-				<g:ScrollPanel height='{constants.aboutTabScrollHeight}'>
-					<g:HTML ui:field="aboutCreatePnl"></g:HTML>
-				</g:ScrollPanel>
-			</g:CaptionPanel>
-			<g:CaptionPanel captionText='{constants.adminTabStr}'>
-				<g:HTML ui:field="aboutAdminPnl"></g:HTML>
-			</g:CaptionPanel>
-			<g:CaptionPanel captionText='{constants.reportTabStr}'>
-				<g:HTML ui:field="aboutReportPnl"></g:HTML>
-			</g:CaptionPanel>
+			<g:ScrollPanel height='{constants.aboutTabScrollHeight}'>
+				<g:VerticalPanel>
+					<g:CaptionPanel captionText='{constants.aboutCreateCaptionStr}'>
+						<g:HTML ui:field="aboutCreatePnl"></g:HTML>
+					</g:CaptionPanel>
+					<g:CaptionPanel captionText='{constants.adminTabStr}'>
+						<g:HTML ui:field="aboutAdminPnl"></g:HTML>
+					</g:CaptionPanel>
+					<g:CaptionPanel captionText='{constants.reportTabStr}'>
+						<g:HTML ui:field="aboutReportPnl"></g:HTML>
+					</g:CaptionPanel>
+				</g:VerticalPanel>
+			</g:ScrollPanel>
 			<g:CaptionPanel captionText='{constants.contactInfoCaptionStr}'>
 				<g:HTML ui:field="contactInfoPnl"></g:HTML>
 			</g:CaptionPanel>

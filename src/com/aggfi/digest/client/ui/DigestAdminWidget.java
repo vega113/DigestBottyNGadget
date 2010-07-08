@@ -20,6 +20,8 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ComplexPanel;
@@ -213,7 +215,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			@Override
 			public void run() {
 				initAdminWidget();
-				
+				DeferredCommand.addCommand(new Command() {
+
+					@Override
+					public void execute() {
+						DigestUtils.getInstance().adjustHeight();
+					}
+				});
 			}
 		};
 		

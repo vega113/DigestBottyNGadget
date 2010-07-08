@@ -6,27 +6,29 @@ import com.aggfi.digest.client.ui.DigestTabPanel;
 import com.aggfi.digest.client.utils.DigestUtils;
 import com.allen_sauer.gwt.log.client.DivLogger;
 import com.allen_sauer.gwt.log.client.Log;
-import com.google.gwt.core.client.EntryPoint;
+//import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-//import com.google.gwt.gadgets.client.DynamicHeightFeature;
-//import com.google.gwt.gadgets.client.NeedsDynamicHeight;
-//import com.google.gwt.gadgets.client.UserPreferences;
-//import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
-//import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
-//import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
-//import com.aggfi.digest.client.feature.minimessages.NeedsMiniMessages;
+import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import com.google.gwt.gadgets.client.NeedsDynamicHeight;
+import com.google.gwt.gadgets.client.UserPreferences;
+import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
+import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
+import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
+import com.aggfi.digest.client.feature.minimessages.NeedsMiniMessages;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class DigestBottyGadget implements EntryPoint {
-//@ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=740, height=400)
-//public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages{
+//public class DigestBottyGadget implements EntryPoint {
+@ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=600, height=600)
+public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages{
 
-	/*
+	
 	@Override
 	protected void init(UserPreferences preferences) {
 		try{
@@ -36,14 +38,21 @@ public class DigestBottyGadget implements EntryPoint {
 			DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 			DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
+			RootPanel.get().add(new HTML("."));
 			dhFeature.getContentDiv().add(widget);
-			dhFeature.adjustHeight();
 			initRemoteLogger(RootPanel.get());
-			dhFeature.adjustHeight();
 		}catch(Exception e){
 			initRemoteLogger(RootPanel.get());
 			handleError(e);
 		}
+		Timer timer = new Timer() {
+			
+			@Override
+			public void run() {
+				dhFeature.adjustHeight();
+			}
+		};
+		timer.scheduleRepeating(800);
 	}
 
 	DynamicHeightFeature dhFeature;
@@ -63,14 +72,14 @@ public class DigestBottyGadget implements EntryPoint {
 	/**
 	 * This is the entry point method.
 	 */
-	
+	/*
 	public void onModuleLoad() {
 		DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 		DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
 	    RootPanel.get("mainPanel").add(widget);
 	    initRemoteLogger(RootPanel.get("logPanel"));
 	}
-	
+	*/
 	public void initRemoteLogger(AbsolutePanel panel){
 		Log.setUncaughtExceptionHandler();
 		if (panel != null) {

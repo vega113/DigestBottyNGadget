@@ -38,6 +38,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification.NotificationType;
+import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
@@ -119,9 +120,11 @@ public class ForumBotty extends AbstractRobot {
     DIGEST_WAVE_ID = System.getProperty("DIGEST_WAVE_ID");
     initOauth();
     try {
-        cache = CacheManager.getInstance().getCacheFactory().createCache(Collections.emptyMap());
+    	Map<String, Integer> props = new HashMap<String, Integer>();
+        props.put(GCacheFactory.EXPIRATION_DELTA, 43200);
+        cache = CacheManager.getInstance().getCacheFactory().createCache(props);
     } catch (CacheException e) {
-        // ...
+        LOG.log(Level.SEVERE,"cache init",e);
     }
 
 

@@ -164,6 +164,7 @@ public interface DigestConstants extends Constants {
 	String installDigestBottyUrl();
 	
 	//size
+	/** width of the whole gadget*/
 	@DefaultStringValue(value="520px")//change both
 	String basicWidthStr();
 	@DefaultIntValue(value=520)//change both
@@ -188,7 +189,7 @@ public interface DigestConstants extends Constants {
 	String basicTextBoxWidthStr();
 	@DefaultIntValue(value=25)
 	int itemCreateHeight();
-	@DefaultStringValue(value="90px")
+	@DefaultStringValue(value="234px")
 	String aboutTabScrollHeight();
 	
 }

@@ -15,10 +15,10 @@
 	<inherits name="com.google.gwt.i18n.I18N" />
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.json.JSON" />
-<!--	<inherits name="com.google.gwt.gadgets.Gadgets" />-->
-<!--	<inherits name='org.cobogw.gwt.waveapi.gadget.WaveGadget' />-->
+	<inherits name="com.google.gwt.gadgets.Gadgets" />
+	<inherits name='org.cobogw.gwt.waveapi.gadget.WaveGadget' />
 	<inherits name='com.google.gwt.visualization.Visualization'/>
-	<inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" /> 
+	<inherits name="com.allen_sauer.gwt.log.gwt-log-ERROR" /> 
 
 	<!-- Specify the app entry point class.                         -->
 	<entry-point class='com.aggfi.digest.client.DigestBottyGadget' />

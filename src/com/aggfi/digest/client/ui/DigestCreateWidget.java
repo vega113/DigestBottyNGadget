@@ -22,6 +22,8 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -123,8 +125,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 									throw new AssertionError ("No message body in create digest - it cannot happen!");
 								}
 								DigestUtils.getInstance().dismissStaticMessage();
-								outMessage = outMessage.substring(1).substring(0, outMessage.length()-1); //workaround to remove ""
-								DigestUtils.getInstance().showSuccessMessage(outMessage, 5);
+								outMessage = outMessage.substring(1).substring(0, outMessage.length()-2); //workaround to remove ""
+								DigestUtils.getInstance().showSuccessMessage(outMessage, 8);
 							}
 							
 							@Override
@@ -133,14 +135,17 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 							}
 						});
 					} catch (RequestException e) {
+						DigestUtils.getInstance().dismissStaticMessage();
 						DigestUtils.getInstance().alert(e.getMessage());
 						Log.error("",e);
 					}
 				}catch(IllegalArgumentException e){
 					Log.error("should be verification error!",e);
+					DigestUtils.getInstance().dismissStaticMessage();
 					DigestUtils.getInstance().alert(e.getMessage());
 				}catch(Exception e){
 					Log.error("",e);
+					DigestUtils.getInstance().dismissStaticMessage();
 					DigestUtils.getInstance().alert(e.getMessage());
 				}
 			}
@@ -290,7 +295,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			w.setTitle( w.getTitle() + " " + constants.exampleWord() + "\"" +  exampleStrs[i] + "\"");
 			String title = w.getTitle();
 			tooltipImage.setTitle(title);
-			int textBoxWidth = (int)(constants.basicWidthInt()*0.64);
+			int textBoxWidth = (int)(constants.basicWidthInt()*0.66);
 			w.setWidth( textBoxWidth + "px");
 			w.setHeight(constants.itemCreateHeight() + "px");
 			hp.setWidth(textBoxWidth + 16 + "px");
@@ -301,13 +306,19 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		ColumnFormatter colFormatter = tbl.getColumnFormatter();
 		colFormatter.addStyleName(1, resources.globalCSS().inputRegular());
 		
-		
 		onDigestCreateWidgetLoad = new Runnable() {
 			
 			@Override
 			public void run() {
 				ownerVal.setText(DigestUtils.getInstance().retrUserId());
 				authorVal.setText(DigestUtils.getInstance().retrUserName());
+				DeferredCommand.addCommand(new Command() {
+					
+					@Override
+					public void execute() {
+						DigestUtils.getInstance().adjustHeight();
+					}
+				});
 			}
 		};
 	}

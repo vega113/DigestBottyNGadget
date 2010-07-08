@@ -104,6 +104,13 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			@Override
 			public void run() {
 					initReportWidget();
+					DeferredCommand.addCommand(new Command() {
+						
+						@Override
+						public void execute() {
+							DigestUtils.getInstance().adjustHeight();
+						}
+					});
 			}
 		};
 		
@@ -156,7 +163,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 						reportPanel.clear();
 						reportPanel.add(pie);
 						reportPanel.setVisible(true);
-						digestUtils.adjustHeight();
 						digestUtils.dismissStaticMessage();
 					}
 					
@@ -282,7 +288,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 						reportPanel.clear();
 						reportPanel.setVisible(true);
 						reportPanel.add(lineChart);
-						digestUtils.adjustHeight();
 						digestUtils.dismissStaticMessage();
 					}
 

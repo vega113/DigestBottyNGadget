@@ -5,10 +5,7 @@ import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.utils.DigestUtils;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.inject.Inject;
 
 public class DigestTabPanel extends DecoratedTabPanel {
@@ -40,22 +37,15 @@ public class DigestTabPanel extends DecoratedTabPanel {
 			
 			@Override
 			public void onSelection(SelectionEvent<Integer> event) {
+				DigestUtils.getInstance().dismissAllStaticMessages();
 				int selected = event.getSelectedItem();
 				Object currentSelectedWidget = getWidget(selected);
 				if(currentSelectedWidget != null && currentSelectedWidget instanceof RunnableOnTabSelect){
 					RunnableOnTabSelect runnableOnTabSelect = ((RunnableOnTabSelect)currentSelectedWidget);
 					if(runnableOnTabSelect.getRunOnTabSelect() != null){
 						runnableOnTabSelect.getRunOnTabSelect().run();
-						DigestUtils.getInstance().adjustHeight();
 					}
 				}
-				DeferredCommand.addCommand(new Command() {
-					
-					@Override
-					public void execute() {
-//						DigestUtils.getInstance().dismissAllStaticMessages();
-					}
-				});
 			}
 		});
 	}

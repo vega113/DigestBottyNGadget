@@ -28,8 +28,8 @@ public final class MiniMessages extends JavaScriptObject {
 	public native void alert(String message) /*-{
 		$wnd.msgAlertCounter = $wnd.msgAlertCounter + 1;
 		$wnd.gwtAlertHtmlMsg[$wnd.msgAlertCounter] = this.createDismissibleMessage(message);
-	  	msgElement.style.backgroundColor = "red";
-	  	msgElement.style.color = "white";
+	  	$wnd.gwtAlertHtmlMsg[$wnd.msgAlertCounter].style.backgroundColor = "red";
+	  	$wnd.gwtAlertHtmlMsg[$wnd.msgAlertCounter].style.color = "white";
 	}-*/;
 	
 	public native void dismissAlert() /*-{
