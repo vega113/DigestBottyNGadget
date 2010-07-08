@@ -20,18 +20,11 @@ import com.google.inject.Inject;
 public class DigestServiceImpl implements DigestService {
 	
 	private RequestService requestService;
-	private String domain;
 	private String url;
 	
 	@Inject
 	public DigestServiceImpl(RequestService requestService, DigestConstants constants){
 		this.requestService = requestService;
-		this.domain = constants.appDomain();
-		
-//		domain = "digestbotty.appengine.com";
-		domain = "localhost:59304";
-//		domain = "localhost:8888";
-//		url = "http://" + domain + "/admin/jsonrpc" + "?cachebust=" + new Date().getTime();
 		url = "/admin/jsonrpc" + "?cachebust=" + new Date().getTime();
 	}
 

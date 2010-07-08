@@ -76,6 +76,7 @@ public class ProjectSelectWidget extends Composite {
 							Log.debug("no projects are found in response" );
 							prjList.addItem("none","");
 							prjList.setEnabled(false);
+							digestUtils.dismissStaticMessage();
 							//								reportPanel.add(new HTML("User " + userId + " doesn't have any digests"));
 						}else{
 							prjList.clear();

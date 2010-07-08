@@ -568,7 +568,7 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 	    }
 	  JSONObject json = new JSONObject();
 	  Blip blip = e.getBlip();
-	  String gadgetUrl = System.getProperty("ADMIN_GADGET_URL");
+	  String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml";
 	  Gadget gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
 	  try{
 		  if(gadget!=null)

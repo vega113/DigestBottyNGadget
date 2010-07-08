@@ -157,7 +157,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		
 		ClearWarningClickHandler clearWarningClickHandler = new ClearWarningClickHandler(resources);
 		
-		Label ownerLbl = new Label(constants.ownerStr());
+		Label ownerLbl = new Label(constants.ownerStr()+"*");
 		final TextBox ownerVal = new TextBox();
 		
 		ownerVal.setStyleName(resources.globalCSS().readonly());
@@ -176,7 +176,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		tbl.setWidget(row, 1, ownerVal);
 		row++;
 
-		Label authorLbl = new Label(constants.authorStr());
+		Label authorLbl = new Label(constants.authorStr()+"*");
 		final TextBox authorVal = new TextBox();
 		authorVal.addClickHandler(clearWarningClickHandler);
 		authorVal.setTitle(constants.authorTitle());
@@ -184,7 +184,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		tbl.setWidget(row, 1, authorVal);
 		row++;
 
-		Label projectIdLbl = new Label(constants.projectIdStr());
+		Label projectIdLbl = new Label(constants.projectIdStr()+"*");
 		TextBox projectIdVal = new TextBox();
 		projectIdVal.addClickHandler(clearWarningClickHandler);
 		projectIdVal.setTitle(constants.projectIdTitle());
@@ -192,7 +192,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		tbl.setWidget(row, 1, projectIdVal);
 		row++;
 
-		Label domainLbl = new Label(constants.domainStr());
+		Label domainLbl = new Label(constants.domainStr()+"*");
 		TextBox domainVal = new TextBox();
 		domainVal.addClickHandler(clearWarningClickHandler);
 		domainVal.setTitle(constants.domainTitle());
@@ -211,7 +211,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		});
 		row++;
 
-		Label digestNameLbl = new Label(constants.digestNameStr());
+		Label digestNameLbl = new Label(constants.digestNameStr()+"*");
 		TextBox digestNameVal = new TextBox();
 		digestNameVal.addClickHandler(clearWarningClickHandler);
 		digestNameVal.setTitle(constants.digestNameTitle());
@@ -235,13 +235,13 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		tbl.setWidget(row, 1, installerThumbnailUrlVal);
 		row++;
 
-		Label toolbarIconUrlLbl = new Label(constants.toolbarIconUrlStr());
-		TextBox toolbarIconUrlVal = new TextBox();
-		toolbarIconUrlVal.addClickHandler(clearWarningClickHandler);
-		toolbarIconUrlVal.setTitle(constants.toolbarIconUrlTitle());
-		tbl.setWidget(row, 0, toolbarIconUrlLbl);
-		tbl.setWidget(row, 1, toolbarIconUrlVal);
-		row++;
+//		Label toolbarIconUrlLbl = new Label(constants.toolbarIconUrlStr());
+//		TextBox toolbarIconUrlVal = new TextBox();
+//		toolbarIconUrlVal.addClickHandler(clearWarningClickHandler);
+//		toolbarIconUrlVal.setTitle(constants.toolbarIconUrlTitle());
+//		tbl.setWidget(row, 0, toolbarIconUrlLbl);
+//		tbl.setWidget(row, 1, toolbarIconUrlVal);
+//		row++;
 
 		Label robotThumbnailUrlLbl = new Label(constants.robotThumbnailUrlStr());
 		TextBox robotThumbnailUrlVal = new TextBox();
@@ -269,8 +269,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		row++;
 		
 		String[] exampleStrs = {constants.ownerExmpl(),constants.authorExmpl(),constants.projectIdExmpl(),constants.domainExmpl(),
-					constants.digestNameExmpl(),constants.descriptionExmpl(),constants.installerThumbnailUrlExmpl(),
-					constants.toolbarIconUrlExmpl(),constants.robotThumbnailUrlExmpl(),constants.forumSiteUrlExmpl(),
+					constants.digestNameExmpl(),constants.descriptionExmpl(),constants.installerThumbnailUrlExmpl(),constants.robotThumbnailUrlExmpl(),constants.forumSiteUrlExmpl(),
 					constants.googlegroupsIdExmpl()};
 
 		for(int i = 0; i < row; i++){
@@ -324,7 +323,6 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		
 		String description = getStrFromTxtBox(row,w).trim();row++;
 		String installerThumbnailUrl = getStrFromTxtBox(row,w).trim();row++;
-		String installerIconUrl = getStrFromTxtBox(row,w).trim();row++;
 		String robotThumbnailUrl = getStrFromTxtBox(row,w).trim();row++;
 		String forumSiteUrl = getStrFromTxtBox(row,w).trim();row++;
 		String googlegroupsId = getStrFromTxtBox(row,w).trim();row++;
@@ -340,7 +338,6 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		digest.setName(digestName);
 		digest.setDescription(description);
 		digest.setInstallerThumbnailUrl(installerThumbnailUrl);
-		digest.setInstallerIconUrl(installerIconUrl);
 		digest.setRobotThumbnailUrl(robotThumbnailUrl);
 		digest.setForumSiteUrl(forumSiteUrl);
 		digest.setGooglegroupsId(googlegroupsId.equals("@googlegroups.com")? "" : googlegroupsId.toLowerCase());

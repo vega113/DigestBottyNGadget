@@ -8,7 +8,7 @@
 	<g:HTMLPanel>
 		<g:DecoratorPanel>
 			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}'
-				width='{constants.basicWidthStr}'>
+				width='{constants.smallerBiggerWidthStr}'>
 				<g:cell>
 					<g:FlexTable ui:field="createGadgetFlexTbl"></g:FlexTable>
 				</g:cell>

@@ -31,7 +31,8 @@ public class InstallGadgetServlet extends HttpServlet{
 			String version = "0.1";//3
 			String authorName = "Yuri Zelikov";//4
 			String robotAddress = System.getProperty("APP_DOMAIN") + "+gadget@appspot.com" ;//5
-			Object[] args = {projectName, profileImageUrl, projectDescription,version,authorName, robotAddress};
+			String gadgetbottyInstallUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml";//6
+			Object[] args = {projectName, profileImageUrl, projectDescription,version,authorName, robotAddress,gadgetbottyInstallUrl};
 			
 			String extensionStr = 
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -41,7 +42,7 @@ public class InstallGadgetServlet extends HttpServlet{
 						"<addParticipants>" + 
 							"<participant id=\"{5}\" />" + 
 						"</addParticipants>" +  
-						 "<insertGadget url=\"http://aggfiwave.appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml\"/>" +
+						 "<insertGadget url=\"{6}\"/>" +
 					"</menuHook>" + 
 			    "</extension>";
 			

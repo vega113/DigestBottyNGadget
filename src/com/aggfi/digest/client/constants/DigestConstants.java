@@ -30,7 +30,8 @@ public interface DigestConstants extends Constants {
 	
 	String instructionsHeaderStr();
 	
-
+	//warning
+	String noForumSelectedWarning();
 	
 	String ownerStr();
 
@@ -127,11 +128,6 @@ public interface DigestConstants extends Constants {
 	 * Google Apps domain Id of the DigestBotty
 	 * @return digestbotty.appspot.com
 	 */
-	@DefaultStringValue(value="aggfiwave.appspot.com")
-	String appDomain();
-	
-	@DefaultIntValue(value=450)
-	public int valueWidgetSize();
 	
 	@DefaultStringValue(value="Request Status Info")
 	String createDigestRequestStatus();
@@ -173,20 +169,22 @@ public interface DigestConstants extends Constants {
 	@DefaultIntValue(value=520)//change both
 	int basicWidthInt();
 	
-	/**
-	 * size of scroll panel
-	 * @return
-	 */
+	/**  width of scroll panel */
 	@DefaultStringValue(value="496px")
 	String smallerWidthStr();
+	/** widht of create panel*/
+	@DefaultStringValue(value="510px")
+	String smallerBiggerWidthStr();
 	
 	@DefaultIntValue(value=320)
 	int basicReportHeightInt();
 	@DefaultStringValue(value="72px")
 	String basicItemScrollHeightStr();
-	@DefaultStringValue(value="215px")
+	/**width of AddRemDefLabel*/
+	@DefaultStringValue(value="210px")
 	String basicItemWidthStr();
-	@DefaultStringValue(value="175px")
+	/** width of input text boxes on admin tab*/
+	@DefaultStringValue(value="164px")
 	String basicTextBoxWidthStr();
 	@DefaultIntValue(value=25)
 	int itemCreateHeight();

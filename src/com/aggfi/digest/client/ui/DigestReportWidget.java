@@ -11,6 +11,7 @@ import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
 import com.aggfi.digest.client.utils.DigestUtils;
+import com.aggfi.digest.shared.FieldVerifier;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -102,7 +103,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			
 			@Override
 			public void run() {
-				initReportWidget();
+					initReportWidget();
 			}
 		};
 		
@@ -133,37 +134,44 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		try {
 			String msg = messages.loadingForumsMsg(constants.reportTabStr(), getProjectName());
 			Log.debug(msg);
-			digestUtils.showStaticMessage(msg);
-			digestService2.retrTagsDistributions(getProjectId() , new AsyncCallback<JSONValue>() {
-				@Override
-				public void onSuccess(JSONValue result) {
-					Map<String,Integer> tagsDistMap = new HashMap<String, Integer>();
-					JSONArray tagsJsonArray =  result.isArray();
-					int size = tagsJsonArray.size();
-					for(int i = 0; i < size; i++){
-						JSONValue tagJson = tagsJsonArray.get(i);
-						String tagName = tagJson.isObject().get("tag").isString().stringValue();
-						Integer tagCount = (int)tagJson.isObject().get("count").isNumber().doubleValue();
-						tagsDistMap.put(tagName,tagCount);
+			if(getProjectId() != null && !"".equals(getProjectId())){
+				digestUtils.showStaticMessage(msg);
+				FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
+				digestService2.retrTagsDistributions(getProjectId() , new AsyncCallback<JSONValue>() {
+					@Override
+					public void onSuccess(JSONValue result) {
+						Map<String,Integer> tagsDistMap = new HashMap<String, Integer>();
+						JSONArray tagsJsonArray =  result.isArray();
+						int size = tagsJsonArray.size();
+						for(int i = 0; i < size; i++){
+							JSONValue tagJson = tagsJsonArray.get(i);
+							String tagName = tagJson.isObject().get("tag").isString().stringValue();
+							Integer tagCount = (int)tagJson.isObject().get("count").isNumber().doubleValue();
+							tagsDistMap.put(tagName,tagCount);
+						}
+						AbstractDataTable dataTable = createTagsBreakdownTable(tagsDistMap);
+						Options options = createTagsBreakdownOptions(constants);
+						PieChart pie = new PieChart(dataTable,options);
+						pie.addSelectHandler(createSelectHandler(pie));
+						reportPanel.clear();
+						reportPanel.add(pie);
+						reportPanel.setVisible(true);
+						digestUtils.adjustHeight();
+						digestUtils.dismissStaticMessage();
 					}
-					AbstractDataTable dataTable = createTagsBreakdownTable(tagsDistMap);
-					Options options = createTagsBreakdownOptions(constants);
-					PieChart pie = new PieChart(dataTable,options);
-					pie.addSelectHandler(createSelectHandler(pie));
-					reportPanel.clear();
-					reportPanel.add(pie);
-					reportPanel.setVisible(true);
-					digestUtils.adjustHeight();
-					digestUtils.dismissStaticMessage();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
 					
-				}
-			});
+					@Override
+					public void onFailure(Throwable caught) {
+						digestUtils.dismissStaticMessage();
+						digestUtils.alert(caught.getMessage());
+					}
+				});
+			}
+			
 		} catch (RequestException e) {
 			Log.error("", e);
+			digestUtils.dismissStaticMessage();
+			digestUtils.alert(e.getMessage());
 		}
 		
 		
@@ -250,6 +258,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			try {
 				String msg = messages.loadingForumsMsg(constants.reportTabStr(), getProjectName());
 				Log.debug(msg);
+				FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 				digestUtils.showStaticMessage(msg);
 				digestService2.retrPostCountsT(getProjectId() , new AsyncCallback<JSONValue>() {
 					
@@ -276,102 +285,112 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 						digestUtils.adjustHeight();
 						digestUtils.dismissStaticMessage();
 					}
-					
-
-					private SelectHandler createPostCountsSelectHandler(
-							final LineChart lineChart) {
-						//
-					    return new SelectHandler() {
-						      @Override
-						      public void onSelect(SelectEvent event) {
-						        String message = "";
-						        
-						        // May be multiple selections.
-						        JsArray<Selection> selections = lineChart.getSelections();
-
-						        for (int i = 0; i < selections.length(); i++) {
-						          // add a new line for each selection
-						          message += i == 0 ? "" : "\n";
-						          
-						          Selection selection = selections.get(i);
-
-						          if (selection.isCell()) {
-						            // isCell() returns true if a cell has been selected.
-						            
-						            // getRow() returns the row number of the selected cell.
-						            int row = selection.getRow();
-						            // getColumn() returns the column number of the selected cell.
-						            int column = selection.getColumn();
-						            message += "cell " + row + ":" + column + " selected";
-						          } else if (selection.isRow()) {
-						            // isRow() returns true if an entire row has been selected.
-						            
-						            // getRow() returns the row number of the selected row.
-						            int row = selection.getRow();
-						            message += "row " + row + " selected";
-						          } else {
-						            // unreachable
-						            message += "Pie chart selections should be either row selections or cell selections.";
-						            message += "  Other visualizations support column selections as well.";
-						          }
-						        }
-						        
-//						        Window.alert(message);
-						      }
-						    };
-						  
-					}
-
-
-					private AbstractDataTable createPostCountsTable(Map<String, Integer> tagsBreakdown) {
-						DataTable data = DataTable.create();
-						data.addColumn(ColumnType.STRING, "Date");
-					    data.addColumn(ColumnType.NUMBER, "New Waves");
-					    
-						Set<String> keys = tagsBreakdown.keySet();
-						data.addRows(keys.size());
-						int row = 0;
-						for(String key : keys){
-							data.setValue(row, 0, key);
-						    data.setValue(row, 1, tagsBreakdown.get(key));
-						    row++;
-						}
-					    return data;
-					  }
-
-					private com.google.gwt.visualization.client.visualizations.LineChart.Options createPostCountsOptions(DigestConstants constants) {
-						com.google.gwt.visualization.client.visualizations.LineChart.Options options = com.google.gwt.visualization.client.visualizations.LineChart.Options.create();
-					    options.setWidth(constants.basicWidthInt());
-					    options.setHeight(constants.basicReportHeightInt());
-					    options.setTitle(constants.newWavesLast14Days());
-					    options.setLegend(LegendPosition.NONE);
-					    return options;
-					  }
-
 
 					@Override
 					public void onFailure(Throwable caught) {
-						
+						digestUtils.dismissStaticMessage();
+						digestUtils.alert(caught.getMessage());
 					}
 				});
+			} catch (IllegalArgumentException e) {
+				digestUtils.dismissStaticMessage();
+//				digestUtils.alert(e.getMessage());
+				Log.error("", e);
 			} catch (RequestException e) {
+				digestUtils.dismissStaticMessage();
+				digestUtils.alert(e.getMessage());
 				Log.error("", e);
 			}
 			
 			
 		}
-	  
-	  void handleOnSelectPrjList(ChangeEvent event){
-		  hideAll();
-		  digestUtils.setCurrentDigestId(getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
-		  if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(TAGS_BREAKDOWN) ){
-			  reportPanel.clear();
-			  createTagsBreakdownPieChart(messages,constants,resources,digestService,reportPanel);
-		  }else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(NEW_WAVES) ){
-			  reportPanel.clear();
-			  drawPostCountsLineChart(messages,constants,resources,digestService,reportPanel);
+	  private SelectHandler createPostCountsSelectHandler(
+				final LineChart lineChart) {
+			//
+		    return new SelectHandler() {
+			      @Override
+			      public void onSelect(SelectEvent event) {
+			        String message = "";
+			        
+			        // May be multiple selections.
+			        JsArray<Selection> selections = lineChart.getSelections();
+
+			        for (int i = 0; i < selections.length(); i++) {
+			          // add a new line for each selection
+			          message += i == 0 ? "" : "\n";
+			          
+			          Selection selection = selections.get(i);
+
+			          if (selection.isCell()) {
+			            // isCell() returns true if a cell has been selected.
+			            
+			            // getRow() returns the row number of the selected cell.
+			            int row = selection.getRow();
+			            // getColumn() returns the column number of the selected cell.
+			            int column = selection.getColumn();
+			            message += "cell " + row + ":" + column + " selected";
+			          } else if (selection.isRow()) {
+			            // isRow() returns true if an entire row has been selected.
+			            
+			            // getRow() returns the row number of the selected row.
+			            int row = selection.getRow();
+			            message += "row " + row + " selected";
+			          } else {
+			            // unreachable
+			            message += "Pie chart selections should be either row selections or cell selections.";
+			            message += "  Other visualizations support column selections as well.";
+			          }
+			        }
+			        
+//			        Window.alert(message);
+			      }
+			    };
+			  
+		}
+
+
+		private AbstractDataTable createPostCountsTable(Map<String, Integer> tagsBreakdown) {
+			DataTable data = DataTable.create();
+			data.addColumn(ColumnType.STRING, "Date");
+		    data.addColumn(ColumnType.NUMBER, "New Waves");
+		    
+			Set<String> keys = tagsBreakdown.keySet();
+			data.addRows(keys.size());
+			int row = 0;
+			for(String key : keys){
+				data.setValue(row, 0, key);
+			    data.setValue(row, 1, tagsBreakdown.get(key));
+			    row++;
+			}
+		    return data;
 		  }
-	  }
+
+		private com.google.gwt.visualization.client.visualizations.LineChart.Options createPostCountsOptions(DigestConstants constants) {
+			com.google.gwt.visualization.client.visualizations.LineChart.Options options = com.google.gwt.visualization.client.visualizations.LineChart.Options.create();
+		    options.setWidth(constants.basicWidthInt());
+		    options.setHeight(constants.basicReportHeightInt());
+		    options.setTitle(constants.newWavesLast14Days());
+		    options.setLegend(LegendPosition.NONE);
+		    return options;
+		  }
+	  
+		void handleOnSelectPrjList(ChangeEvent event){
+			hideAll();
+			if(getProjectId() != null && !"".equals(getProjectId())){
+				reportTypesList.setEnabled(true);
+				digestUtils.setCurrentDigestId(getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
+				if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(TAGS_BREAKDOWN) ){
+					reportPanel.clear();
+					createTagsBreakdownPieChart(messages,constants,resources,digestService,reportPanel);
+				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(NEW_WAVES) ){
+					reportPanel.clear();
+					drawPostCountsLineChart(messages,constants,resources,digestService,reportPanel);
+				}
+			}else{
+				reportTypesList.setEnabled(false);
+				digestUtils.alert(constants.noForumSelectedWarning());
+			}
+		}
 	  
 	  @UiHandler("reportTypesList")
 	  void handleOnSelectReportTypesList(ChangeEvent event){

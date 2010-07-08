@@ -1,11 +1,4 @@
-<!-- Indices written at Wed, 7 Jul 2010 19:56:00 UTC -->
+<!-- Indices written at Thu, 8 Jul 2010 15:17:29 UTC -->
 
-<datastore-indexes>
+<datastore-indexes/>
 
-    <!-- Used 1 time in query history -->
-    <datastore-index kind="Tag" ancestor="false" source="auto">
-        <property name="projectId" direction="asc"/>
-        <property name="count" direction="asc"/>
-    </datastore-index>
-
-</datastore-indexes>

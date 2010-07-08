@@ -6,7 +6,7 @@
 	<ui:with field='constants'
 		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
-		<g:VerticalPanel width='{constants.basicWidthStr}'
+		<g:VerticalPanel width='{constants.smallerBiggerWidthStr}'
 			stylePrimaryName='{res.globalCSS.highlightRow}'>
 			<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
 			<g:CaptionPanel captionText='{constants.setUpDefaultParticipantsStr}'>

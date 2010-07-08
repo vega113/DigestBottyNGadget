@@ -279,8 +279,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	@UiHandler("addManagergBtn")
 	protected void addManagerBtnClick(ClickEvent event){
+		if(getProjectId().equals("")){
+			digestUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
 		final String userId = addManagerBox.getText().trim();
 		try{
+			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(userId, messages, constants.managerWaveIdFieldName());
 			try {
 				digestService.addDigestManager(getProjectId(), userId, new AsyncCallback<JSONValue>() {
@@ -307,9 +312,14 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	@UiHandler("addDefaultTagBtn")
 	protected void addDefaultTagBtnClick(ClickEvent event){
+		if(getProjectId().equals("")){
+			digestUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
 		final String tag = addDefaultTagBox.getText().trim();
 		try{
 			try {
+				FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 				digestService.addDefaultTag(getProjectId(), tag, new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -333,8 +343,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	@UiHandler("addDefaultParticipantBtn")
 	protected void addDefaultParticipantBtnClick(ClickEvent event){
+		if(getProjectId().equals("")){
+			digestUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
 		final String participantId = addDefaultParticipantBox.getText().trim();
 		try{
+			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(participantId, messages, constants.defaultParticipantWaveIdFieldName());
 			try {
 				digestService.addDefaultParticipant(getProjectId(), participantId, new AsyncCallback<JSONValue>() {
@@ -360,8 +375,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	
 	@UiHandler("addAutoTagBtn")
 	protected void addAutoTagClick(ClickEvent event){
+		if(getProjectId().equals("")){
+			digestUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
 		final String tag = addAutoTagNameBox.getText().trim();
 		final String regex = addAutoTagValBox.getText().trim();
+		FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 		try{
 			try {
 				digestService.addAutoTag(getProjectId(), tag, regex, new AsyncCallback<JSONValue>() {

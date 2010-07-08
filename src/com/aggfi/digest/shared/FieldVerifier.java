@@ -57,23 +57,30 @@ public class FieldVerifier {
 		if(!FieldVerifier.isValidName(digest.getDomain())){
 			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.domainStr()));
 		}
-		String[] prjIdSplit = digest.getProjectId().split("-");
-		if(prjIdSplit.length == 1 || !FieldVerifier.isValidName(digest.getProjectId().split("-")[1])){
-			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.projectIdStr()));
-		}
+		verifyProjectId(digest.getProjectId(), messages, constants);
 		if(!FieldVerifier.isValidName(digest.getName())){
 			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.digestNameStr()));
 		}
 		
 		verifyWaveId(digest.getOwnerId(), messages, constants.ownerStr());
-		String digestId = digest.getProjectId().split("-")[1];//because projectId is automatically prefixed with 'ownerId-' 
-		isFieldAlphaNumeric(messages,digestId,constants.projectIdStr());
+		
+		
 		
 		//check owner id is of form: id@googlewave.com
 		if(digest.getGooglegroupsId() != null && !"".equals(digest.getGooglegroupsId()) && digest.getGooglegroupsId().indexOf("@googlegroups.com") < 0){
 			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(constants.googlegroupsIdStr(), "your_group_id@googlegroups.com"));
 		}
 		
+	}
+
+	public static void verifyProjectId(String projectIdB4,
+			DigestMessages messages, DigestConstants constants) {
+		String[] prjIdSplit = projectIdB4.split("-");
+		if(prjIdSplit.length == 1 || !FieldVerifier.isValidName(projectIdB4.split("-")[1])){
+			throw new IllegalArgumentException(messages.missingCreationParamExcptn(constants.projectIdStr()));
+		}
+		String digestId = projectIdB4.split("-")[1];//because projectId is automatically prefixed with 'ownerId-' 
+		isFieldAlphaNumeric(messages,digestId,constants.projectIdStr());
 	}
 
 	public static void verifyWaveId(String userWaveId,
