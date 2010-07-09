@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.resources.client.ImageResource;
@@ -106,6 +107,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 					Log.debug("click on submitBtn");
 					JsDigest digest = initExtDigestFromFields(createGadgetFlexTbl,isPublicBox);
 					FieldVerifier.areValidDigestFields(digest,messages,constants);
+					encodeDigest(digest);
 					DigestUtils.getInstance().showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
 					try {
 						digestService.createDigest(digest, new AsyncCallback<JSONValue>() {
@@ -147,10 +149,17 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 					DigestUtils.getInstance().alert(e.getMessage());
 				}
 			}
+
+			
 		});
 	}
 	
 
+	private void encodeDigest(JsDigest digest) {
+		digest.setAuthor(digest.getAuthor().replace("\"", "'"));
+		digest.setName(digest.getName().replace("\"", "'"));
+		digest.setDescription(digest.getDescription().replace("\"", "'"));
+	}
 
 	private void initCreateGadgetFlexTbl(FlexTable tbl,DigestConstants constants, GlobalResources resources) {
 		tbl.setStylePrimaryName(resources.globalCSS().gridStyle());
@@ -353,9 +362,13 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	private static String getStrFromTxtBox(int row,FlexTable widget ){
 		ComplexPanel panel = (ComplexPanel)widget.getWidget(row, 1);
 		TextBox textBox = (TextBox)panel.getWidget(1);
-		String out = textBox.getText();
+		String out = unescape(textBox.getText());
 		return out;
 	}
+	
+	 private native static String unescape (String val) /*-{
+     	return unescape(val);
+ 	 }-*/;
 
 	@Override
 	public Runnable getRunOnTabSelect() {

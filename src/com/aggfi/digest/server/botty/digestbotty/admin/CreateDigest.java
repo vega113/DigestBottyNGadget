@@ -20,6 +20,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.google.gson.annotations.Expose;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.google.wave.api.Blip;
 import com.google.wave.api.BlipContentRefs;
@@ -295,9 +296,9 @@ public class CreateDigest extends Command {
 			throw new IllegalArgumentException("Missing required param: projectId");
 		} 
 		
-		String description = createDigest.getParam("description");
+		String description = createDigest.getParam("description").replace("\"", "'");
 		String installerThumbnailUrl = createDigest.getParam("installerThumbnailUrl");
-		String name = createDigest.getParam("name");
+		String name = createDigest.getParam("name").replace("\"", "'");
 		if (util.isNullOrEmpty(name)) {
 			throw new IllegalArgumentException("Missing required param: Name of the project");
 		} 
@@ -313,7 +314,7 @@ public class CreateDigest extends Command {
 		if (util.isNullOrEmpty(domain)) {
 			throw new IllegalArgumentException("Missing required param: domain");
 		}
-		String author = createDigest.getParam("author");
+		String author = createDigest.getParam("author").replace("\"", "'");
 		int maxDigests = 1;
 		if(System.getProperty("MAX_DIGESTS") != null){
 			try{
