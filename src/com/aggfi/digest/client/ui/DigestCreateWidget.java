@@ -105,9 +105,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 				try{
 					Log.debug("click on submitBtn");
 					JsDigest digest = initExtDigestFromFields(createGadgetFlexTbl,isPublicBox);
-					Log.debug("click on initExtDigestFromFields - over");
 					FieldVerifier.areValidDigestFields(digest,messages,constants);
-					Log.debug("click on areValidDigestFields - over");
 					DigestUtils.getInstance().showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
 					try {
 						digestService.createDigest(digest, new AsyncCallback<JSONValue>() {
@@ -158,8 +156,6 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		tbl.setStylePrimaryName(resources.globalCSS().gridStyle());
 
 		int row = 0;
-		RowFormatter rowFormatter = tbl.getRowFormatter();
-		
 		ClearWarningClickHandler clearWarningClickHandler = new ClearWarningClickHandler(resources);
 		
 		Label ownerLbl = new Label(constants.ownerStr()+"*");
@@ -198,7 +194,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		row++;
 
 		Label domainLbl = new Label(constants.domainStr()+"*");
-		TextBox domainVal = new TextBox();
+		final TextBox domainVal = new TextBox();
 		domainVal.addClickHandler(clearWarningClickHandler);
 		domainVal.setTitle(constants.domainTitle());
 		tbl.setWidget(row, 0, domainLbl);
@@ -239,14 +235,6 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		tbl.setWidget(row, 0, installerThumbnailUrlLbl);
 		tbl.setWidget(row, 1, installerThumbnailUrlVal);
 		row++;
-
-//		Label toolbarIconUrlLbl = new Label(constants.toolbarIconUrlStr());
-//		TextBox toolbarIconUrlVal = new TextBox();
-//		toolbarIconUrlVal.addClickHandler(clearWarningClickHandler);
-//		toolbarIconUrlVal.setTitle(constants.toolbarIconUrlTitle());
-//		tbl.setWidget(row, 0, toolbarIconUrlLbl);
-//		tbl.setWidget(row, 1, toolbarIconUrlVal);
-//		row++;
 
 		Label robotThumbnailUrlLbl = new Label(constants.robotThumbnailUrlStr());
 		TextBox robotThumbnailUrlVal = new TextBox();
@@ -312,6 +300,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			public void run() {
 				ownerVal.setText(DigestUtils.getInstance().retrUserId());
 				authorVal.setText(DigestUtils.getInstance().retrUserName());
+				domainVal.setText("googlewave.com");
 				DeferredCommand.addCommand(new Command() {
 					
 					@Override
@@ -367,8 +356,6 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		String out = textBox.getText();
 		return out;
 	}
-
-
 
 	@Override
 	public Runnable getRunOnTabSelect() {
