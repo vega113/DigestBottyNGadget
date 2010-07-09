@@ -11,7 +11,6 @@
 
   <listener>
     <listener-class>com.aggfi.digest.server.botty.google.forumbotty.guice.GuiceServletConfig</listener-class>
-<!--    <listener-class>com.aggfi.portfolio.wave.server.guice.AggfiGuiceServiceConfig</listener-class>-->
   </listener>
   
   <servlet>
@@ -49,7 +48,7 @@
     <url-pattern>/report</url-pattern>
   </servlet-mapping> 
   
-  <!--<security-constraint>
+  <security-constraint>
     <web-resource-collection>
       <url-pattern>/admin*</url-pattern>
       <url-pattern>/report*</url-pattern>      
@@ -61,5 +60,4 @@
       <transport-guarantee>CONFIDENTIAL</transport-guarantee>
     </user-data-constraint>
   </security-constraint>   
-  -->
 </web-app>
