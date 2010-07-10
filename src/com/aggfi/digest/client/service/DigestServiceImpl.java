@@ -1,16 +1,11 @@
 package com.aggfi.digest.client.service;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.model.JsDigest;
-import com.aggfi.digest.client.model.JsParams;
 import com.aggfi.digest.client.request.RequestService;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
@@ -200,7 +195,7 @@ public class DigestServiceImpl implements DigestService {
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("CREATE_DIGEST"));
-		JsParams params = (JsParams) postDataJson.getJavaScriptObject();
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,callback,params);
 	}
 

@@ -84,6 +84,12 @@ public class CreateDigest extends Command {
 	    	if(extDigest.getForumSiteUrl() == null || "".equals(extDigest.getForumSiteUrl())){
 	    		extDigest.setForumSiteUrl("https://wave.google.com/wave/waveref/googlewave.com/" + digestWaveId);
 	    	}
+	    	if(extDigest.getInstallerIconUrl() == null || "".equals(extDigest.getInstallerIconUrl())){
+	    		extDigest.setForumSiteUrl("http://wave.google.com/images/wave-60_wshadow.gif");
+	    	}
+	    	if(extDigest.getRobotThumbnailUrl() == null || "".equals(extDigest.getRobotThumbnailUrl())){
+	    		extDigest.setRobotThumbnailUrl("http://wave.google.com/images/wave-60_wshadow.gif");
+	    	}
 	    	//-------------
 			extDigestDao.save(extDigest);
 			//-------------
@@ -195,7 +201,7 @@ public class CreateDigest extends Command {
 		String a3_4 = " Also, you are welcome to install the DigestBotty Forum ";
 		sba.append(a3_4, styleFontStyle, "italic");
 		String a3_5 = "here";
-		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_LINK"));
+		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_FAQ_LINK"));
 		String a3_6 = " and then create a new post with your question.\n\n";
 		sba.append(a3_6, styleFontStyle, "italic");
 		//4

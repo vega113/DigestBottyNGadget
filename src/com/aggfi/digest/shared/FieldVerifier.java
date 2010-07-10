@@ -95,8 +95,8 @@ public class FieldVerifier {
 			isFieldAlphaNumeric(messages,str,fieldName);
 		}
 		//check owner id is of form: id@googlewave.com
-		if(userWaveId.indexOf("@googlewave.com") < 0){
-			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com"));
+		if(userWaveId.indexOf("@googlewave.com") < 0 && userWaveId.indexOf("public@a.gwave.com") < 0 && userWaveId.indexOf("@googlegroups.com") < 0){
+			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com or your_id@googlegroups.com or public@a.gwave.com"));
 		}else{
 			String ownerStr = userWaveId.substring(0, userWaveId.indexOf("@"));
 			if(!FieldVerifier.isValidName(ownerStr)){

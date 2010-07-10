@@ -296,6 +296,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(userId, messages, constants.managerWaveIdFieldName());
 			try {
+				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.digestManagers(), userId));
 				digestService.addDigestManager(getProjectId(), userId, new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -328,11 +329,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		try{
 			try {
 				FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
+				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.defaultTagsStr(), tag));
 				digestService.addDefaultTag(getProjectId(), tag, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,tag,null,null,defaultTagsPanel,addDefaultTagBox,null,removeDefaultTagHandler);
+						digestUtils.dismissStaticMessage();
 					}
 					
 					@Override
@@ -360,11 +363,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(participantId, messages, constants.defaultParticipantWaveIdFieldName());
 			try {
+				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.defaultParticipantsStr(), participantId));
 				digestService.addDefaultParticipant(getProjectId(), participantId, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,participantId,null,null,defaultParticipantsPanel,addDefaultParticipantBox,null,removeDefaultParticipantHandler);
+						digestUtils.dismissStaticMessage();
 					}
 					
 					@Override
@@ -392,11 +397,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 		try{
 			try {
+				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.autoTagging(), tag+" : " + regex));
 				digestService.addAutoTag(getProjectId(), tag, regex, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,constants.tagStr(),tag,constants.regexStr(),regex,autoTagsPanel,addAutoTagNameBox,addAutoTagValBox,removeAutoTagHandler);
+						digestUtils.dismissStaticMessage();
 					}
 					
 					@Override
@@ -423,8 +430,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		int i = 0;
 		for(String key : keys){
 			if(i != 0 && i % 2 == 0){
-				panel.add(pat);
 				pat = new HorizontalPanel();
+				panel.add(pat);
 			}
 			String value = jsonMap.get(key).isString().stringValue();
 			Composite c = new AddRemDefLabel(removeHandler, constants.tagStr(), key, constants.regexStr(), value);
@@ -447,8 +454,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		JSONArray jsonArray = result.isObject().get(jsonFieldName).isArray();
 		for(int i = 0; i< jsonArray.size(); i++){
 			if(i != 0 && i % 2 == 0){
-				panel.add(p);
 				p = new HorizontalPanel();
+				panel.add(p);
 			}
 			String jsonStrValue = jsonArray.get(i).isString().stringValue();
 			Composite c = new AddRemDefLabel(removeHandler, null, jsonStrValue, null, null);

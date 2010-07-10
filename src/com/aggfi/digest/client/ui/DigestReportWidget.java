@@ -88,7 +88,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		
 		reportTypesList.addItem(constants.newWavesLast14Days(),NEW_WAVES);
 		reportTypesList.addItem(constants.breakDown4AllTags(),TAGS_BREAKDOWN);
-		reportTypesList.setItemSelected(1, true);
+		reportTypesList.setItemSelected(0, true);
 		
 		onProjectsLoadCallback = new Runnable() {
 			
@@ -258,7 +258,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	    };
 	  }
 	  
-	  protected void drawPostCountsLineChart(DigestMessages messages,
+	  protected void drawNewWavesLineChart(DigestMessages messages,
 				final DigestConstants constants, GlobalResources resources,
 				DigestService digestService2, VerticalPanel reportPanel2 ) {
 			try {
@@ -268,18 +268,19 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				digestUtils.showStaticMessage(msg);
 				digestService2.retrPostCountsT(getProjectId() , new AsyncCallback<JSONValue>() {
 					
+					@SuppressWarnings("deprecation")
 					@Override
 					public void onSuccess(JSONValue result) {
-						Map<String,Integer> tagsDistMap = new TreeMap<String, Integer>();
+						Map<Date,Integer> tagsDistMap = new TreeMap<Date, Integer>();
 						JSONArray tagsJsonArray =  result.isArray();
 						int size = tagsJsonArray.size();
 						for(int i = 0; i < size; i++){
 							JSONValue tagJson = tagsJsonArray.get(i);
 							String dateStr = tagJson.isObject().get("date").isString().stringValue();
 							 Date date = new Date(dateStr);
-							dateStr = DateTimeFormat.getShortDateFormat().format(date);    
 							Integer postCount = (int)tagJson.isObject().get("count").isNumber().doubleValue();
-							tagsDistMap.put(dateStr,postCount);
+							Log.info(date.toString() + " : " + postCount);
+							tagsDistMap.put(date,postCount);
 						}
 						AbstractDataTable dataTable = createPostCountsTable(tagsDistMap);
 						com.google.gwt.visualization.client.visualizations.LineChart.Options options = createPostCountsOptions(constants);
@@ -354,15 +355,15 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		}
 
 
-		private AbstractDataTable createPostCountsTable(Map<String, Integer> tagsBreakdown) {
+		private AbstractDataTable createPostCountsTable(Map<Date, Integer> tagsBreakdown) {
 			DataTable data = DataTable.create();
-			data.addColumn(ColumnType.STRING, "Date");
+			data.addColumn(ColumnType.DATE, "Date");
 		    data.addColumn(ColumnType.NUMBER, "New Waves");
 		    
-			Set<String> keys = tagsBreakdown.keySet();
+			Set<Date> keys = tagsBreakdown.keySet();
 			data.addRows(keys.size());
 			int row = 0;
-			for(String key : keys){
+			for(Date key : keys){
 				data.setValue(row, 0, key);
 			    data.setValue(row, 1, tagsBreakdown.get(key));
 			    row++;
@@ -389,7 +390,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 					createTagsBreakdownPieChart(messages,constants,resources,digestService,reportPanel);
 				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(NEW_WAVES) ){
 					reportPanel.clear();
-					drawPostCountsLineChart(messages,constants,resources,digestService,reportPanel);
+					drawNewWavesLineChart(messages,constants,resources,digestService,reportPanel);
 				}
 			}else{
 				reportTypesList.setEnabled(false);
@@ -406,9 +407,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	private void initReport() {
 		Runnable onLoadCallback = new Runnable() {
 		  public void run() {
-		    // Create a pie chart visualization.
-//							        PieChart pie = new PieChart(createTable(), createOptions());
-			createTagsBreakdownPieChart(messages,constants,resources,digestService,reportPanel);
+			drawNewWavesLineChart(messages,constants,resources,digestService,reportPanel);
 		  }
 		};
 

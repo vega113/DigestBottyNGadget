@@ -145,6 +145,11 @@ public interface DigestConstants extends Constants {
 	String setUpAutoTagging();
 	String setUpDigestManagers();
 	
+	String defaultParticipantsStr();
+	String defaultTagsStr();
+	String autoTagging();
+	String digestManagers();
+	
 	String tagStr();
 	String regexStr();
 	
@@ -189,7 +194,7 @@ public interface DigestConstants extends Constants {
 	String basicTextBoxWidthStr();
 	@DefaultIntValue(value=25)
 	int itemCreateHeight();
-	@DefaultStringValue(value="234px")
+	@DefaultStringValue(value="238px")
 	String aboutTabScrollHeight();
 	
 }

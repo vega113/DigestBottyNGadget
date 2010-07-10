@@ -4,11 +4,11 @@
 	description="DigestBotty is an extension of ForumBotty. It allows 'on the fly' creation of forums to provide Forum like experience inside Google Wave.">
 	<author name="Yuri Zelikov" />
 	<menuHook location="TOOLBAR" text="DigestBotty"
-		iconUrl="http://digestbotty.appspot.com/images/forumbotty_thumb_old_2.png">
+		iconUrl="http://beta01.latest.digestbotty.appspot.com/images/forumbotty_thumb_old_2.png">
 		<addParticipants>
 			<participant id="digestbotty+gadget@appspot.com" />
 		</addParticipants>
 		<insertGadget
-			url="http://digestbotty.appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml" />
+			url="http://beta01.latest.digestbotty.appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml" />
 	</menuHook>
 </extension>

@@ -45,4 +45,6 @@ public interface DigestMessages extends Messages {
   String sentRequestForCreateMsg(String forumName);
   
   String aboutHlpMsg(String imageUrl);
+
+  String sentRequest2AddD(String what, String name);
 }

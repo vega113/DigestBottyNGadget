@@ -29,7 +29,7 @@ public class GetPostCounts extends Command {
       throw new IllegalArgumentException("Missing required param: id");
     }    
     
-    int durationDays = 7;    
+    int durationDays = 14;    
     if (!util.isNullOrEmpty(this.getParam("days"))) {      
       durationDays = Integer.parseInt(this.getParam("days"));
     }        
@@ -49,7 +49,7 @@ public class GetPostCounts extends Command {
     
     Date startDate = new Date(target.getTime() - (ONE_DAY * durationDays));
     
-    for (int i = 0; i < durationDays; i++) {      
+    for (int i = 0; i < durationDays+1; i++) {      
       int count = forumPostDao.getPostCount(projectId, startDate);
       JSONObject entry = new JSONObject();
       try {
