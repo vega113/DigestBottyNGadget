@@ -85,7 +85,7 @@ public class CreateDigest extends Command {
 	    		extDigest.setForumSiteUrl("https://wave.google.com/wave/waveref/googlewave.com/" + digestWaveId);
 	    	}
 	    	if(extDigest.getInstallerIconUrl() == null || "".equals(extDigest.getInstallerIconUrl())){
-	    		extDigest.setForumSiteUrl("http://wave.google.com/images/wave-60_wshadow.gif");
+	    		extDigest.setInstallerIconUrl("http://wave.google.com/images/wave-60_wshadow.gif");
 	    	}
 	    	if(extDigest.getRobotThumbnailUrl() == null || "".equals(extDigest.getRobotThumbnailUrl())){
 	    		extDigest.setRobotThumbnailUrl("http://wave.google.com/images/wave-60_wshadow.gif");
@@ -159,7 +159,7 @@ public class CreateDigest extends Command {
 		
 		newWavelet.getRootBlip().append(new Installer(installerUrl)); 
 		
-		appendFaq2blip(projectName, digestWaveId,ownerId, newWavelet);
+		appendFaq2blip(projectName,projectId, digestWaveId,ownerId, newWavelet);
 		
 		newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
 	
@@ -170,7 +170,7 @@ public class CreateDigest extends Command {
 		robot.addPost2Digest(projectId, newWavelet);
 	}
 
-	protected void appendFaq2blip(String projectName, String digestWaveId,String ownerId,Wavelet newWavelet) {
+	protected void appendFaq2blip(String projectName, String projectId,String digestWaveId,String ownerId,Wavelet newWavelet) {
 		StringBuilderAnnotater sba = new StringBuilderAnnotater(newWavelet.getRootBlip());
 		
 		String styleFontWeight = "style/fontWeight";
@@ -213,6 +213,12 @@ public class CreateDigest extends Command {
 		sba.append(a4_2, "link/wave", "googlewave.com!" + digestWaveId);
 		String a4_3 = " and then \"Follow\" it.\n\n";
 		sba.append(a4_3, styleFontStyle, "italic");
+		//5
+		String q5 = "Q: How can I import an existing wave into the Forum?\n";
+		sba.append(q4, styleFontWeight, "bold");
+		String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
+		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import; Either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
+		sba.append(a5_1, styleFontStyle, "italic");
 		
 		
 		sba.flush2Blip();

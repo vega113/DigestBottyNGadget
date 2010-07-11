@@ -74,14 +74,14 @@ public class InstallServlet extends HttpServlet{
 			String triggerText = "New " + digest.getName() + " Post"; //6
 			String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com" ;//7
 			String menuText = "Add " + digest.getName();//8
-			String iconUrl = digest.getInstallerIconUrl();//9
+			String iconUrl = digest.getRobotThumbnailUrl();//9
 			Object[] args = {projectName, profileImageUrl, projectDescription,version,infoUrl,
 					authorName, triggerText,robotAddress,
 					menuText,iconUrl,projectId};
 			
 			String extensionStr = 
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<extension name=\"{0}\" thumbnailUrl=\"{1}\" description=\"{2}\">" + 
+				"<extension name=\"{0}\" thumbnailUrl=\"{1}\" description=\"{2}\" version=\"{3}\">" + 
 					"<author name=\"{5}\" /> " +
 					"<savedSearchHook name=\"{0}\"  query=\"with:{7} tag:{10}\" color=\"#00FF00\" />" +
 					"<menuHook location=\"newwavemenu\" text=\"{6}\">" +

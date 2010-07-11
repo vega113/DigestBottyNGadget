@@ -479,8 +479,6 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
   }
 
   private String getServerName() {
-//    ServletHelper servletHelper = injector.getInstance(ServletHelper.class);
-//    LOG.info("Server name: " +servletHelper.getRequest().getServerName() + ", appdomain: " + System.getProperty("APP_DOMAIN"));
     return System.getProperty("APP_DOMAIN");
   }
 
@@ -490,7 +488,6 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 
   public String getRobotProfilePageUrl() {
 	  String profileUrl = System.getProperty("PROFILE_URL");
-//    return "http://" + getServerName() + "/_wave/robot/profile"; 
 	  return "http://" + getServerName() + ".appspot.com/" + profileUrl;
   }
 
@@ -502,6 +499,15 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
   @Override
   protected ParticipantProfile getCustomProfile(String name) {
 	  LOG.fine("requested profile for: " + name);
+	  //-----------------
+	  //work around to get the profile updated //FIXME - remove
+	  if(name.equals("stenyak-asekas")){
+		  SeriallizableParticipantProfile stenyak_asekas = new SeriallizableParticipantProfile("http://ilmaistro.com/wp-content/uploads/2008/01/icono-tubo.jpg","Foro Asekas","https://wave.google.com/wave/waveref/googlewave.com!w+o2VcCrZkBCJ");
+				  cache.put(name, stenyak_asekas);
+				  return stenyak_asekas.getProfile();
+    			  
+	  }
+	  //----------------------------
 	  List<ExtDigest> digests = null;
 	  ParticipantProfile profile = null;
 	  Object o = cache.get(name);

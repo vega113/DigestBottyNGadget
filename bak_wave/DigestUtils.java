@@ -1,8 +1,8 @@
 package com.aggfi.digest.client.utils;
 
-//import org.cobogw.gwt.waveapi.gadget.client.WaveFeature;
-//import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
-//import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import org.cobogw.gwt.waveapi.gadget.client.WaveFeature;
+import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
+import com.google.gwt.gadgets.client.DynamicHeightFeature;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,9 +13,9 @@ import com.google.gwt.user.client.Window;
 
 public class DigestUtils {
 	static DigestUtils instance = null;
-//	private WaveFeature wave;
-//	private DynamicHeightFeature height;
-//	private MiniMessagesFeature messages;
+	private WaveFeature wave;
+	private DynamicHeightFeature height;
+	private MiniMessagesFeature messages;
 	private static Map<String,String> state = new HashMap<String, String>();
 	
 	private DigestUtils(){}
@@ -37,7 +37,7 @@ public class DigestUtils {
 		state.put("digestId", id);
 	}
 	
-	/*
+	
 	public String retrUserId() {
 		if(wave != null && wave.getViewer() != null){
 			return wave.getViewer().getId();
@@ -111,11 +111,11 @@ public class DigestUtils {
 		this.messages = mmFeature;
 		
 	}
-	*/
 	
 	
 	
 	
+	/*
 	public void showStaticMessage(String msg) {
 	}	
 	public void dismissStaticMessage() {
@@ -142,6 +142,6 @@ public class DigestUtils {
 	}	
 	public void dismissAlert(){
 	}
-	
+	*/
 	
 }
