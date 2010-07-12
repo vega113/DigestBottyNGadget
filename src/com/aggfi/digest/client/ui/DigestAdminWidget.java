@@ -24,6 +24,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -40,6 +41,12 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiField
 	Button addDefaultParticipantBtn;
 	@UiField
+	Button addParticipantWavesBtn;
+	@UiField
+	TextBox addParticipantWavesBox;
+	@UiField
+	TextBox addParticipanTagtWavesBox;
+	@UiField
 	VerticalPanel defaultParticipantsPanel;
 	@UiField
 	VerticalPanel defaultTagsPanel;
@@ -52,6 +59,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiField
 	VerticalPanel managersPanel;
 	@UiField
+	VerticalPanel participantWavesPanel;
+	@UiField
 	TextBox addDefaultTagBox;
 	@UiField
 	Button addDefaultTagBtn;
@@ -62,6 +71,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	TextBox addAutoTagValBox;
 	@UiField
 	Button addAutoTagBtn;
+	
+	@UiField
+	CaptionPanel addParticipantWaveCaption;//FIXME remove
 	
 	ProjectSelectWidget projectSelectWidget;
 	
@@ -172,6 +184,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		};
 		//end remove auto tag
 		
+		
 		onProjectsLoadCallback = new Runnable() { //will be run after projectIds list is loaded
 			
 			@Override
@@ -253,12 +266,14 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		defaultTagsPanel.clear();
 		autoTagsPanel.clear();
 		managersPanel.clear();
+		participantWavesPanel.clear();
 	}
 	protected void hideAll(){
 		defaultParticipantsPanel.getParent().setVisible(false);
 		defaultTagsPanel.getParent().setVisible(false);
 		autoTagsPanel.getParent().setVisible(false);
 		managersPanel.getParent().setVisible(false);
+		participantWavesPanel.getParent().setVisible(false);
 	}
 	
 	/*
@@ -370,6 +385,47 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,participantId,null,null,defaultParticipantsPanel,addDefaultParticipantBox,null,removeDefaultParticipantHandler);
 						digestUtils.dismissStaticMessage();
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						digestUtils.alert(caught.getMessage());
+						
+					}
+				});
+			} catch (RequestException e) {
+				e.printStackTrace();
+			}
+		}catch(IllegalArgumentException e){
+			digestAlert(e);
+		}
+	}
+	@UiHandler("addParticipantWavesBtn")
+	protected void addParticipantWavesBtnClick(ClickEvent event){
+		if(getProjectId().equals("")){
+			digestUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
+		final String participantId = addParticipantWavesBox.getText().trim();
+		final String tagName = addParticipanTagtWavesBox.getText().trim();
+		try{
+			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
+			FieldVerifier.verifyWaveId(participantId, messages, constants.participantWaveIdFieldName());
+			try {
+				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.setUpParticipantWaves(), participantId));
+				digestService.addWavesParticipant(getProjectId(), participantId, tagName,new AsyncCallback<JSONValue>() { 
+					
+					@Override
+					public void onSuccess(JSONValue result) {
+						addParticipantWavesBox.setText("");
+						addParticipanTagtWavesBox.setText("");
+						digestUtils.dismissStaticMessage();
+						int wavesNum = 0;
+						if(result != null && result.isNumber() != null){
+							wavesNum = (int)result.isNumber().doubleValue();
+							digestUtils.showSuccessMessage(messages.addParticipantWavesSuccessMsg(participantId,wavesNum), 8);
+						}
+						
 					}
 					
 					@Override

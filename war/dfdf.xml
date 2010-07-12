@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension name="Discuss DigestBotty"
+<extension name="DigestBotty"
 	thumbnailUrl="http://digestbotty.appspot.com/images/forumbotty_thumb_old_2.png"
-	description="DigestBotty is an extension of ForumBotty. It allows 'on the fly' creation of forums to provide Forum like experience inside Google Wave."
-	version="0.1">
+	description="DigestBotty allows 'on the fly' creation of forums to provide Forum like experience inside Google Wave.">
 	<author name="Yuri Zelikov" />
-	<savedSearchHook name="Discuss DigestBotty"
-		query="with:digestbotty+vega113-discussdigestbotty@appspot.com tag:vega113-discussdigestbotty"
-		color="#00FF00" />
-	<menuHook location="newwavemenu" text="New Discuss DigestBotty Post">
-		<createNewWave>
-			<participant id="digestbotty+vega113-discussdigestbotty@appspot.com" />
-		</createNewWave>
-	</menuHook>
-	<menuHook location="TOOLBAR" text="Add Discuss DigestBotty"
+	<menuHook location="TOOLBAR" text="DigestBotty"
 		iconUrl="http://digestbotty.appspot.com/images/forumbotty_thumb_old_2.png">
 		<addParticipants>
-			<participant id="digestbotty+vega113-discussdigestbotty@appspot.com" />
+			<participant id="digestbotty+gadget@appspot.com" />
 		</addParticipants>
+		<insertGadget
+			url="http://digestbotty.appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml" />
 	</menuHook>
 </extension>

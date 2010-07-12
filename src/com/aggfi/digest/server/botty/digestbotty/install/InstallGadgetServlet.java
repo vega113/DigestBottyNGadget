@@ -27,8 +27,8 @@ public class InstallGadgetServlet extends HttpServlet{
 			
 			String projectName = "DigestBotty"; //0
 		    String profileImageUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/images/forumbotty_thumb_old_2.png";//1
-			String projectDescription = "DigestBotty is an extension of ForumBotty. It allows 'on the fly' creation of forums to provide Forum like experience inside Google Wave.";//2
-			String version = "0.1";//3
+			String projectDescription = "DigestBotty allows 'on the fly' creation of forums to provide Forum like experience inside Google Wave.";//2
+			String version = "0.2";//3
 			String authorName = "Yuri Zelikov";//4
 			String robotAddress = System.getProperty("APP_DOMAIN") + "+gadget@appspot.com" ;//5
 			String gadgetbottyInstallUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml";//6

@@ -106,9 +106,11 @@ public class FieldVerifier {
 	}
 	
 	public static void isFieldAlphaNumeric(DigestMessages messages, String field, String fieldname){
-		String splitStr = field.split("\\W")[0];
+		String origField = field;
+		field = field.replace(".","").replace("_", "").replace("-", "");
+		String splitStr = field.split("[\\W]")[0];
 		if(field.split("\\W").length > 1 || splitStr.length() < field.length()){
-			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname,field));
+			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname,origField));
 		}
 	}
 }

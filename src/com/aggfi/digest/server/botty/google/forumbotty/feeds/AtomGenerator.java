@@ -16,6 +16,8 @@ import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
 import net.sf.jsr107cache.CacheManager;
 
+import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
+import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.google.forumbotty.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
@@ -28,11 +30,12 @@ public class AtomGenerator extends HttpServlet {
   private static final Logger LOG = Logger.getLogger(AtomGenerator.class.getName());
 
   private ForumPostDao forumPostDao = null;
+  private ExtDigestDao extDigestDao = null;
   private Util util = null;
 
   private static Cache cache = null;
   private static final String FEED_CACHE_NAME = "atom";
-  private static final int FEED_CACHE_TIME_LIMIT = 60; // in sec
+  private static final int FEED_CACHE_TIME_LIMIT = 30; // in sec
 
   static {
     try {
@@ -45,14 +48,15 @@ public class AtomGenerator extends HttpServlet {
   }
 
   @Inject
-  public AtomGenerator(ForumPostDao forumPostDao, Util util) {
+  public AtomGenerator(ForumPostDao forumPostDao, ExtDigestDao extDigestDao, Util util) {
     this.forumPostDao = forumPostDao;
+    this.extDigestDao = extDigestDao;
     this.util = util;
   }
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    int count = 20;
+    int count = 10;
     if (!util.isNullOrEmpty(req.getParameter("count"))) {
       count = Integer.parseInt(req.getParameter("count"));
     }
@@ -62,17 +66,25 @@ public class AtomGenerator extends HttpServlet {
       throw new IllegalArgumentException("Missing required param: id");
     }
 
-    if (cache.containsKey(FEED_CACHE_NAME)) {
+    if (cache.containsKey(FEED_CACHE_NAME+"."+projectId)) {
       resp.setHeader("content-type", "application/atom+xml");
-      resp.getWriter().println(cache.get(FEED_CACHE_NAME));
-    } else {
+      resp.getWriter().println(cache.get(FEED_CACHE_NAME+"."+projectId));
+    } 
+    else
+    {
       List<ForumPost> entries = this.forumPostDao.getRecentlyUpdated(projectId, count);
 
       Date latestUpdate = new Date();
       if (entries.size() > 0) {
         latestUpdate = entries.get(0).getLastUpdated();
       }
-
+      
+      List<ExtDigest>  digests = extDigestDao.retrDigestsByProjectId(projectId);
+      String forumName = "DigestBotty";
+      if(digests.size() > 0){
+      	forumName = digests.get(0).getName();
+      }
+      LOG.info("forum name for id: " + projectId + " is: " + forumName);
       String serverHost = req.getServerName();
 
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -81,7 +93,7 @@ public class AtomGenerator extends HttpServlet {
       StringBuffer content = new StringBuffer();
       content.append("<feed xmlns=\"http://www.w3.org/2005/Atom\">");
       content.append(String.format("<id>http://%s/feeds/atom?id=%s</id>", serverHost, projectId));
-      content.append("<title type=\"text\">Aggregated Finance (Aggfi) Digest</title>");
+      content.append("<title type=\"text\">" + forumName +"</title>");
       content.append(String.format(
           "<link href=\"http://%s/feeds/atom?id=%s\" rel=\"self\"></link>", serverHost, projectId));
       content.append("<author><name>forumbotty</name></author>");
@@ -94,7 +106,7 @@ public class AtomGenerator extends HttpServlet {
         Date updated = entry.getLastUpdated();
         String id = URLEncoder.encode(entry.getId(), "UTF-8");
 
-        String waveUrl = String.format("https://wave.google.com/wave/#restored:wave:%s", id);
+        String waveUrl = String.format("https://wave.google.com/wave/waveref/googlewave.com/%s", id);
 
         content.append("<entry>");
         content.append(String.format("<id>http://%s/post/%s</id>", serverHost, id));
@@ -110,7 +122,7 @@ public class AtomGenerator extends HttpServlet {
 
       content.append("</feed>");
 
-      cache.put(FEED_CACHE_NAME, content.toString());
+      cache.put(FEED_CACHE_NAME+"."+projectId, content.toString());
 
       resp.setHeader("content-type", "application/atom+xml");
       resp.getWriter().println(content.toString());

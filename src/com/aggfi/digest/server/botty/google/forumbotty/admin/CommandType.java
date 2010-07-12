@@ -1,6 +1,7 @@
 package com.aggfi.digest.server.botty.google.forumbotty.admin;
 
 import com.aggfi.digest.server.botty.digestbotty.admin.AddDigestManager;
+import com.aggfi.digest.server.botty.digestbotty.admin.AddWavesParticipant;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
 import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
@@ -36,6 +37,7 @@ public enum CommandType {
   ADD_DIGEST_MANAGER(AddDigestManager.class),
   GET_PROJECTS_PER_USER(GetProjectsPerUser.class),
   REMOVE_DIGEST_MANAGER(RemoveDigestManager.class),
+  ADD_WAVES_PARTICIPANT(AddWavesParticipant.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

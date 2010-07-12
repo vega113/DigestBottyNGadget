@@ -52,7 +52,9 @@ public class InstallServlet extends HttpServlet{
 			}
 			ExtDigest digest = digests.get(0);
 			String port = isLocal ? ":8888" : "";
-			
+			if(digest.getInstallerThumbnailUrl() == null){
+				digest.setInstallerThumbnailUrl("http://wave.google.com/images/wave-60_wshadow.gif");
+			}
 			/*
 			 * 0 - name
 			 * 1 - thumbnailUrl

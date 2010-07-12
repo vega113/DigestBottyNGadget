@@ -215,10 +215,20 @@ public class CreateDigest extends Command {
 		sba.append(a4_3, styleFontStyle, "italic");
 		//5
 		String q5 = "Q: How can I import an existing wave into the Forum?\n";
-		sba.append(q4, styleFontWeight, "bold");
+		sba.append(q5, styleFontWeight, "bold");
 		String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
 		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import; Either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
 		sba.append(a5_1, styleFontStyle, "italic");
+		//6
+		String q6 = "Q: How can I subscrive to the Forum Atom feed??\n";
+		sba.append(q6, styleFontWeight, "bold");
+		String feedUrl = "http://" + System.getProperty("APP_DOMAIN") +  ".appspot.com/feeds/atom?id=" + projectId;
+		String a6_1 = "A: You can add this Atom feed URL to your favorite Feed Reader (like Google Reader): \"";
+		sba.append(a6_1, styleFontStyle, "italic");
+		String a6_2 = feedUrl;
+		sba.append(a6_2, "link/manual", "googlewave.com!" + feedUrl);
+		String a6_3 = "\" .\n\n";
+		sba.append(a6_3, styleFontStyle, "italic");
 		
 		
 		sba.flush2Blip();

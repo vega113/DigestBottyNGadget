@@ -111,11 +111,9 @@ public interface DigestConstants extends Constants {
 
 	String googlegroupsIdExmpl();
 	
-	@DefaultStringValue(value="Manager Wave Id")
 	String managerWaveIdFieldName();
-	@DefaultStringValue(value="Default Participant Wave Id")
 	String defaultParticipantWaveIdFieldName();
-	@DefaultStringValue(value="The field should be in the form of \"your_wave_id@googlewave.com\"")
+	String participantWaveIdFieldName();
 	String waveIdFromExmpl();
 
 	String isPublicQuestion();
@@ -135,15 +133,16 @@ public interface DigestConstants extends Constants {
 	//ui titles
 	
 	String removeMeStr();
-	@DefaultStringValue(value="add")
 	String addBtnName();
 	
 	String selectDigestStr();
 	String selectReportTypeStr();
 	String setUpDefaultParticipantsStr();
+	String participantsStr();
 	String setUpDefaultTagsStr();
 	String setUpAutoTagging();
 	String setUpDigestManagers();
+	String setUpParticipantWaves();
 	
 	String defaultParticipantsStr();
 	String defaultTagsStr();
@@ -161,11 +160,16 @@ public interface DigestConstants extends Constants {
 	
 	String defaultTagExpl();
 	String autoTagExpl();
+	String autoTagNameExpl();
 	String managersExpl();
 	String defaultParticipantExpl();
+	String participantWavesExpl();
+	String participantWavesTagExpl();
 	
 	//urls
+	@DefaultStringValue(value="https://wave.google.com/wave/waveref/googlewave.com/w+0R06HrZkBhE")
 	String discussDigestBottyUrl();
+	@DefaultStringValue(value="https://wave.google.com/wave/waveref/googlewave.com/w+l1eC1LvNA")
 	String installDigestBottyUrl();
 	
 	//size

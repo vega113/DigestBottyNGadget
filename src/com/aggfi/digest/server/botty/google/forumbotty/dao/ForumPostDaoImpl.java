@@ -156,10 +156,16 @@ public class ForumPostDaoImpl implements ForumPostDao {
 
     try {
       Query query = pm.newQuery(ForumPost.class);
-      query.declareParameters("String projectId_, String tag");
-      query.setFilter("projectId == projectId_ && tags.contains(tag)");
+      if(tag != null && !"".equals(tag)){
+    	  query.declareParameters("String projectId_, String tag");
+          query.setFilter("projectId == projectId_ && tags.contains(tag)");
+          entries = (List<ForumPost>) query.execute(projectId, tag);
+      }else{
+    	  query.declareParameters("String projectId_");
+          query.setFilter("projectId == projectId_");
+          entries = (List<ForumPost>) query.execute(projectId);
+      }
 
-      entries = (List<ForumPost>) query.execute(projectId, tag);
       if (limit > 0) {
         if (entries.size() > limit) {
           entries = entries.subList(0, limit);

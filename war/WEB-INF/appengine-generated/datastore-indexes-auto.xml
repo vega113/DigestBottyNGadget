@@ -1,11 +1,11 @@
-<!-- Indices written at Sun, 11 Jul 2010 10:03:29 UTC -->
+<!-- Indices written at Sun, 11 Jul 2010 20:28:48 UTC -->
 
 <datastore-indexes>
 
-    <!-- Used 15 times in query history -->
+    <!-- Used 1 time in query history -->
     <datastore-index kind="ForumPost" ancestor="false" source="auto">
         <property name="projectId" direction="asc"/>
-        <property name="created" direction="asc"/>
+        <property name="lastUpdated" direction="desc"/>
     </datastore-index>
 
 </datastore-indexes>

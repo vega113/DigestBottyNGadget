@@ -217,4 +217,23 @@ public class DigestServiceImpl implements DigestService {
 		requestService.makeRequest(url,asyncCallback,params);
 		
 	}
+
+
+
+	@Override
+	public void addWavesParticipant(String projectId, String participantId, String tag,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("participantId", new JSONString(participantId));
+		paramsJson.put("tag", new JSONString(tag));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_WAVES_PARTICIPANT"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+		
+	}
 }
