@@ -14,7 +14,7 @@ public final class MiniMessages extends JavaScriptObject {
 		$wnd.gwtHtmlMsg[$wnd.msgCounter] = this.createStaticMessage(message);
 	}-*/;
 	
-	public native void createTimerMessage(String message) /*-{
+	public native void createTimerMessage(String message, int seconds) /*-{
 		this.createTimerMessage(message, seconds);
 	}-*/;
 	

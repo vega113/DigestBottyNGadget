@@ -57,11 +57,11 @@ public class AddAutoTag extends Command {
 	  if (util.isNullOrEmpty(projectId)) {
 		  throw new IllegalArgumentException("Missing required param: Sync");
 	  }
-
-	  this.adminConfigDao.addAutoTagRegex(projectId, tag, regex);
+	  
 	  int tagAppliedCount = 0;
 	  Wavelet firstWavelet = null;
 	  try {
+		  this.adminConfigDao.addAutoTagRegex(projectId, tag, regex);
 		  if(sync != null && !"".equals(sync)){
 			  //retrieve all forumPosts for this projectId
 

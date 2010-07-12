@@ -13,6 +13,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -29,6 +31,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -105,6 +108,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@Inject
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
+		initImageHandler();
 		hideAll();
 		defaultTagsCaptPnl.setVisible(false);//TODO remove the caption panel entirely later
 		resources.globalCSS().ensureInjected();
@@ -113,9 +117,50 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		this.constants = constants;
 		this.resources = resources;
 		this.digestUtils = DigestUtils.getInstance();
-		
+
+
+		onProjectsLoadCallback = new Runnable() { //will be run after projectIds list is loaded
+
+			@Override
+			public void run() {
+				Log.debug("DigestAdminWidget::DigestReportWidget Running");
+				String projectId = getProjectId();
+				try {
+					clearAll();
+					hideAll();
+					String msg = messages.loadingForumsMsg(constants.adminTabStr(), getProjectName());
+					Log.debug(msg);
+					digestUtils.showStaticMessage(msg);
+					digestService.retrAdminConfig(projectId, new AsyncCallback<JSONValue>() {
+
+						@Override
+						public void onSuccess(JSONValue result) {
+							initJsonArrayModule(result,"defaultParticipants",defaultParticipantsPanel,removeDefaultParticipantHandler);
+							initJsonArrayModule(result,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
+							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
+							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
+							Log.debug("dismissMessage");
+							digestUtils.dismissStaticMessage();
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Log.error("", caught);
+							digestUtils.adjustHeight();
+							digestUtils.dismissStaticMessage();
+							digestUtils.alert(caught.getMessage());
+						}
+					});
+				} catch (RequestException e) {
+					digestUtils.dismissStaticMessage();
+					digestUtils.alert(e.getMessage());
+					Log.error("", e);
+				}
+			}
+		};
+
 		//-------remove default participant
-		removeDefaultParticipantHandler = new RemoveHandler(messages, defaultTagsPanel) {
+		removeDefaultParticipantHandler = new RemoveHandler(messages, defaultTagsPanel,onProjectsLoadCallback) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -132,9 +177,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 		};
 		//end remove default participant
-		
+
 		//-------remove default tag
-		removeDefaultTagHandler = new RemoveHandler(messages, defaultTagsPanel) {
+		removeDefaultTagHandler = new RemoveHandler(messages, defaultTagsPanel,onProjectsLoadCallback) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -151,9 +196,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 		};
 		//end remove default tag
-		
+
 		//-------remove manager
-		removeManagerHandler = new RemoveHandler(messages, managersPanel) {
+		removeManagerHandler = new RemoveHandler(messages, managersPanel,onProjectsLoadCallback) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -170,9 +215,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 		};
 		//end remove manager
-		
+
 		//-------remove auto tag
-		removeAutoTagHandler = new RemoveHandler(messages, autoTagsPanel) {
+		removeAutoTagHandler = new RemoveHandler(messages, autoTagsPanel,onProjectsLoadCallback) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -181,56 +226,20 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				widget.setFirstLblKey(messages.removingMsg(tag));
 				widget.getFirstValLbl().setVisible(false);
 				String projectId = getProjectId();
+				String sync = String.valueOf(syncAutoTagCheckBox.getValue());
 				try {
-					digestService.removeAutoTag(projectId, tag, getAfterRemovalAsyncCallback());
+					String msg = messages.sentRequest2Remove(constants.autoTagging(), tag) + " " + constants.syncStr() + ": " + sync;
+					digestUtils.showStaticMessage(msg);
+					digestService.removeAutoTag(projectId, tag,sync, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
 					Log.error("", e);
 				}
 			}
 		};
 		//end remove auto tag
-		
-		
-		onProjectsLoadCallback = new Runnable() { //will be run after projectIds list is loaded
-			
-			@Override
-			public void run() {
-				Log.debug("DigestAdminWidget::DigestReportWidget Running");
-				String projectId = getProjectId();
-				try {
-					String msg = messages.loadingForumsMsg(constants.adminTabStr(), getProjectName());
-					Log.debug(msg);
-					digestUtils.showStaticMessage(msg);
-					digestService.retrAdminConfig(projectId, new AsyncCallback<JSONValue>() {
-						
-						@Override
-						public void onSuccess(JSONValue result) {
-							initJsonArrayModule(result,"defaultParticipants",defaultParticipantsPanel,removeDefaultParticipantHandler);
-							initJsonArrayModule(result,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
-							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
-							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
-							Log.debug("dismissMessage");
-							digestUtils.dismissStaticMessage();
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							Log.error("", caught);
-							digestUtils.adjustHeight();
-							digestUtils.dismissStaticMessage();
-							digestUtils.alert(caught.getMessage());
-						}
-					});
-				} catch (RequestException e) {
-					digestUtils.dismissStaticMessage();
-					digestUtils.alert(e.getMessage());
-					Log.error("", e);
-				}
-			}
-		};
-		
+
 		runOnTabSelect = new Runnable() {
-			
+
 			@Override
 			public void run() {
 				initAdminWidget();
@@ -243,7 +252,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				});
 			}
 		};
-		
+
 	}
 
 	private void initAdminWidget() {
@@ -317,7 +326,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(userId, messages, constants.managerWaveIdFieldName());
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.digestManagers(), userId));
+				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.digestManagers(), userId));
 				digestService.addDigestManager(getProjectId(), userId, new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -350,7 +359,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		try{
 			try {
 				FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
-				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.defaultTagsStr(), tag));
+				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.defaultTagsStr(), tag));
 				digestService.addDefaultTag(getProjectId(), tag, new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -384,7 +393,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(participantId, messages, constants.defaultParticipantWaveIdFieldName());
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.defaultParticipantsStr(), participantId));
+				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.defaultParticipantsStr(), participantId));
 				digestService.addDefaultParticipant(getProjectId(), participantId, new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -400,10 +409,10 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					}
 				});
 			} catch (RequestException e) {
-				e.printStackTrace();
+				digestUtils.alert(e.getMessage());
 			}
 		}catch(IllegalArgumentException e){
-			digestAlert(e);
+			digestUtils.alert(e.getMessage());
 		}
 	}
 	@UiHandler("addParticipantWavesBtn")
@@ -418,7 +427,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(participantId, messages, constants.participantWaveIdFieldName());
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.setUpParticipantWaves(), participantId));
+				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.setUpParticipantWaves(), participantId));
 				digestService.addWavesParticipant(getProjectId(), participantId, tagName,new AsyncCallback<JSONValue>() { 
 					
 					@Override
@@ -466,9 +475,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 		try{
 			try {
-				String msg = messages.sentRequest2AddD(constants.autoTagging(), tag  +" : " + regex) + ", " + constants.syncStr() + ": " + isSync;
-//				digestUtils.showStaticMessage(msg);
-				digestUtils.alert(msg);
+				String msg = messages.sentRequest2Add(constants.autoTagging(), tag  +" : " + regex) + " " + constants.syncStr() + ": " + isSync;
+				digestUtils.showStaticMessage(msg);
 				digestService.addAutoTag(getProjectId(), tag, regex,isSync, new AsyncCallback<JSONValue>() {
 					
 					@Override
@@ -482,8 +490,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 						}else if(result.isString() != null){
 							successMsg = messages.addSuccessMsg(tag);
 						}
-//						digestUtils.showSuccessMessage(successMsg, 8);
-						digestUtils.alert(successMsg);
+						digestUtils.showSuccessMessage(successMsg, 8);
 					}
 					
 					@Override
@@ -567,6 +574,30 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 
 	public Runnable getRunOnTabSelect() {
 		return runOnTabSelect;
+	}
+	
+	@UiField
+	Image img1;
+	@UiField
+	Image img2;
+	@UiField
+	Image img3;
+	@UiField
+	Image img4;
+	@UiField
+	Image img5;
+	@UiField
+	Image img6;
+	@UiField
+	Image img7;
+	@UiField
+	Image img8;
+	private void initImageHandler(){
+		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler();
+		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8};
+		for(Image image : images){
+			image.addMouseDownHandler(mouseDownHandler);
+		}
 	}
 
 }

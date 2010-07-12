@@ -1,5 +1,6 @@
 package com.aggfi.digest.client.request;
 
+import com.aggfi.digest.client.utils.DigestUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -29,7 +30,8 @@ public class DigestRequestCallback implements RequestCallback{
 			responseStr = response.getText();
 			JSONValue jsonVal = JSONParser.parse(responseStr);
 			if(jsonVal.isObject().containsKey("error")){
-				throw new Exception(jsonVal.isObject().get("error").isString().stringValue());
+				String errorMsg = jsonVal.isObject().get("error").isString().stringValue();
+				throw new Exception(errorMsg);
 			}else if(jsonVal.isObject().containsKey("result")){
 					callback.onSuccess(jsonVal.isObject().get("result"));
 					

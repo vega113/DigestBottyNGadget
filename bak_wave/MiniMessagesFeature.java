@@ -40,9 +40,9 @@ public class MiniMessagesFeature implements GadgetFeature {
 		}
 	}
 
-	public  void createTimerMessage(String message) {
+	public  void createTimerMessage(String message, int seconds) {
 		try{
-			messages.createTimerMessage(message);
+			messages.createTimerMessage(message,seconds);
 		}catch (Exception e) {
 			Log.error("", e);
 		}

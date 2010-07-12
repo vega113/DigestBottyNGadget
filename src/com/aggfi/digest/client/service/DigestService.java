@@ -22,7 +22,7 @@ public interface DigestService {
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 	
 	void removeAutoTag(String projectId, String tag,
-			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+			String sync, AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
 	void retrAdminConfig(String projectId, AsyncCallback<JSONValue> callback)
 			throws RequestException;

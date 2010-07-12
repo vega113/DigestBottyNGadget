@@ -5,9 +5,6 @@ import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
 
 
@@ -52,16 +49,11 @@ public class DigestUtils {
 		}
 	}
 	
+	/**
+	 * @deprecated - use adjustHeight
+	 */
 	public void adjustHeightDeferred(){
-		DeferredCommand.addCommand(new Command() {
-			
-			@Override
-			public void execute() {
-				if(height != null){
-					height.adjustHeight();
-				}
-			}
-		});
+		height.adjustHeight();
 	}
 	
 	
@@ -109,6 +101,12 @@ public class DigestUtils {
 
 	public void setMiniMessages(MiniMessagesFeature mmFeature) {
 		this.messages = mmFeature;
+		
+	}
+
+
+	public void showTimerMessage(String msg, int seconds) {
+		messages.createTimerMessage(msg, seconds);
 		
 	}
 	

@@ -14,7 +14,7 @@
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addDefaultParticipantBox" title='{constants.defaultParticipantExpl}'
 							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.defaultParticipantExpl}' />
+						<g:Image resource='{res.tooltip}' title='{constants.defaultParticipantExpl}' ui:field="img1"/>
 						<g:Button ui:field="addDefaultParticipantBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -33,7 +33,7 @@
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addDefaultTagBox" title='{constants.defaultTagExpl}'
 							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.defaultTagExpl}' />
+						<g:Image resource='{res.tooltip}' title='{constants.defaultTagExpl}' ui:field="img2"/>
 						<g:Button ui:field="addDefaultTagBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -51,7 +51,7 @@
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}'
 							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.managersExpl}' />
+						<g:Image resource='{res.tooltip}' title='{constants.managersExpl}' ui:field="img3"/>
 						<g:Button ui:field="addManagergBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -75,7 +75,7 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addAutoTagNameBox" title='{constants.autoTagExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.autoTagNameExpl}' />
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagNameExpl}' ui:field="img4"/>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 						<g:HTML width="10px"></g:HTML>
@@ -87,11 +87,11 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addAutoTagValBox" title='{constants.autoTagExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.autoTagExpl}' />
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagExpl}' ui:field="img5"/>
 								<g:Button ui:field="addAutoTagBtn" text='{constants.addBtnName}'></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
-						<g:HTML width="20px"></g:HTML>
+						<g:HTML width="1px"></g:HTML>
 						<g:CaptionPanel>
 							<g:VerticalPanel>
 							<g:HorizontalPanel>
@@ -99,7 +99,7 @@
 							</g:HorizontalPanel>
 							<g:HorizontalPanel>
 								<g:CheckBox ui:field="syncAutoTagCheckBox"></g:CheckBox>
-								<g:Image resource='{res.tooltip}' title='{constants.autoTagSyncExpl}'/>
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagSyncExpl}' ui:field="img6"/>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 						</g:CaptionPanel>
@@ -127,7 +127,7 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addParticipantWavesBox" title='{constants.participantWavesExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.participantWavesExpl}' />
+								<g:Image resource='{res.tooltip}' title='{constants.participantWavesExpl}' ui:field="img7"/>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 						<g:HTML width="10px"></g:HTML>
@@ -139,7 +139,7 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addParticipanTagtWavesBox" title='{constants.participantWavesExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.participantWavesTagExpl}' />
+								<g:Image resource='{res.tooltip}' title='{constants.participantWavesTagExpl}' ui:field="img8"/>
 								<g:Button ui:field="addParticipantWavesBtn" text='{constants.addBtnName}'></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>

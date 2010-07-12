@@ -145,7 +145,7 @@ public class CreateDigest extends Command {
 			}
 		}
 		if(isPublicOnCreate){
-			participants.add("public@a.gwave.com");
+			participants.add("digestbotty-public@googlegroups.com");
 		}
 		
 		participants.add(ownerId);
@@ -153,7 +153,7 @@ public class CreateDigest extends Command {
 		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_FAQ_CREATED_MSG","",rpcUrl);
 		newWavelet.getParticipants().add(robotAddress);
 		if(isPublicOnCreate){
-			newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
+			newWavelet.getParticipants().setParticipantRole("digestbotty-public@googlegroups.com", Participants.Role.READ_ONLY);
 		}
 		newWavelet.setTitle(projectName  + " Installer and FAQ");
 		
@@ -161,7 +161,7 @@ public class CreateDigest extends Command {
 		
 		appendFaq2blip(projectName,projectId, digestWaveId,ownerId, newWavelet);
 		
-		newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
+		newWavelet.getParticipants().setParticipantRole("digestbotty-public@googlegroups.com", Participants.Role.READ_ONLY);
 	
 		
 		robot.submit(newWavelet, rpcUrl);
@@ -185,11 +185,36 @@ public class CreateDigest extends Command {
 			"After installation you will have a \"New " + projectName + " Post\" option in the \"New Wave\" menu, use it to create new posts.\n\n";
 		sba.append(a1, styleFontStyle, "italic");
 		//2
+		String q4 = "Q: How can I be notified about new posts in this Forum?\n";
+		sba.append(q4, styleFontWeight, "bold");
+		String a4_1 = "A: You can go to the \"" + projectName + "\" ";
+		sba.append(a4_1, styleFontStyle, "italic");
+		String a4_2 = "Digest wave";
+		sba.append(a4_2, "link/wave", "googlewave.com!" + digestWaveId);
+		String a4_3 = " and then \"Follow\" it.\n\n";
+		sba.append(a4_3, styleFontStyle, "italic");
+		//3
+		String q6 = "Q: How can I subscribe to the ATOM feed for this forum?\n";
+		sba.append(q6, styleFontWeight, "bold");
+		String feedUrl = "http://" + System.getProperty("APP_DOMAIN") +  ".appspot.com/feeds/atom?id=" + projectId;
+		String a6_1 = "A: You can add this ATOM feed URL to your favorite Feed Reader (like Google Reader): \"";
+		sba.append(a6_1, styleFontStyle, "italic");
+		String a6_2 = feedUrl;
+		sba.append(a6_2, styleFontStyle, "italic");
+		String a6_3 = "\" .\n\n";
+		sba.append(a6_3, styleFontStyle, "italic");
+		//4
+		String q5 = "Q: How can I import an existing wave into the Forum?\n";
+		sba.append(q5, styleFontWeight, "bold");
+		String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
+		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import - either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
+		sba.append(a5_1, styleFontStyle, "italic");
+		//5
 		String q2 = "Q: Who is the Forum owner?\n";
 		sba.append(q2, styleFontWeight, "bold");
 		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
-		//3
+		//6
 		String q3 = "Q: I have more questions regarding using forums created by DigestBotty, where can I ask them?\n";
 		sba.append(q3, styleFontWeight, "bold");
 		String a3_1 = "A: Please visit the DigestBotty digest wave ";
@@ -204,31 +229,9 @@ public class CreateDigest extends Command {
 		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_FAQ_LINK"));
 		String a3_6 = " and then create a new post with your question.\n\n";
 		sba.append(a3_6, styleFontStyle, "italic");
-		//4
-		String q4 = "Q: How can I be notified about new posts in this Forum?\n";
-		sba.append(q4, styleFontWeight, "bold");
-		String a4_1 = "A: You can go to the \"" + projectName + "\" ";
-		sba.append(a4_1, styleFontStyle, "italic");
-		String a4_2 = "Digest wave";
-		sba.append(a4_2, "link/wave", "googlewave.com!" + digestWaveId);
-		String a4_3 = " and then \"Follow\" it.\n\n";
-		sba.append(a4_3, styleFontStyle, "italic");
-		//5
-		String q5 = "Q: How can I import an existing wave into the Forum?\n";
-		sba.append(q5, styleFontWeight, "bold");
-		String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
-		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import; Either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
-		sba.append(a5_1, styleFontStyle, "italic");
-		//6
-		String q6 = "Q: How can I subscrive to the Forum Atom feed??\n";
-		sba.append(q6, styleFontWeight, "bold");
-		String feedUrl = "http://" + System.getProperty("APP_DOMAIN") +  ".appspot.com/feeds/atom?id=" + projectId;
-		String a6_1 = "A: You can add this Atom feed URL to your favorite Feed Reader (like Google Reader): \"";
-		sba.append(a6_1, styleFontStyle, "italic");
-		String a6_2 = feedUrl;
-		sba.append(a6_2, "link/manual", "googlewave.com!" + feedUrl);
-		String a6_3 = "\" .\n\n";
-		sba.append(a6_3, styleFontStyle, "italic");
+		
+		
+		
 		
 		
 		sba.flush2Blip();
@@ -367,11 +370,14 @@ public class CreateDigest extends Command {
 		String rpcUrl = domain.equals(ForumBotty.PREVIEW_DOMAIN) ? ForumBotty.PREVIEW_RPC_URL : ForumBotty.SANDBOX_RPC_URL;
 		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_CREATED_MSG",projectId + "-digest",rpcUrl);
 		if (isPublicOnCreate) {
-			newWavelet.getParticipants().add("public@a.gwave.com");
-			adminConfigDao.addDefaultParticipant(projectId, "public@a.gwave.com");
+			newWavelet.getParticipants().add("digestbotty-public@googlegroups.com");
+			adminConfigDao.addDefaultParticipant(projectId, "digestbotty-public@googlegroups.com");
 		}
-		newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
-		newWavelet.setTitle(projectName  + " Digest Wave");
+		newWavelet.getParticipants().setParticipantRole("digestbotty-public@googlegroups.com", Participants.Role.READ_ONLY);
+		
+		String titleStr = projectName  + " Digest Wave";
+		newWavelet.setTitle(titleStr);
+		newWavelet.getRootBlip().append("\n");
 		String gadgetUrl = System.getProperty("CLICK_GADGET_URL");
 		Gadget gadget = new Gadget(gadgetUrl);
 		gadget.setProperty("waveid", newWavelet.getWaveletId().getId());

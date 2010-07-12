@@ -426,7 +426,7 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 
 			  Matcher m = null;
 			  m = pattern.matcher(content);
-			  if (m.find()) {
+			  if (m.find() && !blip.getWavelet().getTags().contains(tag)) {
 				  blip.getWavelet().getTags().add(tag);
 				  isTagApplied = true;
 			  }

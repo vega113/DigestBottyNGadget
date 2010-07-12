@@ -14,12 +14,14 @@ abstract class RemoveHandler {
 	private ComplexPanel panel;
 	private AfterRemovalAsyncCallback afterRemovalAsyncCallback = new AfterRemovalAsyncCallback();
 	AddRemDefLabel widget = null;
+	private Runnable onProjectsLoadCallback = null;
 	
 	protected class AfterRemovalAsyncCallback implements AsyncCallback<JSONValue>{
 		
 		@Override
 		public void onSuccess(JSONValue result) {
 			final String removedItem = widget.getSecondLblVal() != null ?  widget.getFirstLblVal() + " : " + widget.getSecondLblVal() :  widget.getFirstLblVal();
+			String tag = widget.getFirstLblVal();
 			widget.getSecondValLbl().setText(messages.removalSuccessMsg(removedItem));
 			Timer t = new Timer() {
 				public void run() {
@@ -29,6 +31,16 @@ abstract class RemoveHandler {
 				}
 			};
 			t.schedule(1500);
+			DigestUtils.getInstance().dismissAllStaticMessages();
+			String successMsg = "";
+			if(result.isNumber() != null){
+				int appliedCount = (int)result.isNumber().doubleValue();
+				successMsg = messages.removedFromWavesSuccessMsg(tag,appliedCount);
+			}else{
+				successMsg = messages.removeSuccessMsg(tag);
+			}
+			onProjectsLoadCallback.run();
+			DigestUtils.getInstance().showSuccessMessage(successMsg, 8);
 		}
 
 		@Override
@@ -36,15 +48,16 @@ abstract class RemoveHandler {
 			widget.setFirstLblKey("");
 			widget.getFirstValLbl().setVisible(true);
 			Log.error("", caught);
-
+			DigestUtils.getInstance().alert(caught.getMessage());
 		}
 
 	}
 	
-	public RemoveHandler(DigestMessages messages,ComplexPanel panel) {
+	public RemoveHandler(DigestMessages messages,ComplexPanel panel, Runnable onProjectsLoadCallback) {
 		super();
 		this.messages = messages;
 		this.panel = panel;
+		this.onProjectsLoadCallback= onProjectsLoadCallback;
 	}
 
 	/**

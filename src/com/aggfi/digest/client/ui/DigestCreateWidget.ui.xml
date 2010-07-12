@@ -18,7 +18,7 @@
 							<g:HorizontalPanel>
 								<g:HTML ui:field="isPublicQuestion"></g:HTML>
 								<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
-								<g:Image resource='{res.tooltip}' title='{constants.isPublicQuestionTtl}'/>
+								<g:Image resource='{res.tooltip}' title='{constants.isPublicQuestionTtl}' ui:field="imgIsPublicCheckBox"/>
 								<g:HTML width='30px'></g:HTML>
 								<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
 								<g:DecoratorPanel>

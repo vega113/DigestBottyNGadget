@@ -9,6 +9,9 @@ import java.util.Map;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 
 
 public class DigestUtils {
@@ -125,10 +128,12 @@ public class DigestUtils {
 	public void showSuccessMessage(String msg, int seconds) {
 		Window.alert(msg);
 	}
-	
+	public void showTimerMessage(String msg, int seconds){
+		Window.alert(msg);
+	}
 	
 	public String retrUserId() {
-		return "vega114@googlewave.com";
+		return "vega113@googlewave.com";
 		
 	}
 	public String retrUserName() {
@@ -142,6 +147,4 @@ public class DigestUtils {
 	}	
 	public void dismissAlert(){
 	}
-	
-	
 }

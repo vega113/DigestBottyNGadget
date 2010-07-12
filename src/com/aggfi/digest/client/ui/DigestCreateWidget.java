@@ -16,6 +16,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.json.client.JSONObject;
@@ -68,6 +69,9 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	CheckBox isPublicBox;
 	@UiField
 	HTML isPublicQuestion;
+	
+	@UiField
+	Image imgIsPublicCheckBox;
 
 	private Runnable onDigestCreateWidgetLoad;
 	
@@ -273,7 +277,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		String[] exampleStrs = {constants.ownerExmpl(),constants.authorExmpl(),constants.projectIdExmpl(),constants.domainExmpl(),
 					constants.digestNameExmpl(),constants.descriptionExmpl(),constants.installerThumbnailUrlExmpl(),constants.robotThumbnailUrlExmpl(),constants.forumSiteUrlExmpl(),
 					constants.googlegroupsIdExmpl()};
-
+		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler();
+		imgIsPublicCheckBox.addMouseDownHandler(mouseDownHandler);
 		for(int i = 0; i < row; i++){
 			if(i%2 == 0){
 				tbl.getCellFormatter().setStyleName(row,0, resources.globalCSS().highlight());
@@ -292,6 +297,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			w.setTitle( w.getTitle() + " " + constants.exampleWord() + "\"" +  exampleStrs[i] + "\"");
 			String title = w.getTitle();
 			tooltipImage.setTitle(title);
+			tooltipImage.addMouseDownHandler(mouseDownHandler);
 			int textBoxWidth = (int)(constants.basicWidthInt()*0.66);
 			w.setWidth( textBoxWidth + "px");
 			w.setHeight(constants.itemCreateHeight() + "px");
@@ -300,6 +306,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			hp.add(w);
 			tbl.setWidget(i, 1, hp);
 		}
+		
 		ColumnFormatter colFormatter = tbl.getColumnFormatter();
 		colFormatter.addStyleName(1, resources.globalCSS().inputRegular());
 		
