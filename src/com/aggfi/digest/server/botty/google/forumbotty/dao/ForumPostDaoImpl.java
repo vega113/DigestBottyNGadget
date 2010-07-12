@@ -149,7 +149,8 @@ public class ForumPostDaoImpl implements ForumPostDao {
     return entry;
   }
 
-  @Override
+  @SuppressWarnings("unchecked")
+@Override
   public List<ForumPost> getForumPostsByTag(String projectId, String tag, int limit) {
     PersistenceManager pm = pmf.getPersistenceManager();
     List<ForumPost> entries = new ArrayList<ForumPost>();

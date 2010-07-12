@@ -44,7 +44,7 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 
 				// Each new AdminConfig by default has its own id as the default tag
 				List<String> defaultTags = new ArrayList<String>();
-				defaultTags.add(id);
+//				defaultTags.add(id);// I want to make default tags obsolete, will be substituted by auto tags
 				adminConfig.setDefaultTags(defaultTags);
 
 				List<String> managers = new ArrayList<String>();

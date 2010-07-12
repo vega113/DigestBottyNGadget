@@ -48,5 +48,6 @@ public interface DigestMessages extends Messages {
 
   String sentRequest2AddD(String what, String name);
   
-  String addParticipantWavesSuccessMsg(String participantId, int wavesNumber);
+  String add2WavesSuccessMsg(String participantId, int wavesNumber);
+  String addSuccessMsg(String name);
 }

@@ -28,7 +28,7 @@
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 
-			<g:CaptionPanel captionText='{constants.setUpDefaultTagsStr}'>
+			<g:CaptionPanel captionText='{constants.setUpDefaultTagsStr}' ui:field="defaultTagsCaptPnl">
 				<g:VerticalPanel>
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addDefaultTagBox" title='{constants.defaultTagExpl}'
@@ -46,7 +46,24 @@
 					</g:ScrollPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
-
+			<g:CaptionPanel captionText='{constants.setUpDigestManagers}'>
+				<g:VerticalPanel>
+					<g:HorizontalPanel>
+						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}'
+							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
+						<g:Image resource='{res.tooltip}' title='{constants.managersExpl}' />
+						<g:Button ui:field="addManagergBtn" text='{constants.addBtnName}'></g:Button>
+					</g:HorizontalPanel>
+					<g:cell height="10px">
+						<g:HTML></g:HTML>
+					</g:cell>
+					<g:ScrollPanel width='{constants.smallerWidthStr}'
+						height='{constants.basicItemScrollHeightStr}'>
+						<g:VerticalPanel ui:field="managersPanel">
+						</g:VerticalPanel>
+					</g:ScrollPanel>
+				</g:VerticalPanel>
+			</g:CaptionPanel>
 			<g:CaptionPanel captionText='{constants.setUpAutoTagging}'>
 				<g:VerticalPanel>
 					<g:HorizontalPanel>
@@ -74,6 +91,18 @@
 								<g:Button ui:field="addAutoTagBtn" text='{constants.addBtnName}'></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
+						<g:HTML width="20px"></g:HTML>
+						<g:CaptionPanel>
+							<g:VerticalPanel>
+							<g:HorizontalPanel>
+								<g:Label text='{constants.syncStr}'></g:Label> 
+							</g:HorizontalPanel>
+							<g:HorizontalPanel>
+								<g:CheckBox ui:field="syncAutoTagCheckBox"></g:CheckBox>
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagSyncExpl}'/>
+							</g:HorizontalPanel>
+						</g:VerticalPanel>
+						</g:CaptionPanel>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
 						<g:HTML></g:HTML>
@@ -86,24 +115,6 @@
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 
-			<g:CaptionPanel captionText='{constants.setUpDigestManagers}'>
-				<g:VerticalPanel>
-					<g:HorizontalPanel>
-						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}'
-							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.managersExpl}' />
-						<g:Button ui:field="addManagergBtn" text='{constants.addBtnName}'></g:Button>
-					</g:HorizontalPanel>
-					<g:cell height="10px">
-						<g:HTML></g:HTML>
-					</g:cell>
-					<g:ScrollPanel width='{constants.smallerWidthStr}'
-						height='{constants.basicItemScrollHeightStr}'>
-						<g:VerticalPanel ui:field="managersPanel">
-						</g:VerticalPanel>
-					</g:ScrollPanel>
-				</g:VerticalPanel>
-			</g:CaptionPanel>
 			<g:CaptionPanel captionText='{constants.setUpParticipantWaves}'
 				ui:field="addParticipantWaveCaption">
 				<g:VerticalPanel>

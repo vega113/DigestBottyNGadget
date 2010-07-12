@@ -202,7 +202,7 @@ public class DigestServiceImpl implements DigestService {
 
 
 	@Override
-	public void addAutoTag(String projectId, String tag, String regex,
+	public void addAutoTag(String projectId, String tag, String regex, String isSync,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
 		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
@@ -210,6 +210,7 @@ public class DigestServiceImpl implements DigestService {
 		paramsJson.put("projectId", new JSONString(projectId));
 		paramsJson.put("tag", new JSONString(tag));
 		paramsJson.put("regex", new JSONString(regex));
+		paramsJson.put("sync", new JSONString(isSync));
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_AUTO_TAG"));
 		

@@ -21,6 +21,7 @@
     <property name="DIGEST_WAVE_DOMAIN" value="googlewave.com"/>     
     <property name="DIGEST_WAVE_ID" value=""/>   
     <property name="MAX_DIGESTS" value="10"/>
+    <property name="MAX_WAVELET_FETCH_SIZE" value="1000"/>
     <property name="APP_DOMAIN" value="digestbotty"/>
     <property name="CLICK_GADGET_URL" value="http://waveclick.appspot.com/waveclick/com.aggfi.wave.waveclick.client.WaveClick.gadget.xml"/>
     <property name="DIGESTBOTTY_FORUM_FAQ_LINK" value="googlewave.com!w+VIL2ZrZkBSb"/>

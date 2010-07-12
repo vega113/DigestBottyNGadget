@@ -40,7 +40,7 @@ public interface DigestService {
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
 	void addAutoTag(String projectId, String tag, String regex,
-			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+			String isSync, AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
 	void addWavesParticipant(String projectId, String participantId,
 			String tagName, AsyncCallback<JSONValue> asyncCallback) throws RequestException;

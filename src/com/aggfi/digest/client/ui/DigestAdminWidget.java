@@ -25,6 +25,7 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -51,6 +52,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiField
 	VerticalPanel defaultTagsPanel;
 	@UiField
+	CaptionPanel defaultTagsCaptPnl;
+	@UiField
 	VerticalPanel autoTagsPanel;
 	@UiField
 	SimplePanel prjListContainer;
@@ -71,6 +74,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	TextBox addAutoTagValBox;
 	@UiField
 	Button addAutoTagBtn;
+	@UiField
+	CheckBox syncAutoTagCheckBox;
 	
 	@UiField
 	CaptionPanel addParticipantWaveCaption;//FIXME remove
@@ -101,6 +106,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
 		initWidget(uiBinder.createAndBindUi(this));
 		hideAll();
+		defaultTagsCaptPnl.setVisible(false);//TODO remove the caption panel entirely later
 		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
 		this.messages = messages;
@@ -280,7 +286,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	 * used in the onSucess methods in callbacks below
 	 */
 	private void onAddSuccess(JSONValue result,String name1, String val1, String name2, String val2,ComplexPanel panel, TextBox textBox1,TextBox textBox2, RemoveHandler removeHandler){
-		if(result != null && result.isString().stringValue().equals("true")){
+		if(result != null){
 			Composite c = new AddRemDefLabel(removeHandler, name1, val1, name2, val2);
 			int widgetCount = panel.getWidgetCount();
 			if(widgetCount % 2 == 1){
@@ -423,7 +429,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 						int wavesNum = 0;
 						if(result != null && result.isNumber() != null){
 							wavesNum = (int)result.isNumber().doubleValue();
-							digestUtils.showSuccessMessage(messages.addParticipantWavesSuccessMsg(participantId,wavesNum), 8);
+							digestUtils.showSuccessMessage(messages.add2WavesSuccessMsg(participantId,wavesNum), 8);
 						}
 						
 					}
@@ -448,18 +454,36 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			digestUtils.alert(constants.noForumSelectedWarning());
 			return;
 		}
+		String isSync = String.valueOf(syncAutoTagCheckBox.getValue());
 		final String tag = addAutoTagNameBox.getText().trim();
-		final String regex = addAutoTagValBox.getText().trim();
+		final String regex1;
+		if("".equals(addAutoTagValBox.getText().trim())){
+			regex1 = ".*";
+		}else{
+			regex1 = addAutoTagValBox.getText().trim();
+		}
+		final String regex = regex1;
 		FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 		try{
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2AddD(constants.autoTagging(), tag+" : " + regex));
-				digestService.addAutoTag(getProjectId(), tag, regex, new AsyncCallback<JSONValue>() {
+				String msg = messages.sentRequest2AddD(constants.autoTagging(), tag  +" : " + regex) + ", " + constants.syncStr() + ": " + isSync;
+//				digestUtils.showStaticMessage(msg);
+				digestUtils.alert(msg);
+				digestService.addAutoTag(getProjectId(), tag, regex,isSync, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,constants.tagStr(),tag,constants.regexStr(),regex,autoTagsPanel,addAutoTagNameBox,addAutoTagValBox,removeAutoTagHandler);
 						digestUtils.dismissStaticMessage();
+						String successMsg = "";
+						if(result.isNumber() != null){
+							int appliedCount = (int)result.isNumber().doubleValue();
+							successMsg = messages.add2WavesSuccessMsg(tag,appliedCount);
+						}else if(result.isString() != null){
+							successMsg = messages.addSuccessMsg(tag);
+						}
+//						digestUtils.showSuccessMessage(successMsg, 8);
+						digestUtils.alert(successMsg);
 					}
 					
 					@Override

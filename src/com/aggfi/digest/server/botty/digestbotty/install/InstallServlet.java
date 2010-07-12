@@ -70,7 +70,7 @@ public class InstallServlet extends HttpServlet{
 			String projectName = digest.getName(); //0
 		    String profileImageUrl = digest.getInstallerThumbnailUrl();//1
 			String projectDescription = digest.getDescription();//2
-			String version = "0.1";//3
+			String version = "0.5";//3
 			String infoUrl = digest.getForumSiteUrl();//4
 			String authorName = digest.getAuthor();//5
 			String triggerText = "New " + digest.getName() + " Post"; //6
@@ -85,7 +85,7 @@ public class InstallServlet extends HttpServlet{
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<extension name=\"{0}\" thumbnailUrl=\"{1}\" description=\"{2}\" version=\"{3}\">" + 
 					"<author name=\"{5}\" /> " +
-					"<savedSearchHook name=\"{0}\"  query=\"with:{7} tag:{10}\" color=\"#00FF00\" />" +
+					"<savedSearchHook name=\"{0}\"  query=\"with:{7}\" color=\"#00FF00\" />" +
 					"<menuHook location=\"newwavemenu\" text=\"{6}\">" +
 						"<createNewWave>" +
 								"<participant id=\"{7}\"/>" +

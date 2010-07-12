@@ -151,6 +151,7 @@ public interface DigestConstants extends Constants {
 	
 	String tagStr();
 	String regexStr();
+	String syncStr();
 	
 	String newWavesLast14Days();
 	String breakDown4AllTags();
@@ -161,6 +162,7 @@ public interface DigestConstants extends Constants {
 	String defaultTagExpl();
 	String autoTagExpl();
 	String autoTagNameExpl();
+	String autoTagSyncExpl();
 	String managersExpl();
 	String defaultParticipantExpl();
 	String participantWavesExpl();

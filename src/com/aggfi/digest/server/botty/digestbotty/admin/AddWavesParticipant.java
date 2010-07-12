@@ -50,7 +50,7 @@ public class AddWavesParticipant extends Command {
     String tag = this.getParam("tag");
     Wavelet wavelet = null;
     //retrieve a list of all forumPosts for this projectId
-    List<ForumPost> entries = forumPostDao.getForumPostsByTag(projectId,tag,200);
+    List<ForumPost> entries = forumPostDao.getForumPostsByTag(projectId,tag,Integer.parseInt(System.getProperty("MAX_WAVELET_FETCH_SIZE")));
     Wavelet firstWavelet = null;
     try {
     	for(ForumPost entry : entries){

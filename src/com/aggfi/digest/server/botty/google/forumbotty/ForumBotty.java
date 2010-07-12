@@ -228,7 +228,6 @@ public class ForumBotty extends AbstractRobot {
 public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
 	ForumPost entry = new ForumPost(wavelet.getDomain(), wavelet);
       entry.setProjectId(projectId);
-      applyDefaultTags(wavelet, projectId);
       entry = forumPostDao.syncTags(projectId, entry, wavelet);
       forumPostDao.save(entry);
       updateDigestWave(entry);
@@ -277,7 +276,7 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
       // Existing wavelet in datastore
       entry.setTitle(wavelet.getTitle());
       entry.setLastUpdated(new Date());
-      entry.setBlipCount(wavelet.getBlips().size());
+//      entry.setBlipCount(wavelet.getBlips().size());
     } else {
       // Brand new wavelet
       entry = new ForumPost(wavelet.getDomain(), wavelet);
@@ -288,10 +287,11 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
     // Update contributor list if this is not robot or agent
     if (isNormalUser(event.getModifiedBy())) {
       entry.addContributor(event.getModifiedBy());
+      entry.setBlipCount(entry.getBlipCount() +1);
     }
 
     // Apply default and auto tags to the wave
-    applyDefaultTags(wavelet, projectId);
+//    applyDefaultTags(wavelet, projectId);
     applyAutoTags(event.getBlip(), projectId);
 
     entry = forumPostDao.syncTags(projectId, entry, wavelet);
@@ -413,6 +413,26 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
         blip.getWavelet().getTags().add(tag);
       }
     }
+  }
+  
+  public boolean applyAutoTag(Blip blip, String projectId, String tagName) {
+	  String content = blip.getContent();
+	  boolean isTagApplied = false;
+	  for (Entry<String, Pattern> entry : this.adminConfigDao.getAdminConfig(projectId)
+			  .getAutoTagRegexMap().entrySet()) {
+		  String tag = entry.getKey();
+		  if(tag.equals(tagName)){
+			  Pattern pattern = entry.getValue();
+
+			  Matcher m = null;
+			  m = pattern.matcher(content);
+			  if (m.find()) {
+				  blip.getWavelet().getTags().add(tag);
+				  isTagApplied = true;
+			  }
+		  }
+	  }
+	  return isTagApplied;
   }
 
   private boolean isNotifyProxy(String proxyForString) {
