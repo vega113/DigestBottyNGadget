@@ -27,11 +27,13 @@ public class DigestUtils {
 
 	
 	public String getCurrentDigestId(){
-		String id = state.get("digestId");
+		String id = wave.getPrivateState().get("digestId");
 		return id != null? id : "";
 	}
 	public void setCurrentDigestId(String id){
-		state.put("digestId", id);
+		HashMap<String,String> delta = new HashMap<String, String>();
+		delta.put("digestId", id);
+		wave.getPrivateState().submitDelta(delta);
 	}
 	
 	
@@ -139,6 +141,13 @@ public class DigestUtils {
 		Window.alert(msg);
 	}	
 	public void dismissAlert(){
+	}
+	public String getCurrentDigestId(){
+		String id = state.get("digestId");
+		return id != null? id : "";
+	}
+	public void setCurrentDigestId(String id){
+		state.put("digestId", id);
 	}
 	*/
 	

@@ -439,6 +439,10 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 						if(result != null && result.isNumber() != null){
 							wavesNum = (int)result.isNumber().doubleValue();
 							digestUtils.showSuccessMessage(messages.add2WavesSuccessMsg(participantId,wavesNum), 8);
+						}else if(result.isString() != null){
+							digestUtils.alert (result.isString().stringValue());//FIXME check why there's no output
+						}else if(result != null){
+							digestUtils.alert (result.toString());
 						}
 						
 					}
@@ -484,13 +488,19 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 						onAddSuccess(result,constants.tagStr(),tag,constants.regexStr(),regex,autoTagsPanel,addAutoTagNameBox,addAutoTagValBox,removeAutoTagHandler);
 						digestUtils.dismissStaticMessage();
 						String successMsg = "";
-						if(result.isNumber() != null){
-							int appliedCount = (int)result.isNumber().doubleValue();
-							successMsg = messages.add2WavesSuccessMsg(tag,appliedCount);
-						}else if(result.isString() != null){
-							successMsg = messages.addSuccessMsg(tag);
+						if(result != null){
+							if(result.isNumber() != null){
+								int appliedCount = (int)result.isNumber().doubleValue();
+								successMsg = messages.add2WavesSuccessMsg(tag,appliedCount);
+							}else if(result.isString() != null){
+								successMsg = messages.addSuccessMsg(tag);
+							}else{
+								successMsg = result.toString();
+							}
+							digestUtils.showSuccessMessage(successMsg, 8);
+						}else{
+							digestUtils.alert("addAutoTagClick->null");
 						}
-						digestUtils.showSuccessMessage(successMsg, 8);
 					}
 					
 					@Override

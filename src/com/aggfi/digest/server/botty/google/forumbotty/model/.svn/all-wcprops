@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/3/trunk/forumbotty/src/com/google/forumbotty/model
+END
+Digest.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/3/trunk/forumbotty/src/com/google/forumbotty/model/Digest.java
+END
+UserNotification.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/3/trunk/forumbotty/src/com/google/forumbotty/model/UserNotification.java
+END
+Tag.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/3/trunk/forumbotty/src/com/google/forumbotty/model/Tag.java
+END
+ForumPost.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/3/trunk/forumbotty/src/com/google/forumbotty/model/ForumPost.java
+END
+AdminConfig.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/3/trunk/forumbotty/src/com/google/forumbotty/model/AdminConfig.java
+END

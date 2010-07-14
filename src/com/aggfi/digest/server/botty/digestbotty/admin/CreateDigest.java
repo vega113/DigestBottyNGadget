@@ -61,6 +61,12 @@ public class CreateDigest extends Command {
 	    	String projectName= extDigest.getName();
 	    	String ownerId = extDigest.getOwnerId();
 	    	String googlegroups = extDigest.getGooglegroupsId();
+	    	
+	    	String senderId = this.getParam("senderId");
+	        if (senderId != null && !senderId.equals(extDigest.getOwnerId())) {
+	        	throw new RuntimeException(extDigest.getOwnerId()  + " and " + senderId + " do not match!" );
+	        }
+	        
 	    	if(extDigestDao.retrDigestsByProjectId(projectId).size() > 0 ){
 	    		throw new IllegalArgumentException("Project with id: " + projectId + " already exists! Please choose another project id."); 
 	    	}
@@ -145,23 +151,22 @@ public class CreateDigest extends Command {
 			}
 		}
 		if(isPublicOnCreate){
-			participants.add("digestbotty-public@googlegroups.com");
+			participants.add(System.getProperty("PUBLIC_GROUP"));
 		}
-		
 		participants.add(ownerId);
 		LOG.info("IN createFAQ, robot name: " + robot.getRobotName() + ", " + robot.getRobotProfilePageUrl());
 		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_FAQ_CREATED_MSG","",rpcUrl);
 		newWavelet.getParticipants().add(robotAddress);
 		if(isPublicOnCreate){
-			newWavelet.getParticipants().setParticipantRole("digestbotty-public@googlegroups.com", Participants.Role.READ_ONLY);
+			newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 		}
-		newWavelet.setTitle(projectName  + " Installer and FAQ");
+		newWavelet.setTitle(projectName  + " [Installer and FAQ]");
 		
 		newWavelet.getRootBlip().append(new Installer(installerUrl)); 
 		
 		appendFaq2blip(projectName,projectId, digestWaveId,ownerId, newWavelet);
 		
-		newWavelet.getParticipants().setParticipantRole("digestbotty-public@googlegroups.com", Participants.Role.READ_ONLY);
+		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 	
 		
 		robot.submit(newWavelet, rpcUrl);
@@ -181,7 +186,7 @@ public class CreateDigest extends Command {
 		//1
 		String q1 = "Q: How can I create posts in this Forum?\n";
 		sba.append(q1, styleFontWeight, "bold");
-		String a1 = "A: Use the installer above to install " + projectName + " Forum. " + 
+		String a1 = "A: Use the installer above to install \"" + projectName + "\" Forum. " + 
 			"After installation you will have a \"New " + projectName + " Post\" option in the \"New Wave\" menu, use it to create new posts.\n\n";
 		sba.append(a1, styleFontStyle, "italic");
 		//2
@@ -210,11 +215,16 @@ public class CreateDigest extends Command {
 		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import - either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
 		sba.append(a5_1, styleFontStyle, "italic");
 		//5
+		String q7 = "Q: How do I search for Forum waves?\n";
+		sba.append(q7, styleFontWeight, "bold");
+		String a7_1 = "A: You can use the \"Saved Search\" that was installed along with the Forum. It is located on the \"Navigation\" panel on the top left of the Wave Client under the \"Searches\" category. To remove it - hover with the mouth over the search and then choose the \"delete\" option.\n\n";
+		sba.append(a7_1, styleFontStyle, "italic");
+		//6
 		String q2 = "Q: Who is the Forum owner?\n";
 		sba.append(q2, styleFontWeight, "bold");
 		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
-		//6
+		//7
 		String q3 = "Q: I have more questions regarding using forums created by DigestBotty, where can I ask them?\n";
 		sba.append(q3, styleFontWeight, "bold");
 		String a3_1 = "A: Please visit the DigestBotty digest wave ";
@@ -370,14 +380,15 @@ public class CreateDigest extends Command {
 		String rpcUrl = domain.equals(ForumBotty.PREVIEW_DOMAIN) ? ForumBotty.PREVIEW_RPC_URL : ForumBotty.SANDBOX_RPC_URL;
 		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_CREATED_MSG",projectId + "-digest",rpcUrl);
 		if (isPublicOnCreate) {
-			newWavelet.getParticipants().add("digestbotty-public@googlegroups.com");
-			adminConfigDao.addDefaultParticipant(projectId, "digestbotty-public@googlegroups.com");
+			newWavelet.getParticipants().add(System.getProperty("PUBLIC_GROUP"));
+			adminConfigDao.addDefaultParticipant(projectId, System.getProperty("PUBLIC_GROUP"));
 		}
-		newWavelet.getParticipants().setParticipantRole("digestbotty-public@googlegroups.com", Participants.Role.READ_ONLY);
+		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 		
-		String titleStr = projectName  + " Digest Wave";
-		newWavelet.setTitle(titleStr);
-		newWavelet.getRootBlip().append("\n");
+		String titleStr = projectName + " Digest Wave";
+		newWavelet.getRootBlip().append(titleStr +"\n");
+		BlipContentRefs.range(newWavelet.getRootBlip(), 0, titleStr.length()+1).annotate("style/fontSize","2em");
+		BlipContentRefs.range(newWavelet.getRootBlip(), 0, projectName.length()+1).annotate("style/fontWeight","bold");
 		String gadgetUrl = System.getProperty("CLICK_GADGET_URL");
 		Gadget gadget = new Gadget(gadgetUrl);
 		gadget.setProperty("waveid", newWavelet.getWaveletId().getId());

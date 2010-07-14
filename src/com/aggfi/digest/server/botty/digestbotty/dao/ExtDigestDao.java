@@ -9,6 +9,6 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.DigestDao;
 
 public interface ExtDigestDao extends DigestDao {
 	List<ExtDigest> retrDigestsByProjectId(String projectId);
-	List<ExtDigest> retrDigestsByOwnerId(String projectId);
-	List<ExtDigest> retrDigestsByOwnerOrManagerId(String projectId);
+	List<ExtDigest> retrDigestsByOwnerId(String ownerId);
+	List<ExtDigest> retrDigestsByOwnerOrManagerId(String userId);
 }

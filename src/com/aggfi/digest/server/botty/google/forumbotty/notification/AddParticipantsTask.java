@@ -2,6 +2,7 @@ package com.aggfi.digest.server.botty.google.forumbotty.notification;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -56,10 +57,14 @@ public class AddParticipantsTask extends HttpServlet {
       LOG.info("startIndex = " + startIndex);
       LOG.info("endIndex = " + endIndex);
       LOG.info("notificationType = " + notificationType.toString());
-
-      Wavelet wavelet = robot.fetchWavelet(new WaveId(domain, waveId), new WaveletId(domain,
-          waveletId), projectId, robot.getRpcServerUrl());
-
+      Wavelet wavelet = null;
+      try{
+    	  wavelet = robot.fetchWavelet(new WaveId(domain, waveId), new WaveletId(domain,
+    	          waveletId), projectId, robot.getRpcServerUrl());
+		}catch (IOException e) {
+			LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+		}
+      
       List<UserNotification> userNotifications = userNotificationDao.getAllUserNotifications(
           projectId, notificationType);
 

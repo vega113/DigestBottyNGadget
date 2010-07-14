@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.google.forumbotty.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.google.inject.Inject;
@@ -16,11 +17,13 @@ public class GetAdminConfig extends Command {
 
   private AdminConfigDao adminConfigDao = null;
   private Util util = null;
+  private ExtDigestDao extDigestDao;
 
   @Inject
-  public GetAdminConfig(Util util, AdminConfigDao adminConfigDao) {
+  public GetAdminConfig(Util util, AdminConfigDao adminConfigDao, ExtDigestDao extDigestDao) {
     this.util = util;
     this.adminConfigDao = adminConfigDao;
+    this.extDigestDao = extDigestDao;
   }
 
   @Override
@@ -29,6 +32,11 @@ public class GetAdminConfig extends Command {
     if (util.isNullOrEmpty(projectId)) {
       throw new IllegalArgumentException("Missing required param: projectId");
     }
+    
+//    String senderId = this.getParam("senderId");
+//    if (!util.isNullOrEmpty(senderId)) {
+//      verifyUserAccess(extDigestDao, projectId, senderId);
+//    }
 
     JSONObject json = new JSONObject();
     json.put("result", new JSONObject(util.toJson(adminConfigDao.getAdminConfig(projectId))));

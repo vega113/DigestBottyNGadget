@@ -79,7 +79,7 @@
 	<macrodef name="git-commit-with-message">
 		<attribute name="message" />
 		<sequential>
-			<git command="ca">
+			<git command="commit">
 				<args>
 					<arg value="@{message}" />
 				</args>

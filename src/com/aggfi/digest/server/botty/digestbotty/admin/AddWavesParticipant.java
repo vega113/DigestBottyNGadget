@@ -55,9 +55,13 @@ public class AddWavesParticipant extends Command {
     try {
     	for(ForumPost entry : entries){
 
-    		wavelet = robot.fetchWavelet( new WaveId(entry.getDomain(), entry.getWaveId()), new WaveletId(entry.getDomain(), "conv+root"), entry.getProjectId(),  robot.getRpcServerUrl());
+    		try{
+    			wavelet = robot.fetchWavelet( new WaveId(entry.getDomain(), entry.getWaveId()), new WaveletId(entry.getDomain(), "conv+root"), entry.getProjectId(),  robot.getRpcServerUrl());
+    		}catch (IOException e) {
+    			LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+    		}
     		
-    		if(!wavelet.getParticipants().contains(participantId)){
+    		if(wavelet != null && !wavelet.getParticipants().contains(participantId)){
     			wavelet.getParticipants().add(participantId);
         		if(firstWavelet == null){
         			firstWavelet = wavelet;

@@ -50,9 +50,11 @@ public class WaveRequestServiceImpl implements RequestService {
 						}catch (Exception e) {
 							callback.onFailure(e);
 						}
+						break;
 					}else if(keys.get(i).startsWith("response")){
 						Log.trace("No callback for key: " + keys.get(i));
 						event.getState().submitValue(keys.get(i), null); //if we can't find what to do with this response - dismiss it.
+						break;
 					}
 				}
 			}catch (Exception e) {

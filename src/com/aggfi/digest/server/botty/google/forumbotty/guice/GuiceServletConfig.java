@@ -9,6 +9,8 @@ import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallGadgetServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallServlet;
+import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitedDao;
+import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitedDaoImpl;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.*;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.*;
@@ -66,6 +68,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         bind(AdminConfigDao.class).to(AdminConfigDaoImpl.class);
         bind(DigestDao.class).to(ExtDigestDaoImpl.class);
         bind(ExtDigestDao.class).to(ExtDigestDaoImpl.class);
+        bind(BlipSubmitedDao.class).to(BlipSubmitedDaoImpl.class);
       }
 
       @Provides

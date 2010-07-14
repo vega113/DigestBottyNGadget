@@ -174,6 +174,8 @@ public interface DigestConstants extends Constants {
 	@DefaultStringValue(value="https://wave.google.com/wave/waveref/googlewave.com/w+l1eC1LvNA")
 	String installDigestBottyUrl();
 	
+	@DefaultStringValue(value="UA-13269470-3")
+	String trackerUIStr();
 	//size
 	/** width of the whole gadget*/
 	@DefaultStringValue(value="520px")//change both

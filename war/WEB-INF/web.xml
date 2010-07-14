@@ -13,10 +13,10 @@
     <listener-class>com.aggfi.digest.server.botty.google.forumbotty.guice.GuiceServletConfig</listener-class>
   </listener>
   
-  <servlet>
-    <servlet-name>install</servlet-name>
-    <jsp-file>/install.jsp</jsp-file>
-  </servlet>
+<!--  <servlet>-->
+<!--    <servlet-name>install</servlet-name>-->
+<!--    <jsp-file>/install.jsp</jsp-file>-->
+<!--  </servlet>-->
   <servlet>
   <servlet-name>remoteLoggerServiceImpl</servlet-name>
   <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
@@ -25,20 +25,20 @@
   <servlet-name>remoteLoggerServiceImpl</servlet-name>
   <url-pattern>/digestbottygadget/gwt-log</url-pattern>
 </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>install</servlet-name>
-    <url-pattern>/install</url-pattern>
-  </servlet-mapping>    
+<!--  <servlet-mapping>-->
+<!--    <servlet-name>install</servlet-name>-->
+<!--    <url-pattern>/install</url-pattern>-->
+<!--  </servlet-mapping>    -->
   
-  <servlet>
-    <servlet-name>admin</servlet-name>
-    <jsp-file>/admin.jsp</jsp-file>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>admin</servlet-name>
-    <url-pattern>/admin</url-pattern>
-  </servlet-mapping>     
-  
+<!--  <servlet>-->
+<!--    <servlet-name>admin</servlet-name>-->
+<!--    <jsp-file>/admin.jsp</jsp-file>-->
+<!--  </servlet>-->
+<!--  <servlet-mapping>-->
+<!--    <servlet-name>admin</servlet-name>-->
+<!--    <url-pattern>/admin</url-pattern>-->
+<!--  </servlet-mapping>     -->
+<!--  -->
   
   <servlet>
     <servlet-name>RemoteApiServlet</servlet-name>
@@ -49,14 +49,14 @@
     <url-pattern>/remote_api</url-pattern>
   </servlet-mapping>     
   
-    <servlet>
-    <servlet-name>report</servlet-name>
-    <jsp-file>/report.jsp</jsp-file>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>report</servlet-name>
-    <url-pattern>/report</url-pattern>
-  </servlet-mapping> 
+<!--    <servlet>-->
+<!--    <servlet-name>report</servlet-name>-->
+<!--    <jsp-file>/report.jsp</jsp-file>-->
+<!--  </servlet>-->
+<!--  <servlet-mapping>-->
+<!--    <servlet-name>report</servlet-name>-->
+<!--    <url-pattern>/report</url-pattern>-->
+<!--  </servlet-mapping> -->
   
   <!--  <security-constraint>
     <web-resource-collection>

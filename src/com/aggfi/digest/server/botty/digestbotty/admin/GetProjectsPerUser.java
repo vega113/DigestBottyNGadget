@@ -28,6 +28,10 @@ public class GetProjectsPerUser extends Command {
 		if (util.isNullOrEmpty(userId)) {
 			throw new IllegalArgumentException("Missing required param: userId");
 		}    
+		String senderId = this.getParam("senderId");
+	    if (senderId != null && !senderId.equals(userId)) {
+	    	throw new RuntimeException(userId  + " and " + senderId + " do not match!" );
+	    }
 		JSONObject json = new JSONObject();
 		JSONObject digestMapJson = new JSONObject();
 		List<ExtDigest> digests = extDigestDao.retrDigestsByOwnerOrManagerId(userId);

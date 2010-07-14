@@ -64,7 +64,11 @@ public class RemoveAutoTag extends Command {
 			  //retrieve a list of all forumPosts for this projectId
 			  List<ForumPost> entries = forumPostDao.getForumPostsByTag(projectId,null,Integer.parseInt(System.getProperty("MAX_WAVELET_FETCH_SIZE")));
 			  for(ForumPost entry : entries){
-				  wavelet = robot.fetchWavelet( new WaveId(entry.getDomain(), entry.getWaveId()), new WaveletId(entry.getDomain(), "conv+root"), entry.getProjectId(),  robot.getRpcServerUrl());
+				  try{
+					  wavelet = robot.fetchWavelet( new WaveId(entry.getDomain(), entry.getWaveId()), new WaveletId(entry.getDomain(), "conv+root"), entry.getProjectId(),  robot.getRpcServerUrl());
+				  }catch (IOException e) {
+					  LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+				  }
 				  if(wavelet.getTags().contains(tag)){
 					  tagRemovedCount++;
 					  if(firstWavelet == null){
