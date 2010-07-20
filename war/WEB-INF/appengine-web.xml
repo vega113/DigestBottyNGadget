@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
   <application>digestbotty</application>
-  <version>beta097</version>
+  <version>beta098</version>
   
   <!-- Configure java.util.logging -->
   <system-properties>
@@ -9,16 +9,16 @@
     <property name="com.google.gdata.DisableCookieHandler" value="true"/>
     
     <!-- forumbotty config properties -->
-<!--    <property name="APP_DOMAIN" value="digestbotty"/>-->
-<!--    <property name="OAUTH_TOKEN" value="AOijR2dxXLssMcXF-8l7lbCBrgZXjgPD9uK81HBlCPmLXxSTrcH19EVmr8bFWA8tjzlkkdBzSFjEJif1ZRag7ah-1TQep9TKAcjTMcDVOmaQZ6S67pQ4CY9nbCJqOHTuvqZbzYyOAqk1zZtx56_Up_ZQbwcvaKxd8w=="/>-->
-<!--    <property name="OAUTH_KEY" value="267068549898"/> -->
-<!--    <property name="OAUTH_SECRET" value="elNoHKEbijMAcyd83HLtRLcf"/> -->
-<!--    <property name="SECURITY_TOKEN" value="2238"/>         -->
-    <property name="APP_DOMAIN" value="aggfiwave"/>
-    <property name="OAUTH_TOKEN" value="AOijR2cAh7ETatBb37zGZlSBv7sLpxCNe0_kFj2TnonjWALK-ocuV7ohTqLWXzU8JZCssITlnKY-ixpsFQkpympTVagfwgJfkgMGPQj9ym3giIe5Jrr_NYN602mK6nDbu90DVEry-w5Ofn6TizjVLOCr2v8iKfQuHw=="/>
-    <property name="OAUTH_KEY" value="174095776520"/> 
-    <property name="OAUTH_SECRET" value="CSwfxYsrSV/oPxbVP7aEpN9c"/> 
-    <property name="SECURITY_TOKEN" value="691"/>   
+    <property name="APP_DOMAIN" value="digestbotty"/>
+    <property name="OAUTH_TOKEN" value="AOijR2dxXLssMcXF-8l7lbCBrgZXjgPD9uK81HBlCPmLXxSTrcH19EVmr8bFWA8tjzlkkdBzSFjEJif1ZRag7ah-1TQep9TKAcjTMcDVOmaQZ6S67pQ4CY9nbCJqOHTuvqZbzYyOAqk1zZtx56_Up_ZQbwcvaKxd8w=="/>
+    <property name="OAUTH_KEY" value="267068549898"/> 
+    <property name="OAUTH_SECRET" value="elNoHKEbijMAcyd83HLtRLcf"/> 
+    <property name="SECURITY_TOKEN" value="2238"/>         
+<!--    <property name="APP_DOMAIN" value="aggfiwave"/>-->
+<!--    <property name="OAUTH_TOKEN" value="AOijR2cAh7ETatBb37zGZlSBv7sLpxCNe0_kFj2TnonjWALK-ocuV7ohTqLWXzU8JZCssITlnKY-ixpsFQkpympTVagfwgJfkgMGPQj9ym3giIe5Jrr_NYN602mK6nDbu90DVEry-w5Ofn6TizjVLOCr2v8iKfQuHw=="/>-->
+<!--    <property name="OAUTH_KEY" value="174095776520"/> -->
+<!--    <property name="OAUTH_SECRET" value="CSwfxYsrSV/oPxbVP7aEpN9c"/> -->
+<!--    <property name="SECURITY_TOKEN" value="691"/>   -->
     
     <property name="DIGEST_WAVE_DOMAIN" value="googlewave.com"/>     
     <property name="DIGEST_WAVE_ID" value=""/>   

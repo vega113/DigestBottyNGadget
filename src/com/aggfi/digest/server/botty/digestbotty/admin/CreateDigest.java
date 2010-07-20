@@ -91,7 +91,7 @@ public class CreateDigest extends Command {
 	    		extDigest.setForumSiteUrl("https://wave.google.com/wave/waveref/googlewave.com/" + digestWaveId);
 	    	}
 	    	if(extDigest.getInstallerIconUrl() == null || "".equals(extDigest.getInstallerIconUrl())){
-	    		extDigest.setInstallerIconUrl("http://wave.google.com/images/wave-60_wshadow.gif");
+	    		extDigest.setInstallerIconUrl("http://" + System.getProperty("APP_DOMAIN") + "." + "appspot.com" + "/images/1279552179_google_wave.png");
 	    	}
 	    	if(extDigest.getRobotThumbnailUrl() == null || "".equals(extDigest.getRobotThumbnailUrl())){
 	    		extDigest.setRobotThumbnailUrl("http://wave.google.com/images/wave-60_wshadow.gif");

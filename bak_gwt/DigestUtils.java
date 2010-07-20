@@ -40,6 +40,8 @@ public class DigestUtils {
 	public void showTimerMessage(String msg, int seconds){
 		Window.alert(msg);
 	}
+	public void recordPageView(String typeOfrecord) {
+	}
 	
 	public String retrUserId() {
 		return "vega113@googlewave.com";

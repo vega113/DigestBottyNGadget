@@ -8,7 +8,9 @@ import com.allen_sauer.gwt.log.client.DivLogger;
 import com.allen_sauer.gwt.log.client.Log;
 //import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.gadgets.client.AnalyticsFeature;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import com.google.gwt.gadgets.client.NeedsAnalytics;
 import com.google.gwt.gadgets.client.NeedsDynamicHeight;
 import com.google.gwt.gadgets.client.UserPreferences;
 import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
@@ -26,7 +28,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 //public class DigestBottyGadget implements EntryPoint {
 @ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=600, height=600)
-public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages{
+public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages, NeedsAnalytics{
 
 	
 	@Override
@@ -35,6 +37,8 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 			mmFeature.initMiniMessagesFeature();
 			DigestUtils.getInstance().setMiniMessages(mmFeature);
 			DigestUtils.getInstance().setHeight(dhFeature);
+			DigestUtils.getInstance().setAnalytics(analyticsFeature);
+			
 			DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 			DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
@@ -62,11 +66,18 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 		
 	}
 	
-	MiniMessagesFeature mmFeature;
+	private MiniMessagesFeature mmFeature;
 	@Override
 	public void initializeFeature(MiniMessagesFeature feature) {
 		this.mmFeature = feature;
 	}
+	
+	private AnalyticsFeature analyticsFeature;
+	@Override
+	public void initializeFeature(AnalyticsFeature analyticsFeature) {
+		this.analyticsFeature = analyticsFeature;
+	}
+
 	
 	
 	/**
@@ -91,5 +102,5 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 	private void handleError(Throwable error) {
 		Log.error("", error);
 	}
-
+	
 }

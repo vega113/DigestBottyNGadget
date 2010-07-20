@@ -2,6 +2,7 @@ package com.aggfi.digest.client.utils;
 
 import org.cobogw.gwt.waveapi.gadget.client.WaveFeature;
 import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
+import com.google.gwt.gadgets.client.AnalyticsFeature;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ public class DigestUtils {
 	private WaveFeature wave;
 	private DynamicHeightFeature height;
 	private MiniMessagesFeature messages;
+	private AnalyticsFeature analytics;
 	private static Map<String,String> state = new HashMap<String, String>();
 	
 	private DigestUtils(){}
@@ -111,8 +113,16 @@ public class DigestUtils {
 		messages.createTimerMessage(msg, seconds);
 		
 	}
+
+
+	public void setAnalytics(AnalyticsFeature analyticsFeature) {
+		this.analytics = analyticsFeature; 
+	}
 	
-	
+	private final static String ANALYTICS_ID = "UA-13269470-3";
+	public void recordPageView(String typeOfrecord) {
+		analytics.recordPageView(ANALYTICS_ID, typeOfrecord);
+	}
 	
 	
 	/*
@@ -125,7 +135,8 @@ public class DigestUtils {
 	public void showSuccessMessage(String msg, int seconds) {
 		Window.alert(msg);
 	}
-	
+	public void recordPageView(String typeOfrecord) {
+	}
 	
 	public String retrUserId() {
 		return "vega114@googlewave.com";

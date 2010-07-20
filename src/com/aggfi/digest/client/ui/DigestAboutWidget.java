@@ -51,6 +51,9 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 	}
 	
 
+	public String getName(){
+		return "about";
+	}
 	@Override
 	public Runnable getRunOnTabSelect() {
 		return new Runnable() {

@@ -421,4 +421,8 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	public Runnable getRunOnTabSelect() {
 		return runOnTabSelect;
 	}
+	@Override
+	public String getName(){
+		return "report";
+	}
 }

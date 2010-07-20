@@ -17,6 +17,8 @@
 		</copy>
 		<copy file="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" tofile="./bak_gwt/DigestBottyGadget.gwt.xml" overwrite="true">
 		</copy>
+		<copy file="./war/localdebug.html" tofile="./bak_gwt/localdebug.html" overwrite="true">
+				</copy>
 	</target>
 
 	<!-- ================================= 
@@ -37,6 +39,8 @@
 		</copy>
 		<copy file="./bak_gwt/DigestBottyGadget.gwt.xml" tofile="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" overwrite="true">
 		</copy>
+		<copy file="./bak_gwt/localdebug.html" tofile="./home/vega/wavetrady_27_04/DigestBottyNGadget/war/localdebug.html" overwrite="true" failonerror="false">
+						</copy>
 	</target>
 	
 	
@@ -75,6 +79,7 @@
 			</copy>
 			<copy file="./bak_wave/DigestBottyGadget.gwt.xml" tofile="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" overwrite="true">
 			</copy>
+			<delete file="./home/vega/wavetrady_27_04/DigestBottyNGadget/war/localdebug.html"></delete>
 		</target>
 </project>
 

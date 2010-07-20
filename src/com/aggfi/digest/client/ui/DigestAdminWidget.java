@@ -609,5 +609,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			image.addMouseDownHandler(mouseDownHandler);
 		}
 	}
-
+	public String getName(){
+		return "admin";
+	}
 }

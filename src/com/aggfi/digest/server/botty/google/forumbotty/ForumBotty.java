@@ -21,8 +21,9 @@ import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheManager;
 import org.waveprotocol.wave.model.id.WaveId;
 import org.waveprotocol.wave.model.id.WaveletId;
+
+import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
-import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
@@ -209,7 +210,9 @@ protected void actOnBottyAdded(String projectId,
 	  // Add default participants
 	  for (String participant : this.adminConfigDao.getAdminConfig(projectId)
 			  .getDefaultParticipants()) {
-		  wavelet.getParticipants().add(participant);
+		  if(!wavelet.getParticipants().contains(participant)){
+			  wavelet.getParticipants().add(participant);
+		  }
 	  }
 
 	  if (isWorthy(wavelet)) {
@@ -583,14 +586,14 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 					  String responseKey = "response#" + split[1] + "#" +  split[2];
 					  long currTime = System.currentTimeMillis();
 					  long requestTime = Long.parseLong(split[2]);
-					  if(currTime > requestTime + 1000 * 10){ //if delay is more than 10 seconds - dismiss the request.
-						  json.put("error", "Request timed out!");
-						  Map<String,String> out = new HashMap<String, String>();
-						  out.put(key, null);
-						  out.put(responseKey, json.toString());
-						  blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).updateElement(out);
-						  continue;
-					  }
+//					  if(currTime > requestTime + 1000 * 100){ //if delay is more than 10 seconds - dismiss the request.
+//						  json.put("error", "Request timed out!");
+//						  Map<String,String> out = new HashMap<String, String>();
+//						  out.put(key, null);
+//						  out.put(responseKey, json.toString());
+//						  blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).updateElement(out);
+//						  continue;
+//					  }
 					  LOG.info("Found request: " + key + ", body: " + postBody);
 					  Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 					  JsonRpcRequest jsonRpcRequest = gson.fromJson(postBody, JsonRpcRequest.class);
@@ -640,19 +643,21 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
   public void onWaveletParticipantsChanged(WaveletParticipantsChangedEvent event) {
 	  LOG.info("Entering onWaveletParticipantsChanged");
 	  try{
-		  String patternStr = "digestbotty\\+.*\\@appspot.com";
+		  String patternStr =  getServerName() + "\\+.*\\@appspot.com";
 		  List<String> participants = event.getParticipantsAdded();
 		  for(String participant : participants){
 			  if(participant.matches(patternStr)){
 				  //digestbotty added, need to act
-				  int proxyForStart = participant.indexOf("+");
+				  int proxyForStart = participant.indexOf("+")+1;
 				  int proxyForEnd = participant.indexOf("@");
 				  String proxyFor = participant.substring(proxyForStart,proxyForEnd);
 				  String projectId = proxyFor;
 				  Wavelet wavelet = event.getWavelet();
 				  Blip blip = event.getBlip();
 				  String modifiedBy = event.getModifiedBy();
-				  actOnBottyAdded(projectId, proxyFor, wavelet, blip, modifiedBy);
+				  if(!proxyFor.equals(event.getBundle().getProxyingFor())){
+					  actOnBottyAdded(projectId, proxyFor, wavelet, blip, modifiedBy);
+				  }
 			  }
 		  }
 	  }catch(Exception e){

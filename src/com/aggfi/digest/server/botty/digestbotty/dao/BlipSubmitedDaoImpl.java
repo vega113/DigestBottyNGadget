@@ -1,4 +1,4 @@
-package com.aggfi.digest.server.botty.digestbotty.model;
+package com.aggfi.digest.server.botty.digestbotty.dao;
 
 
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.inject.Inject;
 import com.google.wave.api.Wavelet;

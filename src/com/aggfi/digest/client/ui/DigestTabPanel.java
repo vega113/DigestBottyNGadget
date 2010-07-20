@@ -43,6 +43,7 @@ public class DigestTabPanel extends DecoratedTabPanel {
 				if(currentSelectedWidget != null && currentSelectedWidget instanceof RunnableOnTabSelect){
 					RunnableOnTabSelect runnableOnTabSelect = ((RunnableOnTabSelect)currentSelectedWidget);
 					if(runnableOnTabSelect.getRunOnTabSelect() != null){
+						DigestUtils.getInstance().recordPageView("/digestbotty/" + runnableOnTabSelect.getName());
 						runnableOnTabSelect.getRunOnTabSelect().run();
 					}
 				}

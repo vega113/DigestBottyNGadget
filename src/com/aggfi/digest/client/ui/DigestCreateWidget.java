@@ -381,4 +381,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	public Runnable getRunOnTabSelect() {
 		return onDigestCreateWidgetLoad;
 	}
+	@Override
+	public String getName(){
+		return "create";
+	}
 }
