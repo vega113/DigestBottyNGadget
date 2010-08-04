@@ -131,6 +131,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 								DigestUtils.getInstance().dismissStaticMessage();
 								outMessage = outMessage.substring(1).substring(0, outMessage.length()-2); //workaround to remove ""
 								DigestUtils.getInstance().showSuccessMessage(outMessage, 8);
+								DigestUtils.getInstance().recordPageView("/createTab/forumCreationSuccess");
 							}
 							
 							@Override
@@ -152,6 +153,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 					DigestUtils.getInstance().dismissStaticMessage();
 					DigestUtils.getInstance().alert(e.getMessage());
 				}
+				DigestUtils.getInstance().reportEvent("/createTab/click","createForum", DigestUtils.getInstance().retrUserId(), 1);
 			}
 
 			
@@ -165,7 +167,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		digest.setDescription(digest.getDescription().replace("\"", "'"));
 	}
 
-	private void initCreateGadgetFlexTbl(FlexTable tbl,DigestConstants constants, GlobalResources resources) {
+	private void initCreateGadgetFlexTbl(FlexTable tbl,final DigestConstants constants, GlobalResources resources) {
 		tbl.setStylePrimaryName(resources.globalCSS().gridStyle());
 
 		int row = 0;
@@ -207,7 +209,9 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		row++;
 
 		Label domainLbl = new Label(constants.domainStr()+"*");
+		domainLbl.setVisible(false);
 		final TextBox domainVal = new TextBox();
+		domainVal.setVisible(false);
 		domainVal.addClickHandler(clearWarningClickHandler);
 		domainVal.setTitle(constants.domainTitle());
 		tbl.setWidget(row, 0, domainLbl);
@@ -250,15 +254,19 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		row++;
 
 		Label robotThumbnailUrlLbl = new Label(constants.robotThumbnailUrlStr());
+		robotThumbnailUrlLbl.setVisible(false);
 		TextBox robotThumbnailUrlVal = new TextBox();
 		robotThumbnailUrlVal.addClickHandler(clearWarningClickHandler);
+		robotThumbnailUrlVal.setVisible(false);
 		robotThumbnailUrlVal.setTitle(constants.robotThumbnailUrlTitle());
 		tbl.setWidget(row, 0, robotThumbnailUrlLbl);
 		tbl.setWidget(row, 1, robotThumbnailUrlVal);
 		row++;
 
 		Label forumSiteUrlLbl = new Label(constants.forumSiteUrlStr());
+		forumSiteUrlLbl.setVisible(false);
 		TextBox forumSiteUrlVal = new TextBox();
+		forumSiteUrlVal.setVisible(false);
 		forumSiteUrlVal.addClickHandler(clearWarningClickHandler);
 		forumSiteUrlVal.setTitle(constants.forumSiteUrlTitle());
 		tbl.setWidget(row, 0, forumSiteUrlLbl);
@@ -268,7 +276,19 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		Label googlegroupsIdLbl = new Label(constants.googlegroupsIdStr());
 		TextBox googlegroupsIdVal = new TextBox();
 		googlegroupsIdVal.setText("@googlegroups.com");
-		googlegroupsIdVal.addClickHandler(clearWarningClickHandler);
+		googlegroupsIdVal.addClickHandler(new ClickHandler() {
+			boolean isMessageShown = false;
+			@Override
+			public void onClick(ClickEvent event) {
+				DigestUtils.getInstance().dismissAlert();
+				if(!isMessageShown){
+					isMessageShown = true;
+//					DigestUtils.getInstance().showStaticMessage(constants.googlegroupsWarningStr());
+					DigestUtils.getInstance().alert(constants.googlegroupsWarningStr());
+				}
+				
+			}
+		});
 		googlegroupsIdVal.setTitle(constants.googlegroupsIdTitle());
 		tbl.setWidget(row, 0, googlegroupsIdLbl);
 		tbl.setWidget(row, 1, googlegroupsIdVal);
@@ -304,6 +324,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			hp.setWidth(textBoxWidth + 16 + "px");
 			hp.add(vp);
 			hp.add(w);
+			hp.setVisible(w.isVisible());
 			tbl.setWidget(i, 1, hp);
 		}
 		
@@ -317,13 +338,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 				ownerVal.setText(DigestUtils.getInstance().retrUserId());
 				authorVal.setText(DigestUtils.getInstance().retrUserName());
 				domainVal.setText("googlewave.com");
-				DeferredCommand.addCommand(new Command() {
-					
-					@Override
-					public void execute() {
-						DigestUtils.getInstance().adjustHeight();
-					}
-				});
+				DigestUtils.getInstance().adjustHeight();
+				DigestUtils.getInstance().recordPageView("/createTab/");
 			}
 		};
 	}
@@ -345,11 +361,12 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		boolean isPublicOnCreate = box.getValue();
 		
 		String ownerStr = ownerId.substring(0, ownerId.indexOf("@"));
+		String domainStr = ownerId.substring(ownerStr.length()+1, ownerStr.length()+1 + ownerId.substring(ownerStr.length()+1).indexOf("."));
 		
 		JsDigest digest = JsDigestInstance();
 		digest.setOwnerId(ownerId.toLowerCase());
 		digest.setAuthor(authorName);
-		digest.setProjectId((ownerStr + "-" + projectId).toLowerCase());
+		digest.setProjectId((ownerStr + "-" + domainStr + "-" + projectId).toLowerCase());
 		digest.setDomain(domain);
 		digest.setName(digestName);
 		digest.setDescription(description);

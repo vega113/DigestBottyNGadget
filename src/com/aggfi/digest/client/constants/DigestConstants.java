@@ -28,6 +28,12 @@ public interface DigestConstants extends Constants {
 	String aboutHlpCaptionStr();
 	String contactInfoCaptionStr();
 	
+	String contactInfoValue1Msg();
+	String contactInfoValue2Msg();
+	String contactInfoValue3Msg();
+	String contactInfoValue4Msg();
+	String contactInfoValue5Msg();
+	
 	String instructionsHeaderStr();
 	
 	//warning
@@ -82,6 +88,7 @@ public interface DigestConstants extends Constants {
 
 	String googlegroupsIdTitle();
 	
+	String googlegroupsWarningStr();
 
 	String fieldNameStr();
 
@@ -168,10 +175,12 @@ public interface DigestConstants extends Constants {
 	String participantWavesExpl();
 	String participantWavesTagExpl();
 	
+	@DefaultStringValue(value="aggfiwave")
+	String appDomain();
 	//urls
-	@DefaultStringValue(value="https://wave.google.com/wave/waveref/googlewave.com/w+0R06HrZkBhE")
+	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252BVIL2ZrZkBSb")
 	String discussDigestBottyUrl();
-	@DefaultStringValue(value="https://wave.google.com/wave/waveref/googlewave.com/w+l1eC1LvNA")
+	@DefaultStringValue(value="#restored:search:group%253Agoogle-wave-extension-gallery-all%2540googlegroups.com,restored:wave:googlewave.com%252Fw%252B0R06HrZkCAQ")
 	String installDigestBottyUrl();
 	
 	@DefaultStringValue(value="UA-13269470-3")

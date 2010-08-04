@@ -6,10 +6,13 @@ import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
 import com.aggfi.digest.client.utils.DigestUtils;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,7 +31,10 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 	@UiField
 	HTML aboutReportPnl;
 	@UiField
-	HTML contactInfoPnl;
+	Anchor installAnchor;
+	@UiField
+	Anchor discussAnchor;
+	
 	
 	private static DigestAboutWidgetUiBinder uiBinder = GWT
 			.create(DigestAboutWidgetUiBinder.class);
@@ -46,8 +52,26 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 		aboutCreatePnl.setHTML(constants.aboutCreateStr());
 		aboutAdminPnl.setHTML(constants.aboutAdminStr());
 		aboutReportPnl.setHTML(constants.aboutReportStr());
-		String cntMsg = messages.contactInfoValueMsg(constants.discussDigestBottyUrl(),constants.installDigestBottyUrl());
-		contactInfoPnl.setHTML(cntMsg);
+		installAnchor.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				DigestUtils.getInstance().reportEvent("/aboutTab/click","install", DigestUtils.getInstance().retrUserId(), 1);
+				DigestUtils.getInstance().requestNavigateTo(constants.installDigestBottyUrl(), null);
+				event.preventDefault();
+			}
+		});
+		
+		discussAnchor.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				DigestUtils.getInstance().reportEvent("/aboutTab/click","discuss", DigestUtils.getInstance().retrUserId(), 1);
+				DigestUtils.getInstance().requestNavigateTo(constants.discussDigestBottyUrl(), null);
+				event.preventDefault();
+			}
+		});
+		DigestUtils.getInstance().recordPageView("/aboutTab/");
 	}
 	
 
@@ -59,7 +83,9 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 		return new Runnable() {
 			
 			@Override
-			public void run() {}
+			public void run() {
+				DigestUtils.getInstance().recordPageView("/aboutTab/");
+			}
 		};
 	}
 

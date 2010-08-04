@@ -41,7 +41,6 @@ public interface DigestMessages extends Messages {
   String loadingForumsMsg(String tabName, String forumName);
   String loadingForumsListMsg(String userWaveId);
   
-  String contactInfoValueMsg(String discussDigestBottyUrl, String installDigestBottyUrl);
   String sentRequestForCreateMsg(String forumName);
   
   String aboutHlpMsg(String imageUrl);

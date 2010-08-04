@@ -9,6 +9,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import com.google.appengine.api.datastore.Text;
 import com.google.gson.annotations.Expose;
 import com.google.wave.api.Wavelet;
 
@@ -27,9 +28,13 @@ public class ForumPost {
   @Persistent
   @Expose
   private String projectId = null;
+  @Expose
+  private String digestBlipId = null;
   @Persistent
   @Expose
   private String creator = null;
+  @Expose
+  private String updater = null;
   @Persistent
   @Expose
   private Date lastUpdated = null;
@@ -48,6 +53,8 @@ public class ForumPost {
   @Persistent
   @Expose
   private int blipCount = 0;
+  @Expose
+  private Text firstBlipContent = null;
 
   public ForumPost(String domain, Wavelet wavelet) {
     this.domain = domain;
@@ -58,6 +65,12 @@ public class ForumPost {
     this.created = new Date();
     this.title = wavelet.getTitle();
     this.blipCount = wavelet.getBlips().size();
+    Set<String> participants = wavelet.getParticipants();
+    if(participants.contains("public@a.gwave.com") || participants.contains(System.getProperty("PUBLIC_GROUP"))){
+    	 if(wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent() != null){
+    		 this.firstBlipContent = new Text(wavelet.getRootBlip().getContent()); 
+    	    }
+    }
   }
 
   public String getId() {
@@ -134,12 +147,38 @@ public class ForumPost {
     return blipCount;
   }
 
+
 @Override
 public String toString() {
 	return "ForumPost [blipCount=" + blipCount + ", contributors="
 			+ contributors + ", created=" + created + ", creator=" + creator
-			+ ", domain=" + domain + ", id=" + id + ", lastUpdated="
-			+ lastUpdated + ", projectId=" + projectId + ", tags=" + tags
-			+ ", title=" + title + ", waveId=" + waveId + "]";
+			+ ", digestBlipId=" + digestBlipId + ", domain=" + domain + ", id="
+			+ id + ", lastUpdated=" + lastUpdated + ", projectId=" + projectId
+			+ ", tags=" + tags + ", title=" + title + ", updater=" + updater
+			+ ", waveId=" + waveId + "]";
+}
+
+public String getUpdater() {
+	return updater;
+}
+
+public void setUpdater(String updater) {
+	this.updater = updater;
+}
+
+public String getDigestBlipId() {
+	return digestBlipId;
+}
+
+public void setDigestBlipId(String digestBlipId) {
+	this.digestBlipId = digestBlipId;
+}
+
+public Text getFirstBlipContent() {
+	return firstBlipContent;
+}
+
+public void setFirstBlipContent(Text firstBlipContent) {
+	this.firstBlipContent = firstBlipContent;
 }
 }

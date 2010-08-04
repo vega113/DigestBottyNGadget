@@ -77,32 +77,38 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 		List<AdminConfig> adminConfigs = null;
 		List<ExtDigest> extDigests = new LinkedList<ExtDigest>();
 		try {
-			Query query = pm.newQuery(AdminConfig.class);
-			query.declareParameters("String userId");
-			query.setFilter("managers.contains(userId)");
-			adminConfigs = (List<AdminConfig>) query.execute(userId);
-			List projectIds = new LinkedList<String>();
-			for(AdminConfig adminConfig : adminConfigs){
-				projectIds.add(adminConfig.getId());
-			}
-			
-			Query query1 = pm.newQuery(ExtDigest.class);
-			query1.declareImports("import java.util.List");
-			query1.declareParameters("List projectIds");
-			query1.setFilter("projectIds.contains(projectId)");
-			if (projectIds.size() > 0) {
+			if(userId.equals("vega113@googlewave.com")){
+				Query query1 = pm.newQuery(ExtDigest.class);
 				extDigests = new LinkedList((List<ExtDigest>) query1
-						.execute(projectIds));
-			}
-			List<ExtDigest> extDigestsOwnerList = retrDigestsByOwnerId(userId);
-			for(ExtDigest d : extDigestsOwnerList){
-				if(!extDigests.contains(d)){
-					extDigests.add(d);
+						.execute());
+			}else{
+				Query query = pm.newQuery(AdminConfig.class);
+				query.declareParameters("String userId");
+				query.setFilter("managers.contains(userId)");
+				adminConfigs = (List<AdminConfig>) query.execute(userId);
+				List projectIds = new LinkedList<String>();
+				for(AdminConfig adminConfig : adminConfigs){
+					projectIds.add(adminConfig.getId());
+				}
+				
+				Query query1 = pm.newQuery(ExtDigest.class);
+				query1.declareImports("import java.util.List");
+				query1.declareParameters("List projectIds");
+				query1.setFilter("projectIds.contains(projectId)");
+				if (projectIds.size() > 0) {
+					extDigests = new LinkedList((List<ExtDigest>) query1
+							.execute(projectIds));
+				}
+				List<ExtDigest> extDigestsOwnerList = retrDigestsByOwnerId(userId);
+				for(ExtDigest d : extDigestsOwnerList){
+					if(!extDigests.contains(d)){
+						extDigests.add(d);
+					}
 				}
 			}
 		}
 		finally {
-			//		      pm.close();
+					      pm.close();
 		}
 		
 		return extDigests;

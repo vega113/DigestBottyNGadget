@@ -82,7 +82,14 @@ public class ProjectSelectWidget extends Composite {
 							prjList.clear();
 							Set<String> keys = resultJson.keySet();
 							for(String key : keys){
-								prjList.addItem(key + " - " + resultJson.get(key).isString().stringValue(),key);
+								String item = resultJson.get(key).isString().stringValue();
+								if(item.length() > 57){
+									item = item.substring(60) + "...";
+								}
+								if(item == null || "".equals(item)){
+									item = key;
+								}
+								prjList.addItem(item,key);
 							}
 							// Create a callback to be called when the visualization API
 							// has been loaded.

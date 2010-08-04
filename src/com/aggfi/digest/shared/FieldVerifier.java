@@ -94,15 +94,15 @@ public class FieldVerifier {
 		for(String str : domain){
 			isFieldAlphaNumeric(messages,str,fieldName);
 		}
-		//check owner id is of form: id@googlewave.com
-		if(userWaveId.indexOf("@googlewave.com") < 0 && userWaveId.indexOf("public@a.gwave.com") < 0 && userWaveId.indexOf("@googlegroups.com") < 0 && userWaveId.indexOf("@appspot.com") < 0){
-			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com or your_id@googlegroups.com or public@a.gwave.com"));
-		}else{
-			String ownerStr = userWaveId.substring(0, userWaveId.indexOf("@"));
-			if(!FieldVerifier.isValidName(ownerStr)){
-				throw new IllegalArgumentException(messages.missingCreationParamExcptn(fieldName));
-			}
-		}
+//		//check owner id is of form: id@googlewave.com
+//		if(userWaveId.indexOf(".com") < 0){
+//			throw new IllegalArgumentException(messages.incorrectFormParamExcptn(fieldName, "your_id@googlewave.com or your_id@googlegroups.com or public@a.gwave.com or your_id@yourdomain."));
+//		}else{
+//			String ownerStr = userWaveId.substring(0, userWaveId.indexOf("@"));
+//			if(!FieldVerifier.isValidName(ownerStr)){
+//				throw new IllegalArgumentException(messages.missingCreationParamExcptn(fieldName));
+//			}
+//		}
 	}
 	
 	public static void isFieldAlphaNumeric(DigestMessages messages, String field, String fieldname){

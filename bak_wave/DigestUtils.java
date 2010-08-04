@@ -2,8 +2,12 @@ package com.aggfi.digest.client.utils;
 
 import org.cobogw.gwt.waveapi.gadget.client.WaveFeature;
 import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
+import com.aggfi.digest.client.feature.views.ViewsFeature;
 import com.google.gwt.gadgets.client.AnalyticsFeature;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import com.google.gwt.gadgets.client.GoogleAnalyticsFeature;
+import com.google.gwt.gadgets.client.GoogleAnalyticsFeature.Tracker;
+
 import java.util.HashMap;
 import java.util.Map;
 import com.google.gwt.user.client.Window;
@@ -14,7 +18,9 @@ public class DigestUtils {
 	private WaveFeature wave;
 	private DynamicHeightFeature height;
 	private MiniMessagesFeature messages;
-	private AnalyticsFeature analytics;
+	private GoogleAnalyticsFeature analytics;
+	private ViewsFeature viewsFeature;
+	private Tracker tracker;
 	private static Map<String,String> state = new HashMap<String, String>();
 	
 	private DigestUtils(){}
@@ -115,13 +121,29 @@ public class DigestUtils {
 	}
 
 
-	public void setAnalytics(AnalyticsFeature analyticsFeature) {
-		this.analytics = analyticsFeature; 
+	public void setAnalytics(GoogleAnalyticsFeature analyticsFeature) {
+		this.analytics = analyticsFeature;
+		this.tracker =  analyticsFeature.createTracker(ANALYTICS_ID);
 	}
 	
 	private final static String ANALYTICS_ID = "UA-13269470-3";
 	public void recordPageView(String typeOfrecord) {
-		analytics.recordPageView(ANALYTICS_ID, typeOfrecord);
+		tracker.reportPageview(typeOfrecord);
+	}
+	
+	public void requestNavigateTo(String view,String optParams){
+		viewsFeature.requestNavigateTo(view, optParams);
+	}
+
+
+	public void setViewsFeature(ViewsFeature viewsFeature) {
+		this.viewsFeature = viewsFeature;
+	}
+
+
+	public void reportEvent(String eventName, String action, String label, int value) {
+		tracker.reportEvent(eventName, action, label, value);
+		
 	}
 	
 	

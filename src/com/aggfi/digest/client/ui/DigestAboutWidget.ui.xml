@@ -29,7 +29,34 @@
 				</g:VerticalPanel>
 			</g:ScrollPanel>
 			<g:CaptionPanel captionText='{constants.contactInfoCaptionStr}'>
-				<g:HTML ui:field="contactInfoPnl"></g:HTML>
+				<g:VerticalPanel>
+					<g:HTMLPanel>
+						<div>
+							<ul>
+								<li>
+									<g:HorizontalPanel>
+										<g:Anchor text='{constants.contactInfoValue1Msg}' href='#' ui:field="discussAnchor"></g:Anchor>
+									<g:HTML width='2px'></g:HTML>
+									<g:Label
+										text='{constants.contactInfoValue2Msg}'></g:Label>
+									</g:HorizontalPanel>
+								</li>
+								<li>
+								<g:HorizontalPanel>
+										<g:Anchor text='{constants.contactInfoValue3Msg}' href='#' ui:field="installAnchor"></g:Anchor>
+									<g:HTML width='2px'></g:HTML>
+									<g:Label
+										text='{constants.contactInfoValue4Msg}'></g:Label>
+									</g:HorizontalPanel>
+								</li>
+								<li>
+									<g:Label
+										text='{constants.contactInfoValue5Msg}'></g:Label>
+								</li>
+							</ul>
+						</div>
+					</g:HTMLPanel>
+				</g:VerticalPanel>
 			</g:CaptionPanel>
 		</g:VerticalPanel>
 	</g:HTMLPanel>

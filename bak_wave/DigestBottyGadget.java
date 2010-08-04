@@ -10,13 +10,20 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.gadgets.client.AnalyticsFeature;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
+import com.google.gwt.gadgets.client.GoogleAnalyticsFeature;
 import com.google.gwt.gadgets.client.NeedsAnalytics;
 import com.google.gwt.gadgets.client.NeedsDynamicHeight;
+import com.google.gwt.gadgets.client.NeedsGoogleAnalytics;
 import com.google.gwt.gadgets.client.UserPreferences;
+import com.google.gwt.gadgets.client.Gadget.AllowHtmlQuirksMode;
 import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
+import com.google.gwt.gadgets.client.Gadget.UseLongManifestName;
+
 import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
 import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
 import com.aggfi.digest.client.feature.minimessages.NeedsMiniMessages;
+import com.aggfi.digest.client.feature.views.NeedsViews;
+import com.aggfi.digest.client.feature.views.ViewsFeature;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -27,8 +34,10 @@ import com.google.gwt.user.client.ui.RootPanel;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 //public class DigestBottyGadget implements EntryPoint {
+@AllowHtmlQuirksMode
+@UseLongManifestName
 @ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=600, height=600)
-public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages, NeedsAnalytics{
+public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages, NeedsGoogleAnalytics, NeedsViews{
 
 	
 	@Override
@@ -38,6 +47,7 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 			DigestUtils.getInstance().setMiniMessages(mmFeature);
 			DigestUtils.getInstance().setHeight(dhFeature);
 			DigestUtils.getInstance().setAnalytics(analyticsFeature);
+			DigestUtils.getInstance().setViewsFeature(viewsFeature);
 			
 			DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
@@ -72,12 +82,17 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 		this.mmFeature = feature;
 	}
 	
-	private AnalyticsFeature analyticsFeature;
+	private GoogleAnalyticsFeature analyticsFeature;
 	@Override
-	public void initializeFeature(AnalyticsFeature analyticsFeature) {
+	public void initializeFeature(GoogleAnalyticsFeature analyticsFeature) {
 		this.analyticsFeature = analyticsFeature;
 	}
-
+	
+	private ViewsFeature viewsFeature;
+	@Override
+	public void initializeFeature(ViewsFeature feature) {
+		this.viewsFeature = feature;
+	}
 	
 	
 	/**
@@ -102,5 +117,11 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 	private void handleError(Throwable error) {
 		Log.error("", error);
 	}
+
+
+	
+
+
+	
 	
 }

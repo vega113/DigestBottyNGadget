@@ -25,6 +25,7 @@ import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+@SuppressWarnings("unchecked")
 @Singleton
 public class AtomGenerator extends HttpServlet {
   private static final Logger LOG = Logger.getLogger(AtomGenerator.class.getName());
@@ -35,7 +36,7 @@ public class AtomGenerator extends HttpServlet {
 
   private static Cache cache = null;
   private static final String FEED_CACHE_NAME = "atom";
-  private static final int FEED_CACHE_TIME_LIMIT = 30; // in sec
+  private static final int FEED_CACHE_TIME_LIMIT = 60; // in sec
 
   static {
     try {
@@ -84,7 +85,6 @@ public class AtomGenerator extends HttpServlet {
       if(digests.size() > 0){
       	forumName = digests.get(0).getName();
       }
-      LOG.info("forum name for id: " + projectId + " is: " + forumName);
       String serverHost = req.getServerName();
 
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -96,27 +96,31 @@ public class AtomGenerator extends HttpServlet {
       content.append("<title type=\"text\">" + forumName +"</title>");
       content.append(String.format(
           "<link href=\"http://%s/feeds/atom?id=%s\" rel=\"self\"></link>", serverHost, projectId));
-      content.append("<author><name>forumbotty</name></author>");
+      content.append("<author><name>" + System.getProperty("APP_DOMAIN") + "</name></author>");
       content.append(String.format("<updated>%s</updated>", String.format("%sT%s", dateFormat
           .format(latestUpdate), timeFormat.format(latestUpdate))));
 
       for (ForumPost entry : entries) {
         String author = entry.getCreator();
+        if(author == null || "".equals(author)){
+        	author = System.getProperty("APP_DOMAIN") + "@appspot.com";
+        }
         String title = entry.getTitle();
         Date updated = entry.getLastUpdated();
         String id = URLEncoder.encode(entry.getId(), "UTF-8");
 
-        String waveUrl = String.format("https://wave.google.com/wave/waveref/googlewave.com/%s", id);
+        String waveUrl = String.format("https://wave.google.com/wave/waveref/%s", id.replaceFirst("%21", "/"));
+        String feedTxt = entry.getFirstBlipContent() != null ? entry.getFirstBlipContent().getValue() + "\n\nlink: " + waveUrl : waveUrl;
 
         content.append("<entry>");
         content.append(String.format("<id>http://%s/post/%s</id>", serverHost, id));
         content.append(String.format("<title type=\"text\">%s</title>", title));
-        content.append(String.format("<link href=\"http://%s/post/%s\" rel=\"self\"></link>",
-            serverHost, id));
+//        content.append(String.format("<link href=\"http://%s/post/%s\" rel=\"self\"></link>", serverHost, id));//Trying
+        content.append(String.format("<link href=\"%s\" rel=\"self\"></link>", waveUrl));
         content.append(String.format("<author><name>%s</name></author>", author));
         content.append(String.format("<updated>%s</updated>", String.format("%sT%s", dateFormat
             .format(updated), timeFormat.format(updated))));
-        content.append(String.format("<content type=\"text\">%s</content>", waveUrl));
+        content.append(String.format("<content type=\"text\">%s</content>", feedTxt));
         content.append("</entry>");
       }
 

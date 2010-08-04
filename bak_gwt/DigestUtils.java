@@ -58,5 +58,16 @@ public class DigestUtils {
 	}	
 	public void dismissAlert(){
 	}
-	
+	public void showDismissibleMessage(String msg){
+		Window.alert(msg);
+	}
+	public void requestNavigateTo(String view,String optParams){
+	}
+
+
+	public void reportEvent(String string, String string2, String projectId,
+			int i) {
+		// TODO Auto-generated method stub
+		
+	}
 }

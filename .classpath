@@ -31,7 +31,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gin-1.0.jar" sourcepath="war/WEB-INF/lib/gin-1.0-src.zip"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-gadgets.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-gadgets.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/DigestBottyNGadget/war/WEB-INF/lib/gwt-gadgets-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-log-3.0.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-visualization.jar">
 		<attributes>

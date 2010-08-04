@@ -26,12 +26,14 @@ import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
+import com.aggfi.digest.server.botty.digestbotty.utils.StringBuilderAnnotater;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.CommandType;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.JsonRpcRequest;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
+import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
@@ -48,9 +50,11 @@ import com.google.wave.api.Context;
 import com.google.wave.api.ElementType;
 import com.google.wave.api.FormElement;
 import com.google.wave.api.Gadget;
+import com.google.wave.api.JsonRpcResponse;
 import com.google.wave.api.Line;
 import com.google.wave.api.ParticipantProfile;
 import com.google.wave.api.Wavelet;
+import com.google.wave.api.JsonRpcConstant.ParamsProperty;
 import com.google.wave.api.event.AbstractEvent;
 import com.google.wave.api.event.BlipSubmittedEvent;
 import com.google.wave.api.event.GadgetStateChangedEvent;
@@ -112,7 +116,7 @@ public class ForumBotty extends AbstractRobot {
     initOauth();
     try {
     	Map<String, Integer> props = new HashMap<String, Integer>();
-        props.put(GCacheFactory.EXPIRATION_DELTA, 43200);
+        props.put(GCacheFactory.EXPIRATION_DELTA, 60*60*12);
         cache = CacheManager.getInstance().getCacheFactory().createCache(props);
     } catch (CacheException e) {
         LOG.log(Level.SEVERE,"cache init",e);
@@ -178,13 +182,13 @@ public class ForumBotty extends AbstractRobot {
 	  Blip blip = event.getBlip();
 	  String modifiedBy = event.getModifiedBy();
 
-	  actOnBottyAdded(projectId, proxyFor, wavelet, blip,modifiedBy);
+	  actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
 }
 
 protected void actOnBottyAdded(String projectId,
 		String proxyFor, Wavelet wavelet, Blip blip, String modifiedBy) {
 	if (projectId == null) {
-		  LOG.log(Level.SEVERE, "Missing proxy-for project id");
+		  LOG.log(Level.SEVERE, "actOnBottyAdded:Missing proxy-for project id");
 		  return;
 	  }
 	  if (isNotifyProxy(proxyFor)) {
@@ -216,7 +220,7 @@ protected void actOnBottyAdded(String projectId,
 	  }
 
 	  if (isWorthy(wavelet)) {
-		  ForumPost entry = addPost2Digest(projectId, wavelet);
+		  ForumPost entry = addOrUpdateDigestWave(projectId, wavelet,blip,modifiedBy);
 
 		  for (String contributor : wavelet.getRootBlip().getContributors()) {
 			  if (isNormalUser(contributor)) {
@@ -229,23 +233,55 @@ protected void actOnBottyAdded(String projectId,
 	  }
 }
 
-public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
-	ForumPost entry = new ForumPost(wavelet.getDomain(), wavelet);
-      entry.setProjectId(projectId);
-      entry = forumPostDao.syncTags(projectId, entry, wavelet);
-      forumPostDao.save(entry);
-      updateDigestWave(entry);
+public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip blip, String modifiedBy) {
+	ForumPost entry = forumPostDao.getForumPost(wavelet.getDomain(), 
+			wavelet.getWaveId().getId());
+	// Update contributor list if this is not robot or agent
+
+	if (entry != null) {
+		if (isNormalUser(modifiedBy)) {
+			entry.addContributor(modifiedBy);
+		}
+		if(modifiedBy != null){
+			entry.setUpdater(modifiedBy);
+			entry.setBlipCount(entry.getBlipCount()+1);
+		}
+		
+		// Existing wavelet in datastore
+		entry.setTitle(wavelet.getTitle());
+		entry.setLastUpdated(new Date());
+		applyAutoTags(blip, projectId);
+		entry = forumPostDao.syncTags(projectId, entry, wavelet);
+//		updateEntryInDigestWave(entry); //TODO - maybe I need to create a different "hot and noisy" wave
+		forumPostDao.save(entry);
+	} else {
+		entry = new ForumPost(wavelet.getDomain(), wavelet);
+		entry.setProjectId(projectId);
+		entry = forumPostDao.syncTags(projectId, entry, wavelet);
+		entry.setBlipCount(wavelet.getBlips().size());
+		applyAutoTags(blip, projectId);
+		entry = forumPostDao.syncTags(projectId, entry, wavelet);
+		addEntry2DigestWave(entry);
+		forumPostDao.save(entry);
+
+	}
+	
+//	forumPostDao.save(entry);
 	return entry;
 }
 
   private boolean isNormalUser(String userId) {
-    return !(userId.endsWith("appspot.com") || userId.endsWith("gwave.com"));
+    return userId != null && !(userId.endsWith("appspot.com") || userId.endsWith("gwave.com"));
   }
 
   @Override
   @Capability(contexts = {Context.PARENT})
   public void onBlipSubmitted(BlipSubmittedEvent event) {
 	  LOG.warning("Entering onBlipSubmitted");
+	  if(event.getBlip() == null || event.getBlip().getContent() == null || event.getBlip().getContent().length()  < 2){
+		  LOG.log(Level.FINE, "The content is not worthy, slipping processing");
+		  return;
+	  }
     // If this is from the "*-notify" proxy, skip processing.
     if (isNotifyProxy(event.getBundle().getProxyingFor())) {
       return;
@@ -262,45 +298,25 @@ public ForumPost addPost2Digest(String projectId, Wavelet wavelet) {
     } 
 
     // If this is unworthy wavelet (empty), skip processing.
-    if (!isWorthy(event.getWavelet())) {
-      return;
+    if (!isWorthy(event.getWavelet()) && event.getBlip().isRoot()) {
+    	event.getWavelet().setTitle(event.getBlip().getContent().split(" ")[0]);
+    }else  if (!isWorthy(event.getWavelet())){
+    	return;
     }
 
     Wavelet wavelet = event.getWavelet();
 
     String projectId = getCurrentProjectId(event);
     if (projectId == null) {
-      LOG.log(Level.SEVERE, "Missing proxy-for project id");
+      LOG.log(Level.SEVERE, "onBlipSubmitted:Missing proxy-for project id");
       return;
     }
 
-    ForumPost entry = forumPostDao.getForumPost(wavelet.getDomain(), 
-        wavelet.getWaveId().getId());
-    if (entry != null) {
-      // Existing wavelet in datastore
-      entry.setTitle(wavelet.getTitle());
-      entry.setLastUpdated(new Date());
-    } else {
-      // Brand new wavelet
-      entry = new ForumPost(wavelet.getDomain(), wavelet);
-      entry.setProjectId(projectId);
-      updateDigestWave(entry);
-    }
+    ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
 
-    // Update contributor list if this is not robot or agent
-    if (isNormalUser(event.getModifiedBy())) {
-      entry.addContributor(event.getModifiedBy());
-      entry.setBlipCount(entry.getBlipCount() +1);
-    }
   //here is the place to save blipSubmitted
     saveBlipSubmitted(event, projectId);
-
-    // Apply default and auto tags to the wave
-//    applyDefaultTags(wavelet, projectId);
-    applyAutoTags(event.getBlip(), projectId);
-
-    entry = forumPostDao.syncTags(projectId, entry, wavelet);
-    forumPostDao.save(entry);
+   
   }
 
 public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
@@ -342,33 +358,98 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 	    }
 	  }
 
-  private void updateDigestWave(ForumPost entry) {
-	LOG.entering(this.getClass().getName(), "updateDigestWave", entry);
-    Wavelet digestWavelet = null;
-    ExtDigestDao extDigestDao = injector.getInstance(ExtDigestDao.class);
+  private void addEntry2DigestWave(ForumPost entry) {
+	  LOG.entering(this.getClass().getName(), "addEntry2DigestWave", entry);
+	  Wavelet digestWavelet = null;
+	  ExtDigestDao extDigestDao = injector.getInstance(ExtDigestDao.class);
+	  List<ExtDigest> entries =  extDigestDao.retrDigestsByProjectId(entry.getProjectId());
+	  if(entries.size() > 0){
+		  ExtDigest digest = extDigestDao.retrDigestsByProjectId(entry.getProjectId()).get(0);
+		  String digestWaveDomain = digest.getDomain();
+		  String digestWaveId = digest.getWaveId();
+		  LOG.log(Level.FINER, "digestWaveDomain: " + digestWaveDomain + ", digestWaveId: " + digestWaveId);
+		  try{
+			  digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), entry.getProjectId() + "-digest",  getRpcServerUrl());
+		  }catch (IOException e) {
+			  LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+		  }
+		  String entryTitle = entry.getTitle();
 
-	ExtDigest digest = extDigestDao.retrDigestsByProjectId(entry.getProjectId()).get(0);
-	String digestWaveDomain = digest.getDomain();
-	String digestWaveId = digest.getWaveId();
-	LOG.log(Level.FINER, "digestWaveDomain: " + digestWaveDomain + ", digestWaveId: " + digestWaveId);
-	try{
-		digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), entry.getProjectId() + "-digest",  getRpcServerUrl());
-	}catch (IOException e) {
-		LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
-	}
-	String entryTitle = entry.getTitle();
+		  Blip blip = digestWavelet.reply("\n");
+		  StringBuilderAnnotater sba = new StringBuilderAnnotater(blip);
+		  sba.append(entryTitle, StringBuilderAnnotater.LINK_WAVE, entry.getId());
+		  if(entry.getCreator() != null && !"".equals(entry.getCreator())){
+			  sba.append(" [", null, null);
+			  sba.append("By: " + entry.getCreator(), StringBuilderAnnotater.STYLE_FONT_STYLE, StringBuilderAnnotater.STYLE_ITALIC);
+			  sba.append("] ", null, null);
+		  }
+		  sba.flush2Blip();
+		  try {
+			  LOG.log(Level.FINER, "trying to get newBlipIs fomr JsonRpcResponse");
+			  List<JsonRpcResponse> submitResponseList = submit(digestWavelet, getRpcServerUrl());
+			  for(JsonRpcResponse res : submitResponseList){
+				  Map<ParamsProperty, Object> dataMap = res.getData();
+				  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
+					  entry.setDigestBlipId(String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID)));
+					  break;
+				  }
+			  }
+		  } catch (IOException e) {
+			  LOG.log(Level.SEVERE, "",e);
+			  throw new RuntimeException(e);
+		  }  
+		  if(entry.getDigestBlipId() != null){
+			  LOG.log(Level.INFO, "Created new entry in DIGEST_WAVE with: " + blip.getContent() + ", blipId: " + entry.getDigestBlipId());
+		  }else{
+			  LOG.log(Level.SEVERE, "Not Found new blip id: " + entry.toString() );
+		  }
+		  
+	  }
+  }
+  
+  private void updateEntryInDigestWave(ForumPost entry) {
+//	  LOG.entering(this.getClass().getName(), "updateEntryInDigestWave", entry);
+	  LOG.log(Level.INFO, "updateEntryInDigestWave", entry);
+	  try{
+		  Wavelet digestWavelet = null;
+		  ExtDigestDao extDigestDao = injector.getInstance(ExtDigestDao.class);
 
-	Blip blip = digestWavelet.reply("\n");
-	blip.append(entryTitle);
-	BlipContentRefs.range(blip, 0, blip.getContent().length()).
-	annotate("link/wave", entry.getId());
-	try {
-		submit(digestWavelet, getRpcServerUrl());
-	} catch (IOException e) {
-		LOG.log(Level.SEVERE, "",e);
-		throw new RuntimeException(e);
-	}  
-	LOG.log(Level.INFO, "Updated DIGEST_WAVE with: " + entryTitle);
+		  ExtDigest digest = extDigestDao.retrDigestsByProjectId(entry.getProjectId()).get(0);
+		  String digestWaveDomain = digest.getDomain();
+		  String digestWaveId = digest.getWaveId();
+		  LOG.log(Level.FINER, "digestWaveDomain: " + digestWaveDomain + ", digestWaveId: " + digestWaveId);
+		  try{
+			  digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), entry.getProjectId() + "-digest",  getRpcServerUrl());
+		  }catch (IOException e) {
+			  LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+		  }
+		  String entryTitle = entry.getTitle();
+		  if(entry.getDigestBlipId() != null && digestWavelet.getBlips().get(entry.getDigestBlipId()) != null){
+			  Blip blip = digestWavelet.getBlips().get(entry.getDigestBlipId());
+			  blip.all().delete();
+			  
+			  StringBuilderAnnotater sba = new StringBuilderAnnotater(blip);
+			  sba.append(entryTitle, StringBuilderAnnotater.LINK_WAVE, entry.getId());
+			  sba.append(" [", null, null);
+			  sba.append(" By: " + entry.getCreator() + ", ", StringBuilderAnnotater.STYLE_FONT_STYLE, StringBuilderAnnotater.STYLE_ITALIC);
+			  sba.append("Last: " + entry.getUpdater() + ", ", StringBuilderAnnotater.STYLE_FONT_STYLE, StringBuilderAnnotater.STYLE_ITALIC);
+			  sba.append("Blips: " + entry.getBlipCount(), StringBuilderAnnotater.STYLE_FONT_STYLE, StringBuilderAnnotater.STYLE_ITALIC);
+			  sba.append(" ] ", null, null);
+			  sba.flush2Blip();
+			
+			  try {
+				  submit(digestWavelet, getRpcServerUrl());
+			  } catch (IOException e) {
+				  LOG.log(Level.SEVERE, "",e);
+				  throw new RuntimeException(e);
+			  }  
+		  }else{
+			  LOG.log(Level.SEVERE, "No digest blip id! entry.getDigestBlipId: " + entry.toString());
+		  }
+	  }catch (Exception e) {
+		  LOG.log(Level.SEVERE, "",e);
+	  }
+	  LOG.log(Level.INFO, "Updated DIGEST_WAVE with: " + entry.getTitle());
 
   }
   
@@ -377,19 +458,26 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
   }
 
   public void applyAutoTags(Blip blip, String projectId) {
-    String content = blip.getContent();
+	  Pattern pattern = null;;
+	  String tag = null;
+	  try{
+		  String content = blip.getContent();
+		  AdminConfig adminConfig = this.adminConfigDao.getAdminConfig(projectId);
+		  if(adminConfig != null && adminConfig.getAutoTagRegexMap() != null){
+			  for (Entry<String, Pattern> entry : adminConfig.getAutoTagRegexMap().entrySet()) {
+				  tag = entry.getKey();
+				  pattern = entry.getValue();
 
-    for (Entry<String, Pattern> entry : this.adminConfigDao.getAdminConfig(projectId)
-        .getAutoTagRegexMap().entrySet()) {
-      String tag = entry.getKey();
-      Pattern pattern = entry.getValue();
-
-      Matcher m = null;
-      m = pattern.matcher(content);
-      if (m.find()) {
-        blip.getWavelet().getTags().add(tag);
-      }
-    }
+				  Matcher m = null;
+				  m = pattern.matcher(content);
+				  if (m.find()) {
+					  blip.getWavelet().getTags().add(tag);
+				  }
+			  }
+		  }
+	  }catch (Exception e) {
+		  LOG.log(Level.SEVERE, "tag: " + tag + ", pattern: " + pattern,e);
+	  }
   }
   
   public boolean applyAutoTag(Blip blip, String projectId, String tagName) {
@@ -428,6 +516,7 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
     FormElement radioGroup = new FormElement(ElementType.RADIO_BUTTON_GROUP);
     String groupLabel = "frequency";
     radioGroup.setName(groupLabel);
+    
 
     String userId = modifiedBy;
     UserNotification userNotification = userNotificationDao.getUserNotification(userId);
@@ -479,17 +568,18 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
   }
 
   public String getRobotAvatarUrl() {
-    return "http://" + getServerName() + ".appspot.com/images/forumbotty_thumb_old_2.png";
+    return System.getProperty("DIGESTBOTTY_ICON_URL");
   }
 
   public String getRobotProfilePageUrl() {
 	  String profileUrl = System.getProperty("PROFILE_URL");
-	  return "http://" + getServerName() + ".appspot.com/" + profileUrl;
+	  return profileUrl;
   }
 
   @Override
   public String getRobotName() {
-    return getServerName().replace(".appspot.com", "");
+	  String baseName = getServerName().replace(".appspot.com", "");
+    return baseName.replace("digestbotty", "DigestBotty");
   }
   
   @Override
@@ -497,12 +587,6 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 	  LOG.fine("requested profile for: " + name);
 	  //-----------------
 	  //work around to get the profile updated //FIXME - remove
-	  if(name.equals("stenyak-asekas")){
-		  SeriallizableParticipantProfile stenyak_asekas = new SeriallizableParticipantProfile("http://ilmaistro.com/wp-content/uploads/2008/01/icono-tubo.jpg","Foro Asekas","https://wave.google.com/wave/waveref/googlewave.com!w+o2VcCrZkBCJ");
-				  cache.put(name, stenyak_asekas);
-				  return stenyak_asekas.getProfile();
-    			  
-	  }
 	  //----------------------------
 	  List<ExtDigest> digests = null;
 	  ParticipantProfile profile = null;
@@ -586,14 +670,6 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 					  String responseKey = "response#" + split[1] + "#" +  split[2];
 					  long currTime = System.currentTimeMillis();
 					  long requestTime = Long.parseLong(split[2]);
-//					  if(currTime > requestTime + 1000 * 100){ //if delay is more than 10 seconds - dismiss the request.
-//						  json.put("error", "Request timed out!");
-//						  Map<String,String> out = new HashMap<String, String>();
-//						  out.put(key, null);
-//						  out.put(responseKey, json.toString());
-//						  blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).updateElement(out);
-//						  continue;
-//					  }
 					  LOG.info("Found request: " + key + ", body: " + postBody);
 					  Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 					  JsonRpcRequest jsonRpcRequest = gson.fromJson(postBody, JsonRpcRequest.class);
@@ -639,6 +715,7 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 	  }
   }
 
+  /*
   @Override
   public void onWaveletParticipantsChanged(WaveletParticipantsChangedEvent event) {
 	  LOG.info("Entering onWaveletParticipantsChanged");
@@ -665,5 +742,5 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 	  }
 	  LOG.info("Exiting onWaveletParticipantsChanged");
   }
-  
+  */
 }

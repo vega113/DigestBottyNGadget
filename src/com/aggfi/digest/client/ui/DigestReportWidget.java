@@ -113,7 +113,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 					});
 			}
 		};
-		
+		DigestUtils.getInstance().recordPageView("/reportTab/");
 	}
 
 
@@ -132,6 +132,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				handleOnSelectPrjList(event);
 			}
 		});
+		DigestUtils.getInstance().recordPageView("/reportTab/");
 	}
 	
 
@@ -180,7 +181,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			digestUtils.alert(e.getMessage());
 		}
 		
-		
+		DigestUtils.getInstance().reportEvent("/report/select/","createTagsBreakdownPieChart", getProjectId(), 1);
 	}
 
 
@@ -308,7 +309,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				Log.error("", e);
 			}
 			
-			
+			DigestUtils.getInstance().reportEvent("/report/select/","drawNewWavesLineChart", getProjectId(), 1);
 		}
 	  private SelectHandler createPostCountsSelectHandler(
 				final LineChart lineChart) {

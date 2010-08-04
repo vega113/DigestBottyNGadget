@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
+import com.aggfi.digest.server.botty.digestbotty.utils.StringBuilderAnnotater;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
 import com.aggfi.digest.server.botty.google.forumbotty.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
@@ -64,6 +65,7 @@ public class CreateDigest extends Command {
 	    	
 	    	String senderId = this.getParam("senderId");
 	        if (senderId != null && !senderId.equals(extDigest.getOwnerId())) {
+	        	LOG.severe(extDigest.getOwnerId()  + " and " + senderId + " do not match!");
 	        	throw new RuntimeException(extDigest.getOwnerId()  + " and " + senderId + " do not match!" );
 	        }
 	        
@@ -71,7 +73,7 @@ public class CreateDigest extends Command {
 	    		throw new IllegalArgumentException("Project with id: " + projectId + " already exists! Please choose another project id."); 
 	    	}
 	    	int numOfOwnerDigests = extDigestDao.retrDigestsByOwnerId(ownerId).size();
-	    	if(!ownerId.equals("vega113@googlewave.com") && numOfOwnerDigests > Integer.parseInt(System.getProperty("MAX_DIGESTS"))){
+	    	if(!ownerId.equals(System.getProperty("BOTTY_OWNER_WAVE_ID")) && numOfOwnerDigests > Integer.parseInt(System.getProperty("MAX_DIGESTS"))){
 	    		throw new IllegalArgumentException("Max number of Digests per owner is: " + System.getProperty("MAX_DIGESTS")); 
 	    	}
 	    	boolean isPublicOnCreate = Boolean.parseBoolean(this.getParam("publicOnCreate"));
@@ -91,10 +93,17 @@ public class CreateDigest extends Command {
 	    		extDigest.setForumSiteUrl("https://wave.google.com/wave/waveref/googlewave.com/" + digestWaveId);
 	    	}
 	    	if(extDigest.getInstallerIconUrl() == null || "".equals(extDigest.getInstallerIconUrl())){
-	    		extDigest.setInstallerIconUrl("http://" + System.getProperty("APP_DOMAIN") + "." + "appspot.com" + "/images/1279552179_google_wave.png");
+	    		extDigest.setInstallerIconUrl(System.getProperty("WAVE_ICON_URL"));
+	    	}
+	    	if(extDigest.getInstallerThumbnailUrl() == null || "".equals(extDigest.getInstallerThumbnailUrl())){
+	    		extDigest.setInstallerThumbnailUrl(System.getProperty("WAVE_ICON_URL"));
 	    	}
 	    	if(extDigest.getRobotThumbnailUrl() == null || "".equals(extDigest.getRobotThumbnailUrl())){
-	    		extDigest.setRobotThumbnailUrl("http://wave.google.com/images/wave-60_wshadow.gif");
+	    		if(extDigest.getInstallerThumbnailUrl() == null || System.getProperty("WAVE_ICON_URL").equals(extDigest.getInstallerThumbnailUrl())){
+	    			extDigest.setRobotThumbnailUrl(System.getProperty("ROBOT_ICON_URL"));
+	    		}else{
+	    			extDigest.setRobotThumbnailUrl(extDigest.getInstallerThumbnailUrl());
+	    		}
 	    	}
 	    	//-------------
 			extDigestDao.save(extDigest);
@@ -172,7 +181,7 @@ public class CreateDigest extends Command {
 		robot.submit(newWavelet, rpcUrl);
 		
 		//add this post to the digest
-		robot.addPost2Digest(projectId, newWavelet);
+		robot.addOrUpdateDigestWave(projectId, newWavelet, null, null);
 	}
 
 	protected void appendFaq2blip(String projectName, String projectId,String digestWaveId,String ownerId,Wavelet newWavelet) {
@@ -220,11 +229,16 @@ public class CreateDigest extends Command {
 		String a7_1 = "A: You can use the \"Saved Search\" that was installed along with the Forum. It is located on the \"Navigation\" panel on the top left of the Wave Client under the \"Searches\" category. To remove it - hover with the mouth over the search and then choose the \"delete\" option.\n\n";
 		sba.append(a7_1, styleFontStyle, "italic");
 		//6
+		String q8 = "Q: How do I locate the forum Digest wave?\n";
+		sba.append(q8, styleFontWeight, "bold");
+		String a8_1 = "A: You can click on the icon of the forum robot - and then on the \"Website\" link - this will redirect you to the Digest wave.\n\n";
+		sba.append(a8_1, styleFontStyle, "italic");
+		//7
 		String q2 = "Q: Who is the Forum owner?\n";
 		sba.append(q2, styleFontWeight, "bold");
 		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
-		//7
+		//8
 		String q3 = "Q: I have more questions regarding using forums created by DigestBotty, where can I ask them?\n";
 		sba.append(q3, styleFontWeight, "bold");
 		String a3_1 = "A: Please visit the DigestBotty digest wave ";
@@ -240,55 +254,10 @@ public class CreateDigest extends Command {
 		String a3_6 = " and then create a new post with your question.\n\n";
 		sba.append(a3_6, styleFontStyle, "italic");
 		
-		
-		
-		
-		
 		sba.flush2Blip();
 	}
 	
-	class StringBuilderAnnotater{
-		private StringBuilder sb;
-		private ArrayList<Integer> annStarts;
-		private ArrayList<Integer> annEnds;
-		private ArrayList<String> annVal;
-		private ArrayList<String> annType;
-		private Blip blip;
-		int prevBlipLength;
-		
-		public StringBuilderAnnotater(Blip blip){
-			sb = new StringBuilder();
-			annStarts = new ArrayList<Integer>();
-			annEnds = new ArrayList<Integer>();
-			annVal = new ArrayList<String>();
-			annType = new ArrayList<String>();
-			this.blip = blip;
-			prevBlipLength = blip.length();
-		}
-		
-		public void append(String str, String annTypeStr, String annValStr){
-			int curLength = sb.length();
-			int strLength = str.length();
-			annStarts.add(curLength);
-			annEnds.add(curLength + strLength);
-			annVal.add(annValStr);
-			annType.add(annTypeStr);
-			sb.append(str);
-		}
-		
-		public Blip flush2Blip(){
-			blip.append(sb.toString());
-			int length = annStarts.size();
-			for(int i = 0; i < length; i++){
-				int annStart = annStarts.get(i);
-				int annEnd = annEnds.get(i);
-				if(annVal.get(i) != null && annType.get(i) != null){
-					BlipContentRefs.range(blip, prevBlipLength + annStart, prevBlipLength + annEnd).annotate( annType.get(i), annVal.get(i) );
-				}
-			}
-			return blip;
-		}
-	}
+	
 
 	class Output {
 		@Expose
@@ -387,8 +356,8 @@ public class CreateDigest extends Command {
 		
 		String titleStr = projectName + " Digest Wave";
 		newWavelet.getRootBlip().append(titleStr +"\n");
-		BlipContentRefs.range(newWavelet.getRootBlip(), 0, titleStr.length()+1).annotate("style/fontSize","2em");
-		BlipContentRefs.range(newWavelet.getRootBlip(), 0, projectName.length()+1).annotate("style/fontWeight","bold");
+		BlipContentRefs.range(newWavelet.getRootBlip(), 1, titleStr.length()+1).annotate("style/fontSize","2em");
+		BlipContentRefs.range(newWavelet.getRootBlip(), 1, projectName.length()+1).annotate("style/fontWeight","bold");
 		String gadgetUrl = System.getProperty("CLICK_GADGET_URL");
 		Gadget gadget = new Gadget(gadgetUrl);
 		gadget.setProperty("waveid", newWavelet.getWaveletId().getId());

@@ -174,6 +174,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				} catch (RequestException e) {
 					Log.error("", e);
 				}
+				try{
+					DigestUtils.getInstance().reportEvent("/admin/remove","removeDefaultParticipantHandler", getProjectId(), 1);
+				}catch (Exception e) {
+					Log.error("", e);
+				}
 			}
 		};
 		//end remove default participant
@@ -193,6 +198,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				} catch (RequestException e) {
 					Log.error("", e);
 				}
+				try{
+					DigestUtils.getInstance().reportEvent("/admin/remove","removeDefaultTagHandler", getProjectId(), 1);
+				}catch (Exception e) {
+					Log.error("", e);
+				}
 			}
 		};
 		//end remove default tag
@@ -210,6 +220,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				try {
 					digestService.removeDigestManager(projectId, managerId, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
+					Log.error("", e);
+				}
+				try{
+					DigestUtils.getInstance().reportEvent("/admin/remove","removeManagerHandler", getProjectId(), 1);
+				}catch (Exception e) {
 					Log.error("", e);
 				}
 			}
@@ -234,6 +249,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				} catch (RequestException e) {
 					Log.error("", e);
 				}
+				try{
+					DigestUtils.getInstance().reportEvent("/admin/remove","removeAutoTagHandler", getProjectId(), 1);
+				}catch (Exception e) {
+					Log.error("", e);
+				}
 			}
 		};
 		//end remove auto tag
@@ -243,13 +263,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			@Override
 			public void run() {
 				initAdminWidget();
-				DeferredCommand.addCommand(new Command() {
-
-					@Override
-					public void execute() {
-						DigestUtils.getInstance().adjustHeight();
-					}
-				});
+				DigestUtils.getInstance().adjustHeight();
 			}
 		};
 
@@ -266,6 +280,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				handleOnSelectPrjList(event);
 			}
 		});
+		DigestUtils.getInstance().recordPageView("/adminTab/");
 	}
 
 	protected void handleOnSelectPrjList(ChangeEvent event) {
@@ -332,6 +347,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,userId,null,null,managersPanel,addManagerBox,null,removeManagerHandler);
+						digestUtils.dismissStaticMessage();
 					}
 					
 					@Override
@@ -345,6 +361,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
+		}
+		try{
+			DigestUtils.getInstance().reportEvent("/admin/add","addManagergBtn", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
 		}
 	}
 	
@@ -380,6 +401,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
 		}
+		try{
+			DigestUtils.getInstance().reportEvent("/admin/add","addDefaultTagBtn", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
+		}
 	}
 	
 	@UiHandler("addDefaultParticipantBtn")
@@ -414,6 +440,12 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		}catch(IllegalArgumentException e){
 			digestUtils.alert(e.getMessage());
 		}
+		try{
+			DigestUtils.getInstance().reportEvent("/admin/add","addDefaultParticipantBtn", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
+		}
+		
 	}
 	@UiHandler("addParticipantWavesBtn")
 	protected void addParticipantWavesBtnClick(ClickEvent event){
@@ -458,6 +490,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
+		}
+		try{
+			DigestUtils.getInstance().reportEvent("/admin/add","addParticipantWavesBtn", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
 		}
 	}
 	
@@ -514,6 +551,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
+		}
+		try{
+			DigestUtils.getInstance().reportEvent("/admin/add","addAutoTagBtn", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
 		}
 	}
 	
