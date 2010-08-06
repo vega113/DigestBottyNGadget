@@ -3,6 +3,7 @@ package com.aggfi.digest.server.botty.google.forumbotty.admin;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddDigestManager;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddWavesParticipant;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetAllForumIds;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
 import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
@@ -38,6 +39,7 @@ public enum CommandType {
   GET_PROJECTS_PER_USER(GetProjectsPerUser.class),
   REMOVE_DIGEST_MANAGER(RemoveDigestManager.class),
   ADD_WAVES_PARTICIPANT(AddWavesParticipant.class),
+  GET_ALL_FORUMS_IDS(GetAllForumIds.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

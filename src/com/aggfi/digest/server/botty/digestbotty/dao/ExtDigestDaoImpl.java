@@ -114,5 +114,19 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 		return extDigests;
 
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ExtDigest> retrAllDigests() {
+		PersistenceManager pm = pmf.getPersistenceManager();
+		List<ExtDigest> extDigests = new LinkedList<ExtDigest>();
+		Query query1 = pm.newQuery(ExtDigest.class);
+		try {
+			extDigests = (List<ExtDigest>) query1.execute();
+			extDigests = (List<ExtDigest>) pm.detachCopyAll(extDigests);
+		} finally {
+			pm.close();
+		}
+		return extDigests;
+	}
 }

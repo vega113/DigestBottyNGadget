@@ -60,7 +60,16 @@
   <servlet-mapping>
     <servlet-name>RemoteApiServlet</servlet-name>
     <url-pattern>/remote_api</url-pattern>
-  </servlet-mapping>     
+  </servlet-mapping>   
+  
+  <servlet>
+    <servlet-name>showembedded</servlet-name>
+    <jsp-file>/showembedded.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>showembedded</servlet-name>
+    <url-pattern>/showembedded</url-pattern>
+  </servlet-mapping>   
   
 <!--    <servlet>-->
 <!--    <servlet-name>report</servlet-name>-->
