@@ -189,9 +189,18 @@ public class CreateDigest extends Command {
 		
 		String styleFontWeight = "style/fontWeight";
 		String styleFontStyle = "style/fontStyle";
+		//-1
+		String guideTitle = "Guide:\n";
+		sba.append(guideTitle, "style/fontSize", "18pt");
+		String guideStr = "Make sure to check the ";
+		sba.append(guideStr, styleFontStyle, "italic");
+		String guideLink = "Wave Guide";
+		sba.append(guideLink, "link/wave", "googlewave.com!w+RmL8QZ6ta");
+		sba.append(".\n\n\n", "styleFontStyle", "italic");
+		
 		//0
 		String faqStr = "FAQ:\n\n";
-		sba.append(faqStr, styleFontWeight, "bold");
+		sba.append(faqStr, "style/fontSize", "18pt");
 		//1
 		String q1 = "Q: How can I create posts in this Forum?\n";
 		sba.append(q1, styleFontWeight, "bold");
@@ -218,27 +227,37 @@ public class CreateDigest extends Command {
 		String a6_3 = "\" .\n\n";
 		sba.append(a6_3, styleFontStyle, "italic");
 		//4
+		String q9 = "Q: Is there a perma link to the Forum, so I can link to it outside the Wave?\n";
+		sba.append(q9, styleFontWeight, "bold");
+		String embedUrl = "http://" + System.getProperty("APP_DOMAIN") +  ".appspot.com/showembedded?forumId=" + projectId;
+		String a9_1 = "A: Yes, you can expose the Forum outside the Wave using the following link: \"";
+		sba.append(a9_1, styleFontStyle, "italic");
+		String a9_2 = embedUrl;
+		sba.append(a9_2, styleFontStyle, "italic");
+		String a9_3 = "\" (Wave access rules still aply).\n\n";
+		sba.append(a9_3, styleFontStyle, "italic");
+		//5
 		String q5 = "Q: How can I import an existing wave into the Forum?\n";
 		sba.append(q5, styleFontWeight, "bold");
 		String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
 		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import - either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
 		sba.append(a5_1, styleFontStyle, "italic");
-		//5
+		//6
 		String q7 = "Q: How do I search for Forum waves?\n";
 		sba.append(q7, styleFontWeight, "bold");
 		String a7_1 = "A: You can use the \"Saved Search\" that was installed along with the Forum. It is located on the \"Navigation\" panel on the top left of the Wave Client under the \"Searches\" category. To remove it - hover with the mouth over the search and then choose the \"delete\" option.\n\n";
 		sba.append(a7_1, styleFontStyle, "italic");
-		//6
+		//7
 		String q8 = "Q: How do I locate the forum Digest wave?\n";
 		sba.append(q8, styleFontWeight, "bold");
 		String a8_1 = "A: You can click on the icon of the forum robot - and then on the \"Website\" link - this will redirect you to the Digest wave.\n\n";
 		sba.append(a8_1, styleFontStyle, "italic");
-		//7
+		//8
 		String q2 = "Q: Who is the Forum owner?\n";
 		sba.append(q2, styleFontWeight, "bold");
 		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
-		//8
+		//9
 		String q3 = "Q: I have more questions regarding using forums created by DigestBotty, where can I ask them?\n";
 		sba.append(q3, styleFontWeight, "bold");
 		String a3_1 = "A: Please visit the DigestBotty digest wave ";
@@ -251,7 +270,7 @@ public class CreateDigest extends Command {
 		sba.append(a3_4, styleFontStyle, "italic");
 		String a3_5 = "here";
 		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_FAQ_LINK"));
-		String a3_6 = " and then create a new post with your question.\n\n";
+		String a3_6 = " and then create a new post with your question. You are also welcome to leave your feedback!\n\n";
 		sba.append(a3_6, styleFontStyle, "italic");
 		
 		sba.flush2Blip();

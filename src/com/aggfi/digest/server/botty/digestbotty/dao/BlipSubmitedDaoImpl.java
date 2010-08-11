@@ -42,5 +42,63 @@ public class BlipSubmitedDaoImpl implements BlipSubmitedDao{
 
 		return entry;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<BlipSubmitted> getBlipsDuringDate(String projectId, Date target) {
+		int count = 0;
+
+		PersistenceManager pm = pmf.getPersistenceManager();
+
+		Date start = new Date(target.getTime());
+		start.setHours(0);
+		start.setMinutes(0);
+		start.setSeconds(0);
+
+		Date end = new Date(target.getTime());
+		end.setHours(23);
+		end.setMinutes(59);
+		end.setSeconds(59);
+		List<BlipSubmitted> entries = new ArrayList<BlipSubmitted>();
+		try {
+			Query query = pm.newQuery(BlipSubmitted.class);
+			//	      query.declareImports("import java.util.Date");
+			query.declareParameters("String projectId_, long start, long end");
+			String filters = "projectId == projectId_ && createdTime >= start && createdTime <= end";      
+			query.setFilter(filters);
+			entries = (List<BlipSubmitted>) query.execute(projectId, start.getTime(), end.getTime());      
+			count = entries.size();      
+		} finally {
+			pm.close();
+		}
+		return entries;
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<BlipSubmitted> getBlipsFromDate(String projectId, Date target) {
+		int count = 0;
+
+		PersistenceManager pm = pmf.getPersistenceManager();
+
+		Date start = new Date(target.getTime());
+		start.setHours(0);
+		start.setMinutes(0);
+		start.setSeconds(0);
+
+		List<BlipSubmitted> entries = new ArrayList<BlipSubmitted>();
+		try {
+			Query query = pm.newQuery(BlipSubmitted.class);
+			//	      query.declareImports("import java.util.Date");
+			query.declareParameters("String projectId_, long start");
+			String filters = "projectId == projectId_ && createdTime >= start";      
+			query.setFilter(filters);
+			entries = (List<BlipSubmitted>) query.execute(projectId, start.getTime());   
+			count = entries.size();     
+			LOG.info("getBlipsFromDate. projectId: " + projectId + ", count:" + count);
+		} finally {
+			pm.close();
+		}
+		return entries;
+	}
 }
 

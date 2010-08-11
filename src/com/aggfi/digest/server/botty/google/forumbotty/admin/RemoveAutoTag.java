@@ -57,7 +57,7 @@ public class RemoveAutoTag extends Command {
 	  int tagRemovedCount = 0;
 	  Wavelet firstWavelet = null;
 	  try {
-		  if(sync != null && !"".equals(sync)){
+		  if(sync != null && !"".equals(sync) && sync.equals("true")){
 			  //retrieve all forumPosts for this projectId
 
 			  Wavelet wavelet = null;

@@ -47,12 +47,12 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 			DigestUtils.getInstance().setMiniMessages(mmFeature);
 			DigestUtils.getInstance().setHeight(dhFeature);
 			DigestUtils.getInstance().setAnalytics(analyticsFeature);
-			viewsFeature.initViewsFeature();
 			DigestUtils.getInstance().setViewsFeature(viewsFeature);
 			
 			DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 			DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
+			RootPanel.get().add(new HTML("."));
 			dhFeature.getContentDiv().add(widget);
 			initRemoteLogger(RootPanel.get());
 		}catch(Exception e){

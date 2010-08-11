@@ -136,6 +136,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 							
 							@Override
 							public void onFailure(Throwable caught) {
+								DigestUtils.getInstance().dismissAllStaticMessages();
 								DigestUtils.getInstance().alert(caught.getMessage());
 							}
 						});

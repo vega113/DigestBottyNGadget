@@ -13,6 +13,16 @@
   <datastore-index kind="ForumPost" ancestor="false" source="auto">
         <property name="projectId" direction="asc"/>
         <property name="created" direction="asc"/>
+  </datastore-index>  
+  
+  <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
+        <property name="projectId" direction="asc"/>
+        <property name="createdTime" direction="desc"/>
+  </datastore-index>  
+  
+  <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
+        <property name="projectId" direction="asc"/>
+        <property name="createdTime" direction="asc"/>
   </datastore-index>    
   
   <datastore-index kind="Tag" ancestor="false" source="auto">

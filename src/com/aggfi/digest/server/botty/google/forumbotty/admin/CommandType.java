@@ -4,6 +4,9 @@ import com.aggfi.digest.server.botty.digestbotty.admin.AddDigestManager;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddWavesParticipant;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetAllForumIds;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsCount;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsPerContributor;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetContributorsPerInfluence;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
 import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
@@ -40,6 +43,9 @@ public enum CommandType {
   REMOVE_DIGEST_MANAGER(RemoveDigestManager.class),
   ADD_WAVES_PARTICIPANT(AddWavesParticipant.class),
   GET_ALL_FORUMS_IDS(GetAllForumIds.class),
+  GET_BLIPS_COUNT(GetBlipsCount.class),
+  GET_BLIPS_PER_CONTRIBUTOR(GetBlipsPerContributor.class),
+  GET_CONTRIBUTORS_PER_INFLUENCE(GetContributorsPerInfluence.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

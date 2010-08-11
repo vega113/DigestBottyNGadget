@@ -3,6 +3,7 @@ package com.aggfi.digest.server.botty.google.forumbotty;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -44,6 +45,8 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.RequestScoped;
 import com.google.wave.api.AbstractRobot;
+import com.google.wave.api.Annotation;
+import com.google.wave.api.Annotations;
 import com.google.wave.api.Blip;
 import com.google.wave.api.BlipContentRefs;
 import com.google.wave.api.Context;
@@ -61,6 +64,8 @@ import com.google.wave.api.event.GadgetStateChangedEvent;
 import com.google.wave.api.event.OperationErrorEvent;
 import com.google.wave.api.event.WaveletParticipantsChangedEvent;
 import com.google.wave.api.event.WaveletSelfAddedEvent;
+import com.google.wave.api.impl.DocumentModifyAction.BundledAnnotation;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -94,7 +99,7 @@ public class ForumBotty extends AbstractRobot {
 
   private String domain = PREVIEW_DOMAIN;//SANDBOX_DOMAIN;
   
-  Cache cache;
+  private Cache cache;
 
 
   @Inject
@@ -172,6 +177,7 @@ public class ForumBotty extends AbstractRobot {
     return event.getBundle().getProxyingFor();
   }
 
+  @Capability(contexts = {Context.ALL})
   @Override
   public void onWaveletSelfAdded(WaveletSelfAddedEvent event) {
 	  LOG.log(Level.INFO, "onWaveletSelfAdded:" + event.toString());
@@ -180,9 +186,13 @@ public class ForumBotty extends AbstractRobot {
 	  String proxyFor = event.getBundle().getProxyingFor();
 	  Wavelet wavelet = event.getWavelet();
 	  Blip blip = event.getBlip();
-	  String modifiedBy = event.getModifiedBy();
 
 	  actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
+	  
+	  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
+		  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
+		  addBack2Digest2RootBlip(wavelet, projectId, wavelet.getRootBlip(),entry);
+	  }
 }
 
 protected void actOnBottyAdded(String projectId,
@@ -203,33 +213,46 @@ protected void actOnBottyAdded(String projectId,
 
 	  if (isDigestAdmin(proxyFor)) {
 		  wavelet.setTitle("DigestBotty [Admin Gadget]");
-		  try {
-			  submit(wavelet, getRpcServerUrl());
-		  } catch (IOException e) {
-			  LOG.log(Level.SEVERE, "",e);
-		  }
-		  return;
-	  }     
-
-	  // Add default participants
-	  for (String participant : this.adminConfigDao.getAdminConfig(projectId)
-			  .getDefaultParticipants()) {
-		  if(!wavelet.getParticipants().contains(participant)){
-			  wavelet.getParticipants().add(participant);
-		  }
-	  }
-
-	  if (isWorthy(wavelet)) {
-		  ForumPost entry = addOrUpdateDigestWave(projectId, wavelet,blip,modifiedBy);
-
-		  for (String contributor : wavelet.getRootBlip().getContributors()) {
-			  if (isNormalUser(contributor)) {
-				  entry.addContributor(contributor);
+		  submitWavelet(wavelet);
+	  }else{
+		// Add default participants
+		  for (String participant : this.adminConfigDao.getAdminConfig(projectId)
+				  .getDefaultParticipants()) {
+			  if(!wavelet.getParticipants().contains(participant)){
+				  wavelet.getParticipants().add(participant);
 			  }
 		  }
 
-		  // Apply default and auto tags to the wave
-		  applyAutoTags(blip, projectId);
+		  if (isWorthy(wavelet)) {
+			  ForumPost entry = addOrUpdateDigestWave(projectId, wavelet,blip,modifiedBy);
+
+			  for (String contributor : wavelet.getRootBlip().getContributors()) {
+				  if (isNormalUser(contributor)) {
+					  entry.addContributor(contributor);
+				  }
+			  }
+
+			  // Apply default and auto tags to the wave
+			  applyAutoTags(blip, projectId);
+		  }
+		 
+	  }
+
+	  
+}
+
+protected void submitWavelet(Wavelet wavelet) {
+	 LOG.log(Level.INFO, "Entering submitWavelet");
+	try {
+		  submit(wavelet, getRpcServerUrl());
+	  } catch (IOException e) {
+//		  try{
+//			  LOG.log(Level.SEVERE, "Trying to resubmit",e);
+//			  submit(wavelet, getRpcServerUrl());
+//		  }catch (Exception e1) {
+//			  LOG.log(Level.SEVERE, "Failed after resubmitting!!!",e1);
+//		}
+		  LOG.log(Level.WARNING, "Wavelet submition failed", e);
 	  }
 }
 
@@ -275,7 +298,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
   }
 
   @Override
-  @Capability(contexts = {Context.PARENT})
+  @Capability(contexts = {Context.ALL})
   public void onBlipSubmitted(BlipSubmittedEvent event) {
 	  LOG.warning("Entering onBlipSubmitted");
 	  if(event.getBlip() == null || event.getBlip().getContent() == null || event.getBlip().getContent().length()  < 2){
@@ -316,8 +339,46 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 
   //here is the place to save blipSubmitted
     saveBlipSubmitted(event, projectId);
+    
+    //check if there's link to Digest Wave in the Root Blip, if one missing add it with annotation.
+	  if(wavelet.getRootBlip() != null){
+		  addBack2Digest2RootBlip(wavelet, projectId, wavelet.getRootBlip(),entry);
+	  }
+	 
    
   }
+
+protected void addBack2Digest2RootBlip(Wavelet wavelet, String projectId,
+		Blip rootBlip, ForumPost entry) {
+	Annotations annotations = rootBlip.getAnnotations();
+	  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
+	  List<Annotation> annotationsList =  annotations.get(backtodigestAnnotationName);
+	  if(annotationsList == null || annotationsList.size() == 0){
+		  List<ExtDigest> digestsList = extDigestDao.retrDigestsByProjectId(projectId);
+		  if(digestsList != null && digestsList.size() > 0 || true){
+			  String forumName = digestsList.size() > 0 ? digestsList.get(0).getName() : "";
+			  String back2digestWaveStr = " Back to " + forumName + " digest wave";
+			  int strLen = back2digestWaveStr.length();
+			  String lineStr = "\n\n_";
+			  for(int i = 0; i< strLen+ (int)Math.ceil(0.15*strLen); i++){
+				  lineStr += "_";
+			  }
+			  LOG.info("content: " + rootBlip.getContent());
+			  BlipContentRefs rootBlipRef = rootBlip.at(rootBlip.getContent().length());
+			  lineStr +="\n";
+			  rootBlipRef.insert(lineStr);
+			  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
+			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
+//			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/wave","googlewave.com!w+iB1ilrZkwc","style/fontSize", "8pt",backtodigestAnnotationName,"done");
+			  rootBlipRef = rootBlip.at(rootBlip.getContent().length());
+			  rootBlipRef.insert(baList, back2digestWaveStr);
+			 
+//			  submitWavelet(wavelet);
+			  LOG.info("updated addBack2Digest2RootBlip " + rootBlip.getContent());
+		  }
+		  
+	  }
+}
 
 public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 	try{
@@ -371,7 +432,7 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 		  try{
 			  digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), entry.getProjectId() + "-digest",  getRpcServerUrl());
 		  }catch (IOException e) {
-			  LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+			  LOG.log(Level.INFO,"can happen if the robot was removed manually from the wave.",e);
 		  }
 		  String entryTitle = entry.getTitle();
 
@@ -458,6 +519,7 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
   }
 
   public void applyAutoTags(Blip blip, String projectId) {
+	  if(blip == null) return;
 	  Pattern pattern = null;;
 	  String tag = null;
 	  try{
