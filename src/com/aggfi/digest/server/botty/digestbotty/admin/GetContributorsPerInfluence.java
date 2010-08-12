@@ -24,6 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import umontreal.iro.lecuyer.probdist.NormalDist;
+import umontreal.iro.lecuyer.probdist.NormalDistQuick;
+
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
@@ -52,6 +55,13 @@ public class GetContributorsPerInfluence extends Command {
         LOG.log(Level.SEVERE,"cache init",e);
     }
   }
+  
+  Map<String,BlipSubmitted> blipContributionMap = new HashMap<String, BlipSubmitted>();
+  Map<String,Double> contributorsInfluenceMap = new HashMap<String,Double>();
+  Map<String,Double> blipsInfluenceMap = new HashMap<String,Double>();
+  Set<String> blipsIdSet = new LinkedHashSet<String>();
+  Map<String,Double> contributorsFreqMap = new HashMap<String, Double>();
+  Map<String,Double> contributorsReplyComplementaryProbMap = new HashMap<String, Double>();
 
   @Override
   public JSONObject execute() throws JSONException {  
@@ -91,36 +101,9 @@ public class GetContributorsPerInfluence extends Command {
         List<BlipSubmitted> blipsList = blipSubmitedDao.getBlipsFromDate(projectId, startDate);
         LOG.info("after getBlipsFromDate, size:" + blipsList.size());
         
-        Map<String,BlipSubmitted> blipContributionMap = new HashMap<String, BlipSubmitted>();
-        Map<String,Double> contributorsInfluenceMap = new HashMap<String,Double>();
-        Map<String,Double> blipsInfluenceMap = new HashMap<String,Double>();
-        Set<String> blipsIdSet = new LinkedHashSet<String>();
-        for(BlipSubmitted blipSubmitted  : blipsList){
-        	blipContributionMap.put(blipSubmitted.getBlipId(), blipSubmitted);
-        	contributorsInfluenceMap.put(blipSubmitted.getCreator(), 0.0);
-        	blipsInfluenceMap.put(blipSubmitted.getBlipId(),  0.0);
-        }
+       
         
-        for(BlipSubmitted blipSubmitted  : blipsList){
-        	if(blipsIdSet.contains(blipSubmitted.getBlipId()) && blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
-        		continue; //count every blip only once for creator
-        	}else if(blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
-        		blipsIdSet.add(blipSubmitted.getBlipId());
-        	}
-        	if(!blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){ //if someone edited blip of creator - creator scores half a point
-        		double influence = contributorsInfluenceMap.get(blipSubmitted.getCreator());
-        		contributorsInfluenceMap.put(blipSubmitted.getCreator(), influence + 0.5);
-        	}
-        	String parentBlipId = blipSubmitted.getParentBlipId();
-        	assignInfluencePoints(parentBlipId,blipContributionMap,contributorsInfluenceMap,blipsInfluenceMap, 1.0);
-        }
-        ArrayList<BlipDataSortHelper> blipDataSortHelperlist = new ArrayList<GetContributorsPerInfluence.BlipDataSortHelper>(contributorsInfluenceMap.size());
-        for(String key : contributorsInfluenceMap.keySet()){
-        	BlipDataSortHelper blipDataSortHelper = new BlipDataSortHelper(key);
-        	blipDataSortHelper.setInfluence(contributorsInfluenceMap.get(key));
-        	blipDataSortHelperlist.add(blipDataSortHelper);
-        }
-        Collections.sort(blipDataSortHelperlist);
+        ArrayList<BlipDataSortHelper> blipDataSortHelperlist = calcInfluenceFromBlips(blipsList);
         
         StringBuilder sb = new StringBuilder();
         int counter = 0;
@@ -146,20 +129,89 @@ public class GetContributorsPerInfluence extends Command {
     LOG.exiting(GetContributorsPerInfluence.class.getName(), "execute", jsonArray.toString());
     return json;       
   }
+
+protected ArrayList<BlipDataSortHelper> calcInfluenceFromBlips(
+		List<BlipSubmitted> blipsList) {
+	for(BlipSubmitted blipSubmitted  : blipsList){
+		blipContributionMap.put(blipSubmitted.getBlipId(), blipSubmitted);
+		contributorsInfluenceMap.put(blipSubmitted.getCreator(), 0.0);
+		blipsInfluenceMap.put(blipSubmitted.getBlipId(),  0.0);
+		if(contributorsFreqMap.get(blipSubmitted.getCreator()) == null){
+			contributorsFreqMap.put(blipSubmitted.getCreator(), 1.0);
+		}else{
+			contributorsFreqMap.put(blipSubmitted.getCreator(), contributorsFreqMap.get(blipSubmitted.getCreator()) + 1.0);
+		}
+	}
+	int i = 0;
+	double[] observations = new double[contributorsFreqMap.size()];
+	for(String key : contributorsFreqMap.keySet()){
+		observations[i] = contributorsFreqMap.get(key);
+		i++;
+	}
+	NormalDist nd = null;
+	
+	try{
+		nd = NormalDist.getInstanceFromMLE(observations,observations.length);
+		LOG.info("NormalDist -  mean: " + nd.getMean() + ", variance: " + nd.getVariance() + ", n=" + observations.length);
+		for(String key : contributorsFreqMap.keySet()){
+			double freq = contributorsFreqMap.get(key);
+	    	double replyProb = nd.barF(freq);
+	    	contributorsReplyComplementaryProbMap.put(key, replyProb);
+	    }
+	}catch (Exception e) {
+		LOG.warning(e.getMessage());
+	}
+	
+	
+	for(BlipSubmitted blipSubmitted  : blipsList){
+		if(blipsIdSet.contains(blipSubmitted.getBlipId()) && blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
+			continue; //count every blip only once for creator
+		}else if(blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
+			blipsIdSet.add(blipSubmitted.getBlipId());
+		}
+		if(!blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){ //if someone edited blip of creator - creator scores half a point
+			double influence = contributorsInfluenceMap.get(blipSubmitted.getCreator());
+			Double complementaryReplyProbOfContributor = contributorsReplyComplementaryProbMap.get(blipSubmitted.getCreator());
+		  if(complementaryReplyProbOfContributor == null){
+			  LOG.warning("no reply prob for: " +blipSubmitted.getCreator() );
+		  }
+		  complementaryReplyProbOfContributor = complementaryReplyProbOfContributor == null ? 1 : complementaryReplyProbOfContributor;
+			contributorsInfluenceMap.put(blipSubmitted.getCreator(), influence + 0.5*(1+complementaryReplyProbOfContributor.doubleValue()));
+		}
+		String childBlipId = blipSubmitted.getBlipId();
+		String parentBlipId = blipSubmitted.getParentBlipId();
+		assignInfluencePoints(childBlipId,parentBlipId, 1.0);
+		
+	}
+	ArrayList<BlipDataSortHelper> blipDataSortHelperlist = new ArrayList<GetContributorsPerInfluence.BlipDataSortHelper>(contributorsInfluenceMap.size());
+	for(String key : contributorsInfluenceMap.keySet()){
+		BlipDataSortHelper blipDataSortHelper = new BlipDataSortHelper(key);
+		blipDataSortHelper.setInfluence(contributorsInfluenceMap.get(key));
+		blipDataSortHelperlist.add(blipDataSortHelper);
+	}
+	Collections.sort(blipDataSortHelperlist);
+	return blipDataSortHelperlist;
+}
   
-  private void assignInfluencePoints(String parentBlipId,Map<String, BlipSubmitted> blipContributionMap,Map<String, Double> contributorsInfluenceMap,Map<String, Double> blipsInfluenceMap, double influencePerLevel) {
+  private void assignInfluencePoints(String childBlipId,String parentBlipId, double influencePerLevel) {
 	  if(parentBlipId == null || "".equals(parentBlipId))
 		  return;
+	  BlipSubmitted childBlipSubmitted = blipContributionMap.get(childBlipId);
 	  BlipSubmitted parentBlipSubmitted = blipContributionMap.get(parentBlipId);
-	  if(parentBlipSubmitted != null){
+	  if(parentBlipSubmitted != null && !childBlipSubmitted.getCreator().equals(parentBlipSubmitted.getCreator())){
 		  String creator = parentBlipSubmitted.getCreator();
 		  double contributorInfluenceValue = contributorsInfluenceMap.get(creator);
 		  contributorsInfluenceMap.put(creator, contributorInfluenceValue + influencePerLevel);
 		  
 		  double blipInfluenceValue = blipsInfluenceMap.get(parentBlipId);
-		  blipsInfluenceMap.put(parentBlipId, blipInfluenceValue + influencePerLevel);
+		  Double complementaryReplyProbOfContributor = contributorsReplyComplementaryProbMap.get(creator);
+		  if(complementaryReplyProbOfContributor == null){
+			  LOG.warning("no reply prob for: " +creator );
+		  }
+		  complementaryReplyProbOfContributor = complementaryReplyProbOfContributor == null ? 1 : complementaryReplyProbOfContributor;
+		  blipsInfluenceMap.put(parentBlipId, blipInfluenceValue + influencePerLevel*(1+complementaryReplyProbOfContributor.doubleValue()));
 		  
-		  assignInfluencePoints(parentBlipSubmitted.getParentBlipId(),blipContributionMap,contributorsInfluenceMap,blipsInfluenceMap, influencePerLevel/2);
+		  assignInfluencePoints(parentBlipSubmitted.getBlipId(), parentBlipSubmitted.getParentBlipId(), influencePerLevel/2);
 	  }
   }
 
