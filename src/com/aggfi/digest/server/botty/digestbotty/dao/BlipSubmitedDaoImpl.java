@@ -100,5 +100,31 @@ public class BlipSubmitedDaoImpl implements BlipSubmitedDao{
 		}
 		return entries;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public BlipSubmitted getBlipByWaveIdBlipIdVersion(String projectId, String waveId, String blipId, long version) {
+
+		PersistenceManager pm = pmf.getPersistenceManager();
+
+
+		List<BlipSubmitted> entries = new ArrayList<BlipSubmitted>();
+		try {
+			Query query = pm.newQuery(BlipSubmitted.class);
+			query.declareParameters("String waveId_, String blipId_, long version_, String projectId_");
+			String filters = "waveId == waveId_ && blipId == blipId_ && version == version_ && projectId == projectId_";      
+			query.setFilter(filters);
+			entries = (List<BlipSubmitted>) query.execute(waveId, blipId, version);   
+			LOG.info("getBlipByWaveIdBlipIdVersion. waveId: " + waveId + ", blipId:" + blipId + ", version: " + version);
+		} finally {
+			pm.close();
+		}
+		if(entries.size() > 1){
+			LOG.warning("more than 1 BlipSubmitted with same String waveId_, String blipId_, long version_, String projectId_" + entries.get(0).toString());
+		}
+		if(entries.size() > 0) 
+			return entries.get(0);
+		else return null;
+	}
 }
 

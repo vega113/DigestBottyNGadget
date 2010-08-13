@@ -193,33 +193,46 @@ public class BlipSubmitted{
 	@Override
 	public String toString() {
 		final int maxLen = 10;
-		return "BlipSubmitted [blipId="
-		+ blipId
-		+ ", blipLength="
-		+ blipLength
-		+ ", contributors="
-		+ (contributors != null ? contributors.subList(0, Math.min(
-				contributors.size(), maxLen)) : null)
-				+ ", createdTime="
-				+ createdTime
-				+ ", creator="
-				+ creator
-				+ ", modifier="
-				+ modifier
-				+ ", parentBlipId="
-				+ parentBlipId
-				+ ", projectId="
-				+ projectId
-				+ ", properties1="
-				+ (properties1 != null ? properties1.subList(0, Math.min(
-						properties1.size(), maxLen)) : null)
-						+ ", properties2="
-						+ (properties2 != null ? properties2.subList(0, Math.min(
-								properties2.size(), maxLen)) : null)
-								+ ", replytoContributors="
-								+ (replytoContributors != null ? replytoContributors.subList(0,
-										Math.min(replytoContributors.size(), maxLen)) : null)
-										+ ", replytoCreator=" + replytoCreator + ", version=" + version
-										+ ", waveId=" + waveId + ", waveletId=" + waveletId + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("BlipSubmitted [id=");
+		builder.append(id);
+		builder.append(", creator=");
+		builder.append(creator);
+		builder.append(", replytoCreator=");
+		builder.append(replytoCreator);
+		builder.append(", modifier=");
+		builder.append(modifier);
+		builder.append(", contributors=");
+		builder.append(contributors != null ? contributors.subList(0,
+				Math.min(contributors.size(), maxLen)) : null);
+		builder.append(", replytoContributors=");
+		builder.append(replytoContributors != null ? replytoContributors
+				.subList(0, Math.min(replytoContributors.size(), maxLen))
+				: null);
+		builder.append(", version=");
+		builder.append(version);
+		builder.append(", blipId=");
+		builder.append(blipId);
+		builder.append(", parentBlipId=");
+		builder.append(parentBlipId);
+		builder.append(", waveletId=");
+		builder.append(waveletId);
+		builder.append(", waveId=");
+		builder.append(waveId);
+		builder.append(", projectId=");
+		builder.append(projectId);
+		builder.append(", blipLength=");
+		builder.append(blipLength);
+		builder.append(", createdTime=");
+		builder.append(createdTime);
+		builder.append(", properties1=");
+		builder.append(properties1 != null ? properties1.subList(0,
+				Math.min(properties1.size(), maxLen)) : null);
+		builder.append(", properties2=");
+		builder.append(properties2 != null ? properties2.subList(0,
+				Math.min(properties2.size(), maxLen)) : null);
+		builder.append("]");
+		return builder.toString();
 	}
+	
 }

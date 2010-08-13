@@ -195,7 +195,7 @@ public class CreateDigest extends Command {
 		String guideStr = "Make sure to check the ";
 		sba.append(guideStr, styleFontStyle, "italic");
 		String guideLink = "Wave Guide";
-		sba.append(guideLink, "link/wave", "googlewave.com!w+RmL8QZ6ta");
+		sba.append(guideLink, "link/manual", System.getProperty("WAVE_GUIDE_REF"));
 		sba.append(".\n\n\n", "styleFontStyle", "italic");
 		
 		//0
@@ -245,12 +245,12 @@ public class CreateDigest extends Command {
 		//6
 		String q7 = "Q: How do I search for Forum waves?\n";
 		sba.append(q7, styleFontWeight, "bold");
-		String a7_1 = "A: You can use the \"Saved Search\" that was installed along with the Forum. It is located on the \"Navigation\" panel on the top left of the Wave Client under the \"Searches\" category. To remove it - hover with the mouth over the search and then choose the \"delete\" option.\n\n";
+		String a7_1 = "A: You can use the \"Saved Search\" that was installed along with the Forum. It is located on the \"Navigation\" panel on the top left of the Wave Client under the \"Searches\" category. To remove it - hover with the mouse over the search and then choose the \"delete\" option.\n\n";
 		sba.append(a7_1, styleFontStyle, "italic");
 		//7
 		String q8 = "Q: How do I locate the forum Digest wave?\n";
 		sba.append(q8, styleFontWeight, "bold");
-		String a8_1 = "A: You can click on the icon of the forum robot - and then on the \"Website\" link - this will redirect you to the Digest wave.\n\n";
+		String a8_1 = "A: You can scroll up to the top of the post and click on the \"Back to " + projectName + " digest wave\" link which is located at the bottom of the root blip.  Another option is to click on the icon of the forum robot - and then on the \"Website\" link - this will redirect you to the Digest wave.\n\n";
 		sba.append(a8_1, styleFontStyle, "italic");
 		//8
 		String q2 = "Q: Who is the Forum owner?\n";
@@ -266,7 +266,7 @@ public class CreateDigest extends Command {
 		sba.append(a3_2, "link/wave", System.getProperty("DIGESTBOTTY_DIGEST_LINK"));
 		String a3_3 = " and check if you can find your answer.";
 		sba.append(a3_3, styleFontStyle, "italic");
-		String a3_4 = " Also, you are welcome to install the DigestBotty Forum ";
+		String a3_4 = " Or, install the DigestBotty Forum ";
 		sba.append(a3_4, styleFontStyle, "italic");
 		String a3_5 = "here";
 		sba.append(a3_5, "link/wave", System.getProperty("DIGESTBOTTY_FORUM_FAQ_LINK"));
@@ -374,7 +374,7 @@ public class CreateDigest extends Command {
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 		
 		String titleStr = projectName + " Digest Wave";
-		newWavelet.getRootBlip().append(titleStr +"\n");
+		newWavelet.setTitle(titleStr);
 		BlipContentRefs.range(newWavelet.getRootBlip(), 1, titleStr.length()+1).annotate("style/fontSize","2em");
 		BlipContentRefs.range(newWavelet.getRootBlip(), 1, projectName.length()+1).annotate("style/fontWeight","bold");
 		String gadgetUrl = System.getProperty("CLICK_GADGET_URL");

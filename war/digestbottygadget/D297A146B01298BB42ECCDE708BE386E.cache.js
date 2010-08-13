@@ -1,4 +1,4 @@
-(function(){var $gwt_version = "2.0.4";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $strongName = '25F50A3B83932757D5FECD66A4CD944A';var $stats = $wnd.__gwtStatsEvent ? function(a) {return $wnd.__gwtStatsEvent(a);} : null;var $sessionId = $wnd.__gwtStatsSessionId ? $wnd.__gwtStatsSessionId : null;$stats && $stats({moduleName:'digestbottygadget',sessionId:$sessionId,subSystem:'startup',evtGroup:'moduleStartup',millis:(new Date()).getTime(),type:'moduleEvalStart'});function qj(){}
+(function(){var $gwt_version = "2.0.4";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $strongName = 'D297A146B01298BB42ECCDE708BE386E';var $stats = $wnd.__gwtStatsEvent ? function(a) {return $wnd.__gwtStatsEvent(a);} : null;var $sessionId = $wnd.__gwtStatsSessionId ? $wnd.__gwtStatsSessionId : null;$stats && $stats({moduleName:'digestbottygadget',sessionId:$sessionId,subSystem:'startup',evtGroup:'moduleStartup',millis:(new Date()).getTime(),type:'moduleEvalStart'});function qj(){}
 function pj(){}
 function oj(){}
 function nj(){}
@@ -1438,7 +1438,7 @@ function Mn(a,b){if(a.H){throw Jbb(new Gbb,pnb)}wn(b);Sm(a,b.N);a.H=b;yn(b,a)}
 function RR(a){if(a!=null&&(a.tM==pkb||a.tI==2)){throw jbb(new hbb)}return a}
 function v7(a){if(!a.b||!a.d.g){throw shb(new qhb)}a.b=false;return a.c=a.d.g}
 function _eb(a){if(a.b>=a.d.Mb()){throw shb(new qhb)}return a.d.gc(a.c=a.b++)}
-function bk(a){a.b=new nM;a.P(new Mk);a.Q(new Zk);a.O(new Ujb);Ej(a);return a}
+function bk(a){a.b=new nM;a.O(new Ujb);a.P(new Mk);a.Q(new Zk);Ej(a);return a}
 function I5(){I5=pkb;G5=L5(new J5,ayb);L5(new J5,_xb);H5=L5(new J5,oxb)}
 function U0(a){T0();N0(a,(vE(),$doc).createElement(pxb));a.N[enb]=qxb;return a}
 function Bcb(a,b){if(!(b!=null&&OR(b.tI,1))){return false}return String(a)==b}

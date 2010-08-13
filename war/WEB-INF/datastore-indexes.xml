@@ -23,7 +23,24 @@
   <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
         <property name="projectId" direction="asc"/>
         <property name="createdTime" direction="asc"/>
-  </datastore-index>    
+  </datastore-index>  
+   <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
+   		 <property name="projectId" direction="asc"/>
+        <property name="waveId" direction="asc"/>
+        <property name="blipId" direction="asc"/>
+         <property name="version" direction="asc"/>
+  </datastore-index>  
+   <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
+        <property name="waveId" direction="asc"/>
+        <property name="blipId" direction="asc"/>
+         <property name="version" direction="desc"/>
+  </datastore-index> 
+<datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
+   		 <property name="projectId" direction="asc"/>
+        <property name="waveId" direction="asc"/>
+        <property name="blipId" direction="asc"/>
+         <property name="version" direction="desc"/>
+  </datastore-index> 
   
   <datastore-index kind="Tag" ancestor="false" source="auto">
         <property name="projectId" direction="asc"/>

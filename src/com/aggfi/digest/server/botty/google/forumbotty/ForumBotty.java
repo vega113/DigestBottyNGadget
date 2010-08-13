@@ -201,10 +201,6 @@ protected void actOnBottyAdded(String projectId,
 		  LOG.log(Level.SEVERE, "actOnBottyAdded:Missing proxy-for project id");
 		  return;
 	  }
-	  if (isNotifyProxy(proxyFor)) {
-		  processNotifyProxy(wavelet,proxyFor,modifiedBy);
-		  return;
-	  }
 
 	  // If this is from the "*-digest" proxy, skip processing.
 	  if (isDigestWave(proxyFor)) {
@@ -286,7 +282,20 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		entry = forumPostDao.syncTags(projectId, entry, wavelet);
 		addEntry2DigestWave(entry);
 		forumPostDao.save(entry);
-
+		//check if the wave was imported. if so - import the blips
+		Map<String,Blip> blips2Import = wavelet.getBlips();
+		Set<String> keys = blips2Import.keySet();
+		BlipSubmitedDao blipSubmitedDao = injector.getInstance(BlipSubmitedDao.class);
+		for(String key : keys){
+			Blip blip2Import = blips2Import.get(key);
+			String waveId = blip2Import.getWaveId().getDomain() + "!" + blip2Import.getWaveId().getId();
+			String blipId = blip2Import.getBlipId();
+			long version = blip2Import.getVersion();
+			BlipSubmitted blipSubmitted = blipSubmitedDao.getBlipByWaveIdBlipIdVersion(projectId,waveId, blipId, version);
+			if(blipSubmitted == null){
+				saveBlipSubmitted(blip2Import.getCreator(), blip2Import, projectId);
+			}
+		}
 	}
 	
 //	forumPostDao.save(entry);
@@ -298,7 +307,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
   }
 
   @Override
-  @Capability(contexts = {Context.ALL})
+  @Capability(contexts = {Context.ROOT, Context.SELF})
   public void onBlipSubmitted(BlipSubmittedEvent event) {
 	  LOG.warning("Entering onBlipSubmitted");
 	  if(event.getBlip() == null || event.getBlip().getContent() == null || event.getBlip().getContent().length()  < 2){
@@ -338,7 +347,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
     ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
 
   //here is the place to save blipSubmitted
-    saveBlipSubmitted(event, projectId);
+    saveBlipSubmitted(event.getModifiedBy(), event.getBlip(), projectId);
     
     //check if there's link to Digest Wave in the Root Blip, if one missing add it with annotation.
 	  if(wavelet.getRootBlip() != null){
@@ -369,22 +378,17 @@ protected void addBack2Digest2RootBlip(Wavelet wavelet, String projectId,
 			  rootBlipRef.insert(lineStr);
 			  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
 			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
-//			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/wave","googlewave.com!w+iB1ilrZkwc","style/fontSize", "8pt",backtodigestAnnotationName,"done");
 			  rootBlipRef = rootBlip.at(rootBlip.getContent().length());
 			  rootBlipRef.insert(baList, back2digestWaveStr);
-			 
-//			  submitWavelet(wavelet);
-			  LOG.info("updated addBack2Digest2RootBlip " + rootBlip.getContent());
+			  LOG.fine("updated addBack2Digest2RootBlip " + rootBlip.getContent());
 		  }
 		  
 	  }
 }
 
-public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
+private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	try{
-		   Blip blip = event.getBlip();
 		    String creator = blip.getCreator();
-		    String modifier = event.getModifiedBy();
 			String replytoCreator = blip.getParentBlip() != null ? blip.getParentBlip().getCreator() : null;
 			List<String> contributors = blip.getContributors();
 			List<String> replytoContributors = blip.getParentBlip() != null ? blip.getParentBlip().getContributors() : null;
@@ -457,7 +461,6 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
 			  }
 		  } catch (IOException e) {
 			  LOG.log(Level.SEVERE, "",e);
-			  throw new RuntimeException(e);
 		  }  
 		  if(entry.getDigestBlipId() != null){
 			  LOG.log(Level.INFO, "Created new entry in DIGEST_WAVE with: " + blip.getContent() + ", blipId: " + entry.getDigestBlipId());
@@ -469,8 +472,7 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
   }
   
   private void updateEntryInDigestWave(ForumPost entry) {
-//	  LOG.entering(this.getClass().getName(), "updateEntryInDigestWave", entry);
-	  LOG.log(Level.INFO, "updateEntryInDigestWave", entry);
+	  LOG.entering(this.getClass().getName(), "updateEntryInDigestWave", entry);
 	  try{
 		  Wavelet digestWavelet = null;
 		  ExtDigestDao extDigestDao = injector.getInstance(ExtDigestDao.class);
@@ -571,59 +573,6 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
     }
   }
 
-  private void processNotifyProxy(Wavelet wavelet,String projectId, String modifiedBy ) {
-
-    projectId = projectId.replace("-notify", "");
-
-    FormElement radioGroup = new FormElement(ElementType.RADIO_BUTTON_GROUP);
-    String groupLabel = "frequency";
-    radioGroup.setName(groupLabel);
-    
-
-    String userId = modifiedBy;
-    UserNotification userNotification = userNotificationDao.getUserNotification(userId);
-    if (userNotification != null) {
-      radioGroup.setValue(userNotification.getNotificationType().toString());
-    }
-
-    FormElement radioNone = new FormElement(ElementType.RADIO_BUTTON);
-    radioNone.setName("none");
-    radioNone.setValue(groupLabel);
-
-    FormElement radioDaily = new FormElement(ElementType.RADIO_BUTTON);
-    radioDaily.setName("daily");
-    radioDaily.setValue(groupLabel);
-
-    FormElement radioWeekly = new FormElement(ElementType.RADIO_BUTTON);
-    radioWeekly.setName("weekly");
-    radioWeekly.setValue(groupLabel);
-
-    wavelet.setTitle("How often would you like to receive digest from " + projectId + "?");
-    Blip rootBlip = wavelet.getRootBlip();
-
-    rootBlip.append(new Line());
-
-    rootBlip.append(radioGroup);
-
-    rootBlip.append(radioNone);
-    rootBlip.append("none");
-    rootBlip.append(new Line());
-
-    rootBlip.append(radioDaily);
-    rootBlip.append("daily");
-    rootBlip.append(new Line());
-
-    rootBlip.append(radioWeekly);
-    rootBlip.append("weekly");
-    rootBlip.append(new Line());
-    rootBlip.append(new Line());
-
-    FormElement frequencySubmit = new FormElement(ElementType.BUTTON);
-    frequencySubmit.setName("frequencySubmit");
-    frequencySubmit.setValue("submit");
-
-    rootBlip.append(frequencySubmit);
-  }
 
   private String getServerName() {
     return System.getProperty("APP_DOMAIN");
@@ -647,9 +596,6 @@ public void saveBlipSubmitted(BlipSubmittedEvent event, String projectId) {
   @Override
   protected ParticipantProfile getCustomProfile(String name) {
 	  LOG.fine("requested profile for: " + name);
-	  //-----------------
-	  //work around to get the profile updated //FIXME - remove
-	  //----------------------------
 	  List<ExtDigest> digests = null;
 	  ParticipantProfile profile = null;
 	  Object o = cache.get(name);

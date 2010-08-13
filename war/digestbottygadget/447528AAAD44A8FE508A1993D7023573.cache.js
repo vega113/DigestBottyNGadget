@@ -1,4 +1,4 @@
-(function(){var $gwt_version = "2.0.4";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $strongName = 'A15F7B4A447152070D0DA53CCE744CC1';var $stats = $wnd.__gwtStatsEvent ? function(a) {return $wnd.__gwtStatsEvent(a);} : null;var $sessionId = $wnd.__gwtStatsSessionId ? $wnd.__gwtStatsSessionId : null;$stats && $stats({moduleName:'digestbottygadget',sessionId:$sessionId,subSystem:'startup',evtGroup:'moduleStartup',millis:(new Date()).getTime(),type:'moduleEvalStart'});function qj(){}
+(function(){var $gwt_version = "2.0.4";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $strongName = '447528AAAD44A8FE508A1993D7023573';var $stats = $wnd.__gwtStatsEvent ? function(a) {return $wnd.__gwtStatsEvent(a);} : null;var $sessionId = $wnd.__gwtStatsSessionId ? $wnd.__gwtStatsSessionId : null;$stats && $stats({moduleName:'digestbottygadget',sessionId:$sessionId,subSystem:'startup',evtGroup:'moduleStartup',millis:(new Date()).getTime(),type:'moduleEvalStart'});function qj(){}
 function pj(){}
 function oj(){}
 function nj(){}
@@ -1449,7 +1449,7 @@ function Mn(a,b){if(a.J){throw Obb(new Lbb,unb)}wn(b);Sm(a,b.P);a.J=b;yn(b,a)}
 function A7(a){if(!a.b||!a.d.g){throw xhb(new vhb)}a.b=false;return a.c=a.d.g}
 function efb(a){if(a.b>=a.d.Ob()){throw xhb(new vhb)}return a.d.ic(a.c=a.b++)}
 function IC(a){GC();a.e=UC(new SC,a);ZC(new XC,a);a.b=[];a.f=[];a.c=[];return a}
-function bk(a){a.b=new rM;a.R(new Mk);a.S(new Zk);a.Q(new Zjb);Ej(a);return a}
+function bk(a){a.b=new rM;a.Q(new Zjb);a.R(new Mk);a.S(new Zk);Ej(a);return a}
 function Tdb(e,a,b){var c,d=e.f;a=qob+a;a in d?(c=d[a]):++e.e;d[a]=b;return c}
 function _E(a){var b=a.button;if(b==1){return 4}else if(b==2){return 2}return 1}
 function QM(a,b){var c;c=KN((b.kc(),b.b.getTimezoneOffset()));return RM(a,b,c)}

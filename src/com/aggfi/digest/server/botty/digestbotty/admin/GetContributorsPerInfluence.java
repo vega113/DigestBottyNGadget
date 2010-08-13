@@ -1,6 +1,7 @@
 package com.aggfi.digest.server.botty.digestbotty.admin;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +41,7 @@ public class GetContributorsPerInfluence extends Command {
   private static final int ONE_DAY = 60 * 60 * 24 * 1000;
   
   private Cache cache;
+  private Cache cacheDailyInfluence;
   private BlipSubmitedDao blipSubmitedDao = null;
   private Util util = null;
   
@@ -51,6 +53,10 @@ public class GetContributorsPerInfluence extends Command {
     	Map<String, Integer> props = new HashMap<String, Integer>();
         props.put(GCacheFactory.EXPIRATION_DELTA, 30);
         cache = CacheManager.getInstance().getCacheFactory().createCache(props);
+        
+        Map<String, Integer> props1 = new HashMap<String, Integer>();
+        props1.put(GCacheFactory.EXPIRATION_DELTA, 60*60*24*32);
+        cacheDailyInfluence = CacheManager.getInstance().getCacheFactory().createCache(props);
     } catch (CacheException e) {
         LOG.log(Level.SEVERE,"cache init",e);
     }
@@ -59,11 +65,11 @@ public class GetContributorsPerInfluence extends Command {
   Map<String,BlipSubmitted> blipContributionMap = new HashMap<String, BlipSubmitted>();
   Map<String,Double> contributorsInfluenceMap = new HashMap<String,Double>();
   Map<String,Double> blipsInfluenceMap = new HashMap<String,Double>();
-  Set<String> blipsIdSet = new LinkedHashSet<String>();
-  Map<String,Double> contributorsFreqMap = new HashMap<String, Double>();
-  Map<String,Double> contributorsReplyComplementaryProbMap = new HashMap<String, Double>();
+  
+  
 
-  @Override
+  @SuppressWarnings("unchecked")
+@Override
   public JSONObject execute() throws JSONException {  
 	  LOG.entering(GetContributorsPerInfluence.class.getName(), "execute", this.getParams());
     String projectId = this.getParam("projectId");
@@ -95,15 +101,55 @@ public class GetContributorsPerInfluence extends Command {
         target.setMinutes(0);
         target.setSeconds(0);
         
-        Date startDate = new Date(target.getTime() - (ONE_DAY * durationDays));
-        
-        LOG.info("before getBlipsFromDate");
-        List<BlipSubmitted> blipsList = blipSubmitedDao.getBlipsFromDate(projectId, startDate);
-        LOG.info("after getBlipsFromDate, size:" + blipsList.size());
+        Date todayDate = new Date();
+        todayDate.setHours(0);
+        todayDate.setMinutes(0);
+        todayDate.setSeconds(0);
         
        
         
-        ArrayList<BlipDataSortHelper> blipDataSortHelperlist = calcInfluenceFromBlips(blipsList);
+       //go over durationDays and calculate influence per this day
+        Map<String,BlipDataSortHelper> blipDataSortHelper4AllPeriodMap = new HashMap<String,BlipDataSortHelper>();
+        for(int i=durationDays; i>=0; i--){ //for each day - get influence form cache - or calculate
+        	 Date startDate = new Date(target.getTime() - (ONE_DAY * i));
+        	 Object o1 = cacheDailyInfluence.get("blipDataSortHelper4TargetDayMap" + startDate.getTime()); //try to get it from cache
+        	 Map<String,BlipDataSortHelper> blipDataSortHelper4TargetDayMap = null;
+        	 if(o1 != null && startDate.getTime() != todayDate.getTime()){ //if today - calculate anyway
+				blipDataSortHelper4TargetDayMap = (Map<String,BlipDataSortHelper>)o1;
+        		 for(String key : blipDataSortHelper4TargetDayMap.keySet()){
+        			 BlipDataSortHelper blipDataSortHelper4TargetDay = blipDataSortHelper4TargetDayMap.get(key);
+        			 BlipDataSortHelper blipDataSortHelper4AllPeriod = blipDataSortHelper4AllPeriodMap.get(key);
+        			 if(blipDataSortHelper4AllPeriod == null){
+        				 blipDataSortHelper4AllPeriodMap.put(blipDataSortHelper4TargetDay.getParticipantId(),blipDataSortHelper4TargetDay);
+        			 }else{
+        				 blipDataSortHelper4AllPeriod.setInfluence(blipDataSortHelper4AllPeriod.getInfluence() + blipDataSortHelper4TargetDay.getInfluence());
+        			 }
+        		 }
+        	 }else{
+        		 blipDataSortHelper4TargetDayMap = new HashMap<String, GetContributorsPerInfluence.BlipDataSortHelper>();
+        		 List<BlipSubmitted> blipsList = blipSubmitedDao.getBlipsDuringDate(projectId, startDate);
+        		 ArrayList<BlipDataSortHelper> blipDataSortHelper4TargetDayList = calcInfluenceFromBlips(blipsList);//calculate
+        		 
+        		 for(BlipDataSortHelper blipDataSortHelper4TargetDay : blipDataSortHelper4TargetDayList){
+        			 BlipDataSortHelper blipDataSortHelper4AllPeriod = blipDataSortHelper4AllPeriodMap.get(blipDataSortHelper4TargetDay.getParticipantId());
+        			 if(blipDataSortHelper4AllPeriod == null){
+        				 blipDataSortHelper4AllPeriodMap.put(blipDataSortHelper4TargetDay.getParticipantId(),blipDataSortHelper4TargetDay);
+        			 }else{
+        				 blipDataSortHelper4AllPeriod.setInfluence(blipDataSortHelper4AllPeriod.getInfluence() + blipDataSortHelper4TargetDay.getInfluence());
+        			 }
+        			 blipDataSortHelper4TargetDayMap.put(blipDataSortHelper4TargetDay.getParticipantId(),blipDataSortHelper4TargetDay);
+        		 }
+        		 cacheDailyInfluence.put("blipDataSortHelper4TargetDayMap" + startDate.getTime(), blipDataSortHelper4TargetDayMap);
+        	 }
+        	
+             
+        }
+        ArrayList<BlipDataSortHelper> blipDataSortHelperlist = new ArrayList<GetContributorsPerInfluence.BlipDataSortHelper>();
+        for(String key : blipDataSortHelper4AllPeriodMap.keySet()){
+        	BlipDataSortHelper blipDataSortHelper4AllPeriod = blipDataSortHelper4AllPeriodMap.get(key);
+        	blipDataSortHelperlist.add(blipDataSortHelper4AllPeriod);
+        }
+    	Collections.sort(blipDataSortHelperlist);
         
         StringBuilder sb = new StringBuilder();
         int counter = 0;
@@ -136,12 +182,52 @@ protected ArrayList<BlipDataSortHelper> calcInfluenceFromBlips(
 		blipContributionMap.put(blipSubmitted.getBlipId(), blipSubmitted);
 		contributorsInfluenceMap.put(blipSubmitted.getCreator(), 0.0);
 		blipsInfluenceMap.put(blipSubmitted.getBlipId(),  0.0);
+	}
+
+	//	calcComplimentaryReplyProb4Contributor(blipsList);
+
+	Set<String> blipsIdSet = new LinkedHashSet<String>();
+	for(BlipSubmitted blipSubmitted  : blipsList){
+		if(blipsIdSet.contains(blipSubmitted.getBlipId()) && blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
+			continue; //count every blip only once for creator
+		}else if(blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
+			blipsIdSet.add(blipSubmitted.getBlipId());
+		}
+		if(!blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){ //if someone edited blip of creator - creator scores half a point
+			double influence = contributorsInfluenceMap.get(blipSubmitted.getCreator());
+			Double complementaryReplyProbOfContributor = retrComplimentaryReplyProb4Contributor(blipSubmitted.getCreator());
+			if(complementaryReplyProbOfContributor == null){
+				LOG.warning("no reply prob for: " +blipSubmitted.getCreator() );
+			}
+			complementaryReplyProbOfContributor = complementaryReplyProbOfContributor == null ? 0.5 : complementaryReplyProbOfContributor;
+			contributorsInfluenceMap.put(blipSubmitted.getCreator(), influence + 0.5*(0.5 + complementaryReplyProbOfContributor.doubleValue()));
+		}
+		String childBlipId = blipSubmitted.getBlipId();
+		String parentBlipId = blipSubmitted.getParentBlipId();
+		assignInfluencePoints(childBlipId,parentBlipId, 1.0);
+
+	}
+	ArrayList<BlipDataSortHelper> blipDataSortHelperlist = new ArrayList<GetContributorsPerInfluence.BlipDataSortHelper>(contributorsInfluenceMap.size());
+	for(String key : contributorsInfluenceMap.keySet()){
+		BlipDataSortHelper blipDataSortHelper = new BlipDataSortHelper(key);
+		blipDataSortHelper.setInfluence(contributorsInfluenceMap.get(key));
+		blipDataSortHelperlist.add(blipDataSortHelper);
+	}
+	return blipDataSortHelperlist;
+}
+
+protected  Map<String,Double> calcComplimentaryReplyProb4Contributor(
+		List<BlipSubmitted> blipsList) {
+	Map<String,Double> contributorsFreqMap = new HashMap<String, Double>();
+	  Map<String,Double> contributorsReplyComplementaryProbMap = new HashMap<String, Double>();
+	for(BlipSubmitted blipSubmitted  : blipsList){
 		if(contributorsFreqMap.get(blipSubmitted.getCreator()) == null){
 			contributorsFreqMap.put(blipSubmitted.getCreator(), 1.0);
 		}else{
 			contributorsFreqMap.put(blipSubmitted.getCreator(), contributorsFreqMap.get(blipSubmitted.getCreator()) + 1.0);
 		}
 	}
+	
 	int i = 0;
 	double[] observations = new double[contributorsFreqMap.size()];
 	for(String key : contributorsFreqMap.keySet()){
@@ -161,36 +247,12 @@ protected ArrayList<BlipDataSortHelper> calcInfluenceFromBlips(
 	}catch (Exception e) {
 		LOG.warning(e.getMessage());
 	}
-	
-	
-	for(BlipSubmitted blipSubmitted  : blipsList){
-		if(blipsIdSet.contains(blipSubmitted.getBlipId()) && blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
-			continue; //count every blip only once for creator
-		}else if(blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){
-			blipsIdSet.add(blipSubmitted.getBlipId());
-		}
-		if(!blipSubmitted.getModifier().equals(blipSubmitted.getCreator())){ //if someone edited blip of creator - creator scores half a point
-			double influence = contributorsInfluenceMap.get(blipSubmitted.getCreator());
-			Double complementaryReplyProbOfContributor = contributorsReplyComplementaryProbMap.get(blipSubmitted.getCreator());
-		  if(complementaryReplyProbOfContributor == null){
-			  LOG.warning("no reply prob for: " +blipSubmitted.getCreator() );
-		  }
-		  complementaryReplyProbOfContributor = complementaryReplyProbOfContributor == null ? 1 : complementaryReplyProbOfContributor;
-			contributorsInfluenceMap.put(blipSubmitted.getCreator(), influence + 0.5*(1+complementaryReplyProbOfContributor.doubleValue()));
-		}
-		String childBlipId = blipSubmitted.getBlipId();
-		String parentBlipId = blipSubmitted.getParentBlipId();
-		assignInfluencePoints(childBlipId,parentBlipId, 1.0);
-		
-	}
-	ArrayList<BlipDataSortHelper> blipDataSortHelperlist = new ArrayList<GetContributorsPerInfluence.BlipDataSortHelper>(contributorsInfluenceMap.size());
-	for(String key : contributorsInfluenceMap.keySet()){
-		BlipDataSortHelper blipDataSortHelper = new BlipDataSortHelper(key);
-		blipDataSortHelper.setInfluence(contributorsInfluenceMap.get(key));
-		blipDataSortHelperlist.add(blipDataSortHelper);
-	}
-	Collections.sort(blipDataSortHelperlist);
-	return blipDataSortHelperlist;
+	return contributorsReplyComplementaryProbMap;
+}
+
+protected Double retrComplimentaryReplyProb4Contributor(String contributorId) {
+//	return contributorsReplyComplementaryProbMap.get(blipSubmitted.getCreator());
+	return null; //TODO should take from cache
 }
   
   private void assignInfluencePoints(String childBlipId,String parentBlipId, double influencePerLevel) {
@@ -204,18 +266,19 @@ protected ArrayList<BlipDataSortHelper> calcInfluenceFromBlips(
 		  contributorsInfluenceMap.put(creator, contributorInfluenceValue + influencePerLevel);
 		  
 		  double blipInfluenceValue = blipsInfluenceMap.get(parentBlipId);
-		  Double complementaryReplyProbOfContributor = contributorsReplyComplementaryProbMap.get(creator);
+		  Double complementaryReplyProbOfContributor = retrComplimentaryReplyProb4Contributor(creator);
 		  if(complementaryReplyProbOfContributor == null){
 			  LOG.warning("no reply prob for: " +creator );
 		  }
-		  complementaryReplyProbOfContributor = complementaryReplyProbOfContributor == null ? 1 : complementaryReplyProbOfContributor;
-		  blipsInfluenceMap.put(parentBlipId, blipInfluenceValue + influencePerLevel*(1+complementaryReplyProbOfContributor.doubleValue()));
+		  complementaryReplyProbOfContributor = complementaryReplyProbOfContributor == null ? 0.5 : complementaryReplyProbOfContributor;
+		  blipsInfluenceMap.put(parentBlipId, blipInfluenceValue + influencePerLevel*(0.5 + complementaryReplyProbOfContributor.doubleValue()));//if contributor is more active than average - reduce from influence
 		  
 		  assignInfluencePoints(parentBlipSubmitted.getBlipId(), parentBlipSubmitted.getParentBlipId(), influencePerLevel/2);
 	  }
   }
 
-private class BlipDataSortHelper implements Comparable<BlipDataSortHelper>{
+@SuppressWarnings("serial")
+private class BlipDataSortHelper implements Comparable<BlipDataSortHelper>, Serializable{
 	  public BlipDataSortHelper(String participantId){
 		  this.participantId = participantId;
 		  influence = 0;
