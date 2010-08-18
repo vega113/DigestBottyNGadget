@@ -1,0 +1,4 @@
+application: digestbotty
+version: beta025
+runtime: python
+api_version: 1

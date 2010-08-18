@@ -1,5 +1,6 @@
 package com.aggfi.digest.server.botty.digestbotty.model;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -12,7 +13,6 @@ import com.google.gson.annotations.Expose;
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class BlipSubmitted{
 
-	@SuppressWarnings("unused")
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	@Expose
@@ -68,6 +68,10 @@ public class BlipSubmitted{
 	@Persistent
 	@Expose
 	private long createdTime;
+	
+	@Persistent
+	@Expose
+	private Date lastUpdated;
 
 	@Persistent
 	@Expose
@@ -97,8 +101,15 @@ public class BlipSubmitted{
 		this.projectId = projectId;
 		this.blipLength = blipLength;
 		this.createdTime = createdTime;
+		this.lastUpdated = new Date(createdTime);
 		this.properties1 = properties1;
 		this.properties2 = properties2;
+	}
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 	public String getCreator() {
 		return creator;
@@ -225,6 +236,8 @@ public class BlipSubmitted{
 		builder.append(blipLength);
 		builder.append(", createdTime=");
 		builder.append(createdTime);
+		builder.append(", lastUpdated=");
+		builder.append(lastUpdated);
 		builder.append(", properties1=");
 		builder.append(properties1 != null ? properties1.subList(0,
 				Math.min(properties1.size(), maxLen)) : null);

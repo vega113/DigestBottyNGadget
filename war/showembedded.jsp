@@ -145,7 +145,7 @@ _gaq.push(['_trackPageview']);
 
 <script type="text/javascript">
 function linkClicked(){
-	var url = "http://" + "<%= request.getServerName() + ":8888" %>" + "/showembedded?id=googlewave.com!w+KNw8wPWXA";
+	var url = "http://" + "<%= request.getServerName() %>" + "/showembedded?id=googlewave.com!w+KNw8wPWXA";
 	try{
 		window.location.href = url;
 	//_trackEvent("/embed", "clickAd");

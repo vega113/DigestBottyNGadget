@@ -15,4 +15,6 @@ public interface BlipSubmitedDao {
 
 	public abstract BlipSubmitted getBlipByWaveIdBlipIdVersion(String projectId, String waveId, String blipId, long version);
 
+	public abstract List<BlipSubmitted> getBlipsDuringPeriod(String projectId, Date fromDate,Date toDate);
+
 }

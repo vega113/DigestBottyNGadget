@@ -41,6 +41,6 @@
   </system-properties>
   <precompilation-enabled>false</precompilation-enabled>
 	<admin-console>
-		<page name="Appstats" url="/stats" />
+		<page name="Appstats" url="http://digestbotty/appspot.com/appstats" />
 	</admin-console>
 </appengine-web-app>

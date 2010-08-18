@@ -127,8 +127,6 @@ public class ForumBotty extends AbstractRobot {
         LOG.log(Level.SEVERE,"cache init",e);
     }
 
-
-    initOauth();
   }
   
   public ForumBotty(){
@@ -369,7 +367,7 @@ protected void addBack2Digest2RootBlip(Wavelet wavelet, String projectId,
 			  String back2digestWaveStr = " Back to " + forumName + " digest wave";
 			  int strLen = back2digestWaveStr.length();
 			  String lineStr = "\n\n_";
-			  for(int i = 0; i< strLen+ (int)Math.ceil(0.15*strLen); i++){
+			  for(int i = 0; i< strLen+ (int)Math.ceil(0.1*strLen); i++){
 				  lineStr += "_";
 			  }
 			  LOG.info("content: " + rootBlip.getContent());
@@ -388,6 +386,7 @@ protected void addBack2Digest2RootBlip(Wavelet wavelet, String projectId,
 
 private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	try{
+			
 		    String creator = blip.getCreator();
 			String replytoCreator = blip.getParentBlip() != null ? blip.getParentBlip().getCreator() : null;
 			List<String> contributors = blip.getContributors();
@@ -399,8 +398,9 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 			String waveId = blip.getWaveId().getDomain()+"!"+blip.getWaveId().getId();
 			long blipLength = blip.getContent().length();
 			long createdTime = blip.getLastModifiedTime();
-			BlipSubmitted blipSubmitted = new BlipSubmitted(creator, replytoCreator, modifier, contributors, replytoContributors, version, blipId, parentBlipId, waveletId, waveId, projectId, blipLength, createdTime, null, null);
 			BlipSubmitedDao blipSubmitedDao = injector.getInstance(BlipSubmitedDao.class);
+			BlipSubmitted blipSubmitted = null;
+			blipSubmitted = new BlipSubmitted(creator, replytoCreator, modifier, contributors, replytoContributors, version, blipId, parentBlipId, waveletId, waveId, projectId, blipLength, createdTime, null, null);
 			blipSubmitedDao.save(blipSubmitted);
 	   }catch(Exception e){
 		   LOG.warning(e.getMessage());
