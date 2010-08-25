@@ -43,6 +43,11 @@ public class ForumPost {
   private Date created = null;
   @Persistent
   @Expose
+  private int rootBlipsWithoutAdCount = 0;
+  
+
+@Persistent
+  @Expose
   private Set<String> tags = new HashSet<String>();
   @Persistent
   @Expose
@@ -53,13 +58,15 @@ public class ForumPost {
   @Persistent
   @Expose
   private int blipCount = 0;
+  @Persistent
   @Expose
   private Text firstBlipContent = null;
+  
 
   public ForumPost(String domain, Wavelet wavelet) {
-    this.domain = domain;
+    this.domain = wavelet.getWaveId().getDomain();
     this.waveId = wavelet.getWaveId().getId();
-    this.id = domain + "!" + waveId;
+    this.id = domain + "!" + wavelet.getWaveId().getId();
     this.creator = wavelet.getCreator();
     this.lastUpdated = new Date();
     this.created = new Date();
@@ -180,5 +187,13 @@ public Text getFirstBlipContent() {
 
 public void setFirstBlipContent(Text firstBlipContent) {
 	this.firstBlipContent = firstBlipContent;
+}
+
+public int getRootBlipsWithoutAdCount() {
+	return rootBlipsWithoutAdCount;
+}
+
+public void setRootBlipsWithoutAdCount(int rootBlipsWithoutAdCount) {
+	this.rootBlipsWithoutAdCount = rootBlipsWithoutAdCount;
 }
 }

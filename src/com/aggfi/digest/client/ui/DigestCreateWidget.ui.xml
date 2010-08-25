@@ -16,9 +16,23 @@
 					<g:HorizontalPanel>
 						<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
 							<g:HorizontalPanel>
-								<g:HTML ui:field="isPublicQuestion"></g:HTML>
-								<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
-								<g:Image resource='{res.tooltip}' title='{constants.isPublicQuestionTtl}' ui:field="imgIsPublicCheckBox"/>
+								<g:VerticalPanel>
+									<g:HorizontalPanel>
+										<g:HTML ui:field="isPublicQuestion"></g:HTML>
+										<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
+										<g:Image resource='{res.tooltip}' title='{constants.isPublicQuestionTtl}'
+											ui:field="imgIsPublicCheckBox" />
+									</g:HorizontalPanel>
+
+									<g:HorizontalPanel>
+										<g:Label ui:field="isAdsEnabledQuestion" text='{constants.isAdsEnabledQuestion}'></g:Label>
+										<g:CheckBox ui:field="isAdsEnabledBox" checked="true"></g:CheckBox>
+										<g:Image resource='{res.tooltip}'
+											title='{constants.isAdsEnabledQuestionTtl}'
+											ui:field="imgIsAdsEnabledCheckBox" />
+									</g:HorizontalPanel>
+
+								</g:VerticalPanel>
 								<g:HTML width='30px'></g:HTML>
 								<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
 								<g:DecoratorPanel>

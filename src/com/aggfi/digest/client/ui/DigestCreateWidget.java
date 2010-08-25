@@ -8,7 +8,7 @@ import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.model.JsDigest;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
-import com.aggfi.digest.client.utils.DigestUtils;
+import com.vegalabs.general.client.utils.VegaUtils;
 import com.aggfi.digest.shared.FieldVerifier;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
@@ -18,16 +18,12 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
@@ -42,7 +38,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.HTMLTable.ColumnFormatter;
-import com.google.gwt.user.client.ui.HTMLTable.RowFormatter;
 import com.google.inject.Inject;
 
 /**
@@ -68,10 +63,15 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	@UiField
 	CheckBox isPublicBox;
 	@UiField
+	CheckBox isAdsEnabledBox;
+	
+	@UiField
 	HTML isPublicQuestion;
 	
 	@UiField
 	Image imgIsPublicCheckBox;
+	
+	private VegaUtils vegaUtils;
 
 	private Runnable onDigestCreateWidgetLoad;
 	
@@ -85,17 +85,18 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		
 		@Override
 		public void onClick(ClickEvent event) {
-			DigestUtils.getInstance().dismissAlert();
+			vegaUtils.dismissAlert();
 		}
 	}
 
 
 	@Inject
-	public DigestCreateWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
+	public DigestCreateWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService, final VegaUtils vegaUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
+		this.vegaUtils = vegaUtils;
 		
 		initCreateGadgetFlexTbl(createGadgetFlexTbl,constants,resources);
 		submitBtn.setText(constants.submitBtnStr());
@@ -109,10 +110,10 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			public void onClick(ClickEvent event) {
 				try{
 					Log.debug("click on submitBtn");
-					JsDigest digest = initExtDigestFromFields(createGadgetFlexTbl,isPublicBox);
+					JsDigest digest = initExtDigestFromFields(createGadgetFlexTbl,isPublicBox,isAdsEnabledBox);
 					FieldVerifier.areValidDigestFields(digest,messages,constants);
 					encodeDigest(digest);
-					DigestUtils.getInstance().showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
+					vegaUtils.showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
 					try {
 						digestService.createDigest(digest, new AsyncCallback<JSONValue>() {
 							
@@ -128,33 +129,33 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 									//cannot happen
 									throw new AssertionError ("No message body in create digest - it cannot happen!");
 								}
-								DigestUtils.getInstance().dismissStaticMessage();
+								vegaUtils.dismissStaticMessage();
 								outMessage = outMessage.substring(1).substring(0, outMessage.length()-2); //workaround to remove ""
-								DigestUtils.getInstance().showSuccessMessage(outMessage, 8);
-								DigestUtils.getInstance().recordPageView("/createTab/forumCreationSuccess");
+								vegaUtils.showSuccessMessage(outMessage, 8);
+								vegaUtils.reportPageview("/createTab/forumCreationSuccess");
 							}
 							
 							@Override
 							public void onFailure(Throwable caught) {
-								DigestUtils.getInstance().dismissAllStaticMessages();
-								DigestUtils.getInstance().alert(caught.getMessage());
+								vegaUtils.dismissAllStaticMessages();
+								vegaUtils.alert(caught.getMessage());
 							}
 						});
 					} catch (RequestException e) {
-						DigestUtils.getInstance().dismissStaticMessage();
-						DigestUtils.getInstance().alert(e.getMessage());
+						vegaUtils.dismissStaticMessage();
+						vegaUtils.alert(e.getMessage());
 						Log.error("",e);
 					}
 				}catch(IllegalArgumentException e){
 					Log.error("should be verification error!",e);
-					DigestUtils.getInstance().dismissStaticMessage();
-					DigestUtils.getInstance().alert(e.getMessage());
+					vegaUtils.dismissStaticMessage();
+					vegaUtils.alert(e.getMessage());
 				}catch(Exception e){
 					Log.error("",e);
-					DigestUtils.getInstance().dismissStaticMessage();
-					DigestUtils.getInstance().alert(e.getMessage());
+					vegaUtils.dismissStaticMessage();
+					vegaUtils.alert(e.getMessage());
 				}
-				DigestUtils.getInstance().reportEvent("/createTab/click","createForum", DigestUtils.getInstance().retrUserId(), 1);
+				vegaUtils.reportEvent("/createTab/click","createForum", vegaUtils.retrUserId(), 1);
 			}
 
 			
@@ -281,11 +282,11 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			boolean isMessageShown = false;
 			@Override
 			public void onClick(ClickEvent event) {
-				DigestUtils.getInstance().dismissAlert();
+				vegaUtils.dismissAlert();
 				if(!isMessageShown){
 					isMessageShown = true;
-//					DigestUtils.getInstance().showStaticMessage(constants.googlegroupsWarningStr());
-					DigestUtils.getInstance().alert(constants.googlegroupsWarningStr());
+//					vegaUtils.showStaticMessage(constants.googlegroupsWarningStr());
+					vegaUtils.alert(constants.googlegroupsWarningStr());
 				}
 				
 			}
@@ -298,7 +299,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		String[] exampleStrs = {constants.ownerExmpl(),constants.authorExmpl(),constants.projectIdExmpl(),constants.domainExmpl(),
 					constants.digestNameExmpl(),constants.descriptionExmpl(),constants.installerThumbnailUrlExmpl(),constants.robotThumbnailUrlExmpl(),constants.forumSiteUrlExmpl(),
 					constants.googlegroupsIdExmpl()};
-		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler();
+		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler(vegaUtils);
 		imgIsPublicCheckBox.addMouseDownHandler(mouseDownHandler);
 		for(int i = 0; i < row; i++){
 			if(i%2 == 0){
@@ -336,16 +337,16 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 			
 			@Override
 			public void run() {
-				ownerVal.setText(DigestUtils.getInstance().retrUserId());
-				authorVal.setText(DigestUtils.getInstance().retrUserName());
+				ownerVal.setText(vegaUtils.retrUserId());
+				authorVal.setText(vegaUtils.retrUserName());
 				domainVal.setText("googlewave.com");
-				DigestUtils.getInstance().adjustHeight();
-				DigestUtils.getInstance().recordPageView("/createTab/");
+				vegaUtils.adjustHeight();
+				vegaUtils.reportPageview("/createTab/");
 			}
 		};
 	}
 
-	public static JsDigest initExtDigestFromFields(FlexTable w,CheckBox box) throws IllegalArgumentException{
+	public static JsDigest initExtDigestFromFields(FlexTable w,CheckBox box, CheckBox isAdsBox) throws IllegalArgumentException{
 		
 		int row=0;
 		String ownerId = getStrFromTxtBox(row,w).trim(); row++;
@@ -360,6 +361,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		String forumSiteUrl = getStrFromTxtBox(row,w).trim();row++;
 		String googlegroupsId = getStrFromTxtBox(row,w).trim();row++;
 		boolean isPublicOnCreate = box.getValue();
+		boolean isAdsEnabled = isAdsBox.getValue();
 		
 		String ownerStr = ownerId.substring(0, ownerId.indexOf("@"));
 		String domainStr = ownerId.substring(ownerStr.length()+1, ownerStr.length()+1 + ownerId.substring(ownerStr.length()+1).indexOf("."));
@@ -376,6 +378,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		digest.setForumSiteUrl(forumSiteUrl);
 		digest.setGooglegroupsId(googlegroupsId.equals("@googlegroups.com")? "" : googlegroupsId.toLowerCase());
 		digest.setPublicOnCreate(isPublicOnCreate);
+		digest.setAdsEnabled(isAdsEnabled);
 		return digest;
 	}
 	

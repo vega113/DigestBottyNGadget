@@ -77,6 +77,12 @@ public class ExtDigest  extends Digest{
 	@Persistent
 	@Expose
 	private int maxDigests;
+	@Persistent
+	@Expose
+	private String lastDigestBlipId = null;
+	@Persistent
+	@Expose
+	private String firstDigestBlipId = null;
 
 	public String getDescription() {
 		return description;
@@ -170,6 +176,22 @@ public class ExtDigest  extends Digest{
 				+ ", getCreated()=" + getCreated() + ", getDomain()="
 				+ getDomain() + ", getId()=" + getId() + ", getWaveId()="
 				+ getWaveId() + "]";
+	}
+
+	public String getLastDigestBlipId() {
+		return lastDigestBlipId;
+	}
+
+	public void setLastDigestBlipId(String lastDigestBlipId) {
+		this.lastDigestBlipId = lastDigestBlipId;
+	}
+
+	public String getFirstDigestBlipId() {
+		return firstDigestBlipId;
+	}
+
+	public void setFirstDigestBlipId(String firstDigestBlipId) {
+		this.firstDigestBlipId = firstDigestBlipId;
 	}
 
 }

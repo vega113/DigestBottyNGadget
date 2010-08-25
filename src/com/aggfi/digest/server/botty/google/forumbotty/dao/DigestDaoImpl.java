@@ -39,9 +39,11 @@ public class DigestDaoImpl implements DigestDao {
       query.declareImports("import java.util.Date");
       query.setOrdering("created desc");
 
-      List<Digest> digests = (List<Digest>) query.execute();
+      @SuppressWarnings("unchecked")
+	List<Digest> digests = (List<Digest>) query.execute();
       if (digests.size() > 0) {
-        return pm.detachCopy(digests.get(0));
+    	  digests = (List<Digest>) pm.detachCopyAll(digests);
+        return digests.get(0);
       }
     } finally {
       pm.close();

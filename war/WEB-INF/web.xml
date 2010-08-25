@@ -93,23 +93,23 @@
     </user-data-constraint>
   </security-constraint>  
   --> 
-  <servlet>
-       <servlet-name>appstats</servlet-name>
-       <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
-   </servlet>
-   <servlet-mapping>
-       <servlet-name>appstats</servlet-name>
-       <url-pattern>/appstats/*</url-pattern>
-   </servlet-mapping>
-
-   <security-constraint>
-       <web-resource-collection>
-           <url-pattern>/appstats/*</url-pattern>
-       </web-resource-collection>
-       <auth-constraint>
-           <role-name>admin</role-name>
-       </auth-constraint>
-   </security-constraint>
+<!--  <servlet>-->
+<!--       <servlet-name>appstats</servlet-name>-->
+<!--       <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>-->
+<!--   </servlet>-->
+<!--   <servlet-mapping>-->
+<!--       <servlet-name>appstats</servlet-name>-->
+<!--       <url-pattern>/appstats/*</url-pattern>-->
+<!--   </servlet-mapping>-->
+<!---->
+<!--   <security-constraint>-->
+<!--       <web-resource-collection>-->
+<!--           <url-pattern>/appstats/*</url-pattern>-->
+<!--       </web-resource-collection>-->
+<!--       <auth-constraint>-->
+<!--           <role-name>admin</role-name>-->
+<!--       </auth-constraint>-->
+<!--   </security-constraint>-->
   <welcome-file-list>
 		<welcome-file>AboutDigestBotty.html</welcome-file>
 	</welcome-file-list>

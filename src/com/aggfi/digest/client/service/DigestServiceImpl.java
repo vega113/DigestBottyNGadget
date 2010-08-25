@@ -3,7 +3,7 @@ package com.aggfi.digest.client.service;
 import java.util.Date;
 import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.model.JsDigest;
-import com.aggfi.digest.client.request.RequestService;
+import com.vegalabs.general.client.request.RequestService;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONObject;
@@ -52,7 +52,7 @@ public class DigestServiceImpl implements DigestService {
 		requestService.makeRequest(url,callback,params);
 	}
 	@Override
-	public void retrPostCountsT(String projectId,
+	public void retrPostCounts(String projectId,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
 		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
@@ -237,5 +237,63 @@ public class DigestServiceImpl implements DigestService {
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);
 		
+	}
+	
+	@Override
+	public void retrBlipsCounts(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException{
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_BLIPS_COUNT"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+
+
+	@Override
+	public void retrBlipsPerContributor(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_BLIPS_PER_CONTRIBUTOR"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+
+
+	@Override
+	public void retrContributorsPerInfluence(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_CONTRIBUTORS_PER_INFLUENCE"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+
+
+
+	@Override
+	public void retrPostsByActivity(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_POST_BY_ACTIVITY"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
 	}
 }

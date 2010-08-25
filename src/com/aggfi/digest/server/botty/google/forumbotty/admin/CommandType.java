@@ -7,6 +7,8 @@ import com.aggfi.digest.server.botty.digestbotty.admin.GetAllForumIds;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsCount;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsPerContributor;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetContributorsPerInfluence;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetNextPubPerProject;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetPostByActivity;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
 import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
@@ -46,6 +48,8 @@ public enum CommandType {
   GET_BLIPS_COUNT(GetBlipsCount.class),
   GET_BLIPS_PER_CONTRIBUTOR(GetBlipsPerContributor.class),
   GET_CONTRIBUTORS_PER_INFLUENCE(GetContributorsPerInfluence.class),
+  GET_POST_BY_ACTIVITY(GetPostByActivity.class),
+  GET_NEXT_PUB_PER_PROJECT(GetNextPubPerProject.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

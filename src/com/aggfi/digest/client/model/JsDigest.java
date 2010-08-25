@@ -142,6 +142,11 @@ public class JsDigest extends JavaScriptObject implements IExtDigest {
 	public final native void setDomain(String domain) /*-{
 		this.domain = domain;
 	}-*/;
+
+	@Override
+	public final native void setAdsEnabled(boolean isAdsEnabled) /*-{
+		this.isAdsEnabled = isAdsEnabled;
+	}-*/;
 	
 	
 	

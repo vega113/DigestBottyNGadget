@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
 import com.aggfi.digest.server.botty.google.forumbotty.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
+import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.google.gson.annotations.Expose;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
@@ -27,8 +30,11 @@ import com.google.wave.api.Blip;
 import com.google.wave.api.BlipContentRefs;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.Installer;
+import com.google.wave.api.JsonRpcResponse;
 import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
+import com.google.wave.api.JsonRpcConstant.ParamsProperty;
+import com.google.wave.api.impl.DocumentModifyAction.BundledAnnotation;
 
 public class CreateDigest extends Command {
 
@@ -56,12 +62,19 @@ public class CreateDigest extends Command {
 		ExtDigest extDigest = null;
 		Output output = null;
 		try{
+			
 	    	extDigest = initDigest(this);
 	    	String digestWaveDomain = extDigest.getDomain();
 	    	String projectId = extDigest.getProjectId();
 	    	String projectName= extDigest.getName();
 	    	String ownerId = extDigest.getOwnerId();
 	    	String googlegroups = extDigest.getGooglegroupsId();
+	    	
+	    	
+	    	boolean isAdsEnabled = Boolean.parseBoolean(getParam("isAdsEnabled"));
+			AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+			adminConfig.setAdsEnabled(isAdsEnabled);
+			adminConfigDao.save(adminConfig);
 	    	
 	    	String senderId = this.getParam("senderId");
 	        if (senderId != null && !senderId.equals(extDigest.getOwnerId())) {
@@ -112,7 +125,7 @@ public class CreateDigest extends Command {
 			String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
 			
 			//now create FAQ wave for the newly created Digest
-			createFAQ(extDigest,digestWaveId,isPublicOnCreate);
+			createFAQ(extDigest,wavelet,isPublicOnCreate);
 			
 			String message = "Success! You have " + (numOfOwnerDigests + 1) + " forum(s). Maximum number of Forums per owner is: " + System.getProperty("MAX_DIGESTS") + 
 			". Forum wave was created and you were added as participant.";
@@ -140,7 +153,7 @@ public class CreateDigest extends Command {
 	/*
 	 * add first post in the Digest - with installer
 	 */
-	private void createFAQ(ExtDigest extDigest, String digestWaveId, boolean isPublicOnCreate) throws IOException {
+	private void createFAQ(ExtDigest extDigest, Wavelet digestWavelet, boolean isPublicOnCreate) throws IOException {
 		String domain = extDigest.getDomain();
     	String projectId = extDigest.getProjectId();
     	String projectName= extDigest.getName();
@@ -173,12 +186,25 @@ public class CreateDigest extends Command {
 		
 		newWavelet.getRootBlip().append(new Installer(installerUrl)); 
 		
-		appendFaq2blip(projectName,projectId, digestWaveId,ownerId, newWavelet);
+		appendFaq2blip(projectName,projectId, digestWavelet.getWaveId().getDomain() + "!" + digestWavelet.getWaveId().getId() ,ownerId, newWavelet);
 		
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 	
 		
-		robot.submit(newWavelet, rpcUrl);
+		List<JsonRpcResponse> submitResponseList = robot.submit(newWavelet, rpcUrl);
+		  boolean rootBlipFound = false;
+		  for(JsonRpcResponse res : submitResponseList){
+			  Map<ParamsProperty, Object> dataMap = res.getData();
+			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
+				  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+				  robot.addOrUpdateLinkToBottomForDigestWave(digestWavelet, blipId);
+				  rootBlipFound = true;
+			  }
+		  }
+		if(!rootBlipFound){
+			LOG.warning("BLip id of root blip not found in createFAQ - can't add to bottom link!");
+		}
+
 		
 		//add this post to the digest
 		robot.addOrUpdateDigestWave(projectId, newWavelet, null, null);
@@ -213,7 +239,7 @@ public class CreateDigest extends Command {
 		String a4_1 = "A: You can go to the \"" + projectName + "\" ";
 		sba.append(a4_1, styleFontStyle, "italic");
 		String a4_2 = "Digest wave";
-		sba.append(a4_2, "link/wave", "googlewave.com!" + digestWaveId);
+		sba.append(a4_2, "link/wave",  digestWaveId);
 		String a4_3 = " and then \"Follow\" it.\n\n";
 		sba.append(a4_3, styleFontStyle, "italic");
 		//3
@@ -381,6 +407,13 @@ public class CreateDigest extends Command {
 		Gadget gadget = new Gadget(gadgetUrl);
 		gadget.setProperty("waveid", newWavelet.getWaveletId().getId());
 		newWavelet.getRootBlip().append(gadget);
+		newWavelet.getRootBlip().append("\n");
+		if(adminConfigDao.getAdminConfig(projectId).isAdsEnabled()){
+			String adGadgetUrl = "http://" + System.getProperty("APP_DOMAIN") +  ".appspot.com/serveAd?id="+projectId;
+			Gadget adGadget = new Gadget(adGadgetUrl);
+			gadget.setProperty("projectId", projectId);
+			newWavelet.getRootBlip().append(adGadget);
+		}
 		robot.submit(newWavelet, rpcUrl);
 		return newWavelet;
 	}

@@ -1,17 +1,4 @@
-<!-- Indices written at Wed, 18 Aug 2010 09:16:06 UTC -->
+<!-- Indices written at Tue, 24 Aug 2010 08:44:36 UTC -->
 
-<datastore-indexes>
+<datastore-indexes/>
 
-    <!-- Used 75 times in query history -->
-    <datastore-index kind="ForumPost" ancestor="false" source="auto">
-        <property name="projectId" direction="asc"/>
-        <property name="created" direction="asc"/>
-    </datastore-index>
-
-    <!-- Used 60 times in query history -->
-    <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">
-        <property name="projectId" direction="asc"/>
-        <property name="createdTime" direction="asc"/>
-    </datastore-index>
-
-</datastore-indexes>

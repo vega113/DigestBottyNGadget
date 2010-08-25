@@ -42,7 +42,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-codec-1.4.jar" sourcepath="war/WEB-INF/lib/commons-codec-1.4-src.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gson.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/oauth-20090617.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/cobogwave-gadget-1.1.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/colt.jar">
@@ -57,6 +56,8 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-model-20100802.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-robot-api-20100802.jar" sourcepath="war/WEB-INF/lib/wave-robot-api-20100802-src.jar"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/VegaGeneral"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/VegaWaveFeatures"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

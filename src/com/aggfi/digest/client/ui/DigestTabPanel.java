@@ -2,7 +2,8 @@ package com.aggfi.digest.client.ui;
 import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
-import com.aggfi.digest.client.utils.DigestUtils;
+import com.allen_sauer.gwt.log.client.Log;
+import com.vegalabs.general.client.utils.VegaUtils;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
@@ -14,12 +15,10 @@ public class DigestTabPanel extends DecoratedTabPanel {
 	protected DigestConstants constants;
 	protected GlobalResources resources;
 	protected DigestCreateWidget digestCreateWidget;
-	
-	
 	@Inject
 	public DigestTabPanel(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources,
 			DigestCreateWidget digestCreateWidget, final DigestReportWidget digestReportWidget,
-			final DigestAdminWidget digestAdminWidget, final DigestAboutWidget digestAboutWidget){
+			final DigestAdminWidget digestAdminWidget, final DigestAboutWidget digestAboutWidget, final VegaUtils utils){
 		this.messages = messages;
 		this.constants = constants;
 		this.resources = resources;
@@ -37,13 +36,22 @@ public class DigestTabPanel extends DecoratedTabPanel {
 			
 			@Override
 			public void onSelection(SelectionEvent<Integer> event) {
-				DigestUtils.getInstance().dismissAllStaticMessages();
+				if(utils == null){
+					Log.warn("utils is null");
+				}else{
+					Log.info("utils is not null");
+				}
+				try{
+					utils.dismissAllStaticMessages();
+				}catch(Exception e){
+					Log.warn("problem with messages? " + e.getMessage());
+				}
 				int selected = event.getSelectedItem();
 				Object currentSelectedWidget = getWidget(selected);
 				if(currentSelectedWidget != null && currentSelectedWidget instanceof RunnableOnTabSelect){
 					RunnableOnTabSelect runnableOnTabSelect = ((RunnableOnTabSelect)currentSelectedWidget);
 					if(runnableOnTabSelect.getRunOnTabSelect() != null){
-						DigestUtils.getInstance().recordPageView("/digestbotty/" + runnableOnTabSelect.getName());
+						utils.reportPageview("/digestbotty/" + runnableOnTabSelect.getName());
 						runnableOnTabSelect.getRunOnTabSelect().run();
 					}
 				}

@@ -78,7 +78,7 @@ public class BlipSubmitedDaoImpl implements BlipSubmitedDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public BlipSubmitted getBlipByWaveIdBlipIdVersion(String projectId, String waveId, String blipId, long version) {
+	public BlipSubmitted getBlipByWaveIdBlipIdVersion(String projectId, String waveId, String blipId) {
 
 		PersistenceManager pm = pmf.getPersistenceManager();
 
@@ -86,16 +86,13 @@ public class BlipSubmitedDaoImpl implements BlipSubmitedDao{
 		List<BlipSubmitted> entries = new ArrayList<BlipSubmitted>();
 		try {
 			Query query = pm.newQuery(BlipSubmitted.class);
-			query.declareParameters("String waveId_, String blipId_, long version_, String projectId_");
+			query.declareParameters("String waveId_, String blipId_, String projectId_");
 			
-			String filters = "waveId == waveId_ && blipId == blipId_ && version == version_ && projectId == projectId_";    
-			if(version < 0){
-				filters = "waveId == waveId_ && blipId == blipId_ && version > -1 && projectId == projectId_";  
-			}
+			String filters = "waveId == waveId_ && blipId == blipId_  && projectId == projectId_";    
 			query.setFilter(filters);
 			query.setOrdering("version desc");
-			entries = (List<BlipSubmitted>) query.execute(waveId, blipId, version);   
-			LOG.info("getBlipByWaveIdBlipIdVersion. waveId: " + waveId + ", blipId:" + blipId + ", version: " + version);
+			entries = (List<BlipSubmitted>) query.execute(waveId, blipId, projectId);   
+			LOG.info("getBlipByWaveIdBlipIdVersion. waveId: " + waveId + ", blipId:" + blipId + ", projectId: " + projectId);
 		} finally {
 			pm.close();
 		}

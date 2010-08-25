@@ -109,4 +109,6 @@ public interface IExtDigest extends IDigest{
 
 	public abstract void setPublicOnCreate(boolean isPublicOnCreate);
 
+	public void setAdsEnabled(boolean isAdsEnabled);
+
 }

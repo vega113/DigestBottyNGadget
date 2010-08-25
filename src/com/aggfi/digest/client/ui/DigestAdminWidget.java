@@ -6,14 +6,13 @@ import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
-import com.aggfi.digest.client.utils.DigestUtils;
+import com.vegalabs.general.client.utils.VegaUtils;
 import com.aggfi.digest.shared.FieldVerifier;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONArray;
@@ -22,8 +21,6 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
@@ -102,11 +99,12 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	DigestMessages messages;
 	DigestConstants constants;
 	GlobalResources resources;
-	DigestUtils digestUtils = null;
+	private VegaUtils vegaUtils;
+	
 	public Runnable runOnTabSelect;
 	
 	@Inject
-	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
+	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService, final VegaUtils vegaUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
 		initImageHandler();
 		hideAll();
@@ -116,7 +114,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		this.messages = messages;
 		this.constants = constants;
 		this.resources = resources;
-		this.digestUtils = DigestUtils.getInstance();
+		this.vegaUtils = vegaUtils;
 
 
 		onProjectsLoadCallback = new Runnable() { //will be run after projectIds list is loaded
@@ -130,7 +128,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					hideAll();
 					String msg = messages.loadingForumsMsg(constants.adminTabStr(), getProjectName());
 					Log.debug(msg);
-					digestUtils.showStaticMessage(msg);
+					vegaUtils.showStaticMessage(msg);
 					digestService.retrAdminConfig(projectId, new AsyncCallback<JSONValue>() {
 
 						@Override
@@ -140,27 +138,27 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
 							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
 							Log.debug("dismissMessage");
-							digestUtils.dismissStaticMessage();
+							vegaUtils.dismissStaticMessage();
 						}
 
 						@Override
 						public void onFailure(Throwable caught) {
 							Log.error("", caught);
-							digestUtils.adjustHeight();
-							digestUtils.dismissStaticMessage();
-							digestUtils.alert(caught.getMessage());
+							vegaUtils.adjustHeight();
+							vegaUtils.dismissStaticMessage();
+							vegaUtils.alert(caught.getMessage());
 						}
 					});
 				} catch (RequestException e) {
-					digestUtils.dismissStaticMessage();
-					digestUtils.alert(e.getMessage());
+					vegaUtils.dismissStaticMessage();
+					vegaUtils.alert(e.getMessage());
 					Log.error("", e);
 				}
 			}
 		};
 
 		//-------remove default participant
-		removeDefaultParticipantHandler = new RemoveHandler(messages, defaultTagsPanel,onProjectsLoadCallback) {
+		removeDefaultParticipantHandler = new RemoveHandler(messages, defaultTagsPanel,onProjectsLoadCallback, vegaUtils) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -175,7 +173,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					Log.error("", e);
 				}
 				try{
-					DigestUtils.getInstance().reportEvent("/admin/remove","removeDefaultParticipantHandler", getProjectId(), 1);
+					vegaUtils.reportEvent("/admin/remove","removeDefaultParticipantHandler", getProjectId(), 1);
 				}catch (Exception e) {
 					Log.error("", e);
 				}
@@ -184,7 +182,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		//end remove default participant
 
 		//-------remove default tag
-		removeDefaultTagHandler = new RemoveHandler(messages, defaultTagsPanel,onProjectsLoadCallback) {
+		removeDefaultTagHandler = new RemoveHandler(messages, defaultTagsPanel,onProjectsLoadCallback, vegaUtils) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -199,7 +197,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					Log.error("", e);
 				}
 				try{
-					DigestUtils.getInstance().reportEvent("/admin/remove","removeDefaultTagHandler", getProjectId(), 1);
+					vegaUtils.reportEvent("/admin/remove","removeDefaultTagHandler", getProjectId(), 1);
 				}catch (Exception e) {
 					Log.error("", e);
 				}
@@ -208,7 +206,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		//end remove default tag
 
 		//-------remove manager
-		removeManagerHandler = new RemoveHandler(messages, managersPanel,onProjectsLoadCallback) {
+		removeManagerHandler = new RemoveHandler(messages, managersPanel,onProjectsLoadCallback, vegaUtils) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -223,7 +221,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					Log.error("", e);
 				}
 				try{
-					DigestUtils.getInstance().reportEvent("/admin/remove","removeManagerHandler", getProjectId(), 1);
+					vegaUtils.reportEvent("/admin/remove","removeManagerHandler", getProjectId(), 1);
 				}catch (Exception e) {
 					Log.error("", e);
 				}
@@ -232,7 +230,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		//end remove manager
 
 		//-------remove auto tag
-		removeAutoTagHandler = new RemoveHandler(messages, autoTagsPanel,onProjectsLoadCallback) {
+		removeAutoTagHandler = new RemoveHandler(messages, autoTagsPanel,onProjectsLoadCallback, vegaUtils) {
 
 			@Override
 			public void onRemove(final AddRemDefLabel widget) {
@@ -244,13 +242,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				String sync = String.valueOf(syncAutoTagCheckBox.getValue());
 				try {
 					String msg = messages.sentRequest2Remove(constants.autoTagging(), tag) + " " + constants.syncStr() + ": " + sync;
-					digestUtils.showStaticMessage(msg);
+					vegaUtils.showStaticMessage(msg);
 					digestService.removeAutoTag(projectId, tag,sync, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
 					Log.error("", e);
 				}
 				try{
-					DigestUtils.getInstance().reportEvent("/admin/remove","removeAutoTagHandler", getProjectId(), 1);
+					vegaUtils.reportEvent("/admin/remove","removeAutoTagHandler", getProjectId(), 1);
 				}catch (Exception e) {
 					Log.error("", e);
 				}
@@ -263,7 +261,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			@Override
 			public void run() {
 				initAdminWidget();
-				DigestUtils.getInstance().adjustHeight();
+				vegaUtils.adjustHeight();
 			}
 		};
 
@@ -271,7 +269,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 
 	private void initAdminWidget() {
 		clearAll();
-		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback);
+		this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback,vegaUtils);
 		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
 		projectSelectWidget.getPrjList().addChangeHandler(new ChangeHandler() {
@@ -280,13 +278,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 				handleOnSelectPrjList(event);
 			}
 		});
-		DigestUtils.getInstance().recordPageView("/adminTab/");
+		vegaUtils.reportPageview("/adminTab/");
 	}
 
 	protected void handleOnSelectPrjList(ChangeEvent event) {
 		clearAll();
 		hideAll();
-		digestUtils.setCurrentDigestId(getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
+		vegaUtils.putToPrivateSate("CurrentDigestId", getProjectId());//need to be done in order to save current digest id, so it will be consistent in all tabs
 		onProjectsLoadCallback.run();
 		
 	}
@@ -333,7 +331,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiHandler("addManagergBtn")
 	protected void addManagerBtnClick(ClickEvent event){
 		if(getProjectId().equals("")){
-			digestUtils.alert(constants.noForumSelectedWarning());
+			vegaUtils.alert(constants.noForumSelectedWarning());
 			return;
 		}
 		final String userId = addManagerBox.getText().trim();
@@ -341,18 +339,18 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(userId, messages, constants.managerWaveIdFieldName());
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.digestManagers(), userId));
+				vegaUtils.showStaticMessage(messages.sentRequest2Add(constants.digestManagers(), userId));
 				digestService.addDigestManager(getProjectId(), userId, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,userId,null,null,managersPanel,addManagerBox,null,removeManagerHandler);
-						digestUtils.dismissStaticMessage();
+						vegaUtils.dismissStaticMessage();
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						digestUtils.alert(caught.getMessage());
+						vegaUtils.alert(caught.getMessage());
 						
 					}
 				});
@@ -363,7 +361,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			digestAlert(e);
 		}
 		try{
-			DigestUtils.getInstance().reportEvent("/admin/add","addManagergBtn", getProjectId(), 1);
+			vegaUtils.reportEvent("/admin/add","addManagergBtn", getProjectId(), 1);
 		}catch (Exception e) {
 			Log.error("", e);
 		}
@@ -373,25 +371,25 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiHandler("addDefaultTagBtn")
 	protected void addDefaultTagBtnClick(ClickEvent event){
 		if(getProjectId().equals("")){
-			digestUtils.alert(constants.noForumSelectedWarning());
+			vegaUtils.alert(constants.noForumSelectedWarning());
 			return;
 		}
 		final String tag = addDefaultTagBox.getText().trim();
 		try{
 			try {
 				FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
-				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.defaultTagsStr(), tag));
+				vegaUtils.showStaticMessage(messages.sentRequest2Add(constants.defaultTagsStr(), tag));
 				digestService.addDefaultTag(getProjectId(), tag, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,tag,null,null,defaultTagsPanel,addDefaultTagBox,null,removeDefaultTagHandler);
-						digestUtils.dismissStaticMessage();
+						vegaUtils.dismissStaticMessage();
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						digestUtils.alert(caught.getMessage());
+						vegaUtils.alert(caught.getMessage());
 						
 					}
 				});
@@ -402,7 +400,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			digestAlert(e);
 		}
 		try{
-			DigestUtils.getInstance().reportEvent("/admin/add","addDefaultTagBtn", getProjectId(), 1);
+			vegaUtils.reportEvent("/admin/add","addDefaultTagBtn", getProjectId(), 1);
 		}catch (Exception e) {
 			Log.error("", e);
 		}
@@ -411,7 +409,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiHandler("addDefaultParticipantBtn")
 	protected void addDefaultParticipantBtnClick(ClickEvent event){
 		if(getProjectId().equals("")){
-			digestUtils.alert(constants.noForumSelectedWarning());
+			vegaUtils.alert(constants.noForumSelectedWarning());
 			return;
 		}
 		final String participantId = addDefaultParticipantBox.getText().trim();
@@ -419,29 +417,29 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(participantId, messages, constants.defaultParticipantWaveIdFieldName());
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.defaultParticipantsStr(), participantId));
+				vegaUtils.showStaticMessage(messages.sentRequest2Add(constants.defaultParticipantsStr(), participantId));
 				digestService.addDefaultParticipant(getProjectId(), participantId, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,null,participantId,null,null,defaultParticipantsPanel,addDefaultParticipantBox,null,removeDefaultParticipantHandler);
-						digestUtils.dismissStaticMessage();
+						vegaUtils.dismissStaticMessage();
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						digestUtils.alert(caught.getMessage());
+						vegaUtils.alert(caught.getMessage());
 						
 					}
 				});
 			} catch (RequestException e) {
-				digestUtils.alert(e.getMessage());
+				vegaUtils.alert(e.getMessage());
 			}
 		}catch(IllegalArgumentException e){
-			digestUtils.alert(e.getMessage());
+			vegaUtils.alert(e.getMessage());
 		}
 		try{
-			DigestUtils.getInstance().reportEvent("/admin/add","addDefaultParticipantBtn", getProjectId(), 1);
+			vegaUtils.reportEvent("/admin/add","addDefaultParticipantBtn", getProjectId(), 1);
 		}catch (Exception e) {
 			Log.error("", e);
 		}
@@ -450,7 +448,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiHandler("addParticipantWavesBtn")
 	protected void addParticipantWavesBtnClick(ClickEvent event){
 		if(getProjectId().equals("")){
-			digestUtils.alert(constants.noForumSelectedWarning());
+			vegaUtils.alert(constants.noForumSelectedWarning());
 			return;
 		}
 		final String participantId = addParticipantWavesBox.getText().trim();
@@ -459,29 +457,29 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			FieldVerifier.verifyProjectId(getProjectId(),messages,constants);
 			FieldVerifier.verifyWaveId(participantId, messages, constants.participantWaveIdFieldName());
 			try {
-				digestUtils.showStaticMessage(messages.sentRequest2Add(constants.setUpParticipantWaves(), participantId));
+				vegaUtils.showStaticMessage(messages.sentRequest2Add(constants.setUpParticipantWaves(), participantId));
 				digestService.addWavesParticipant(getProjectId(), participantId, tagName,new AsyncCallback<JSONValue>() { 
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						addParticipantWavesBox.setText("");
 						addParticipanTagtWavesBox.setText("");
-						digestUtils.dismissStaticMessage();
+						vegaUtils.dismissStaticMessage();
 						int wavesNum = 0;
 						if(result != null && result.isNumber() != null){
 							wavesNum = (int)result.isNumber().doubleValue();
-							digestUtils.showSuccessMessage(messages.add2WavesSuccessMsg(participantId,wavesNum), 8);
+							vegaUtils.showSuccessMessage(messages.add2WavesSuccessMsg(participantId,wavesNum), 8);
 						}else if(result.isString() != null){
-							digestUtils.alert (result.isString().stringValue());//FIXME check why there's no output
+							vegaUtils.alert (result.isString().stringValue());//FIXME check why there's no output
 						}else if(result != null){
-							digestUtils.alert (result.toString());
+							vegaUtils.alert (result.toString());
 						}
 						
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						digestUtils.alert(caught.getMessage());
+						vegaUtils.alert(caught.getMessage());
 						
 					}
 				});
@@ -492,7 +490,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			digestAlert(e);
 		}
 		try{
-			DigestUtils.getInstance().reportEvent("/admin/add","addParticipantWavesBtn", getProjectId(), 1);
+			vegaUtils.reportEvent("/admin/add","addParticipantWavesBtn", getProjectId(), 1);
 		}catch (Exception e) {
 			Log.error("", e);
 		}
@@ -501,7 +499,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiHandler("addAutoTagBtn")
 	protected void addAutoTagClick(ClickEvent event){
 		if(getProjectId().equals("")){
-			digestUtils.alert(constants.noForumSelectedWarning());
+			vegaUtils.alert(constants.noForumSelectedWarning());
 			return;
 		}
 		String isSync = String.valueOf(syncAutoTagCheckBox.getValue());
@@ -517,13 +515,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		try{
 			try {
 				String msg = messages.sentRequest2Add(constants.autoTagging(), tag  +" : " + regex) + " " + constants.syncStr() + ": " + isSync;
-				digestUtils.showStaticMessage(msg);
+				vegaUtils.showStaticMessage(msg);
 				digestService.addAutoTag(getProjectId(), tag, regex,isSync, new AsyncCallback<JSONValue>() {
 					
 					@Override
 					public void onSuccess(JSONValue result) {
 						onAddSuccess(result,constants.tagStr(),tag,constants.regexStr(),regex,autoTagsPanel,addAutoTagNameBox,addAutoTagValBox,removeAutoTagHandler);
-						digestUtils.dismissStaticMessage();
+						vegaUtils.dismissStaticMessage();
 						String successMsg = "";
 						if(result != null){
 							if(result.isNumber() != null){
@@ -534,15 +532,15 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 							}else{
 								successMsg = result.toString();
 							}
-							digestUtils.showSuccessMessage(successMsg, 8);
+							vegaUtils.showSuccessMessage(successMsg, 8);
 						}else{
-							digestUtils.alert("addAutoTagClick->null");
+							vegaUtils.alert("addAutoTagClick->null");
 						}
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						digestUtils.alert(caught.getMessage());
+						vegaUtils.alert(caught.getMessage());
 						
 					}
 				});
@@ -553,7 +551,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			digestAlert(e);
 		}
 		try{
-			DigestUtils.getInstance().reportEvent("/admin/add","addAutoTagBtn", getProjectId(), 1);
+			vegaUtils.reportEvent("/admin/add","addAutoTagBtn", getProjectId(), 1);
 		}catch (Exception e) {
 			Log.error("", e);
 		}
@@ -584,7 +582,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			panel.getParent().setVisible(true);
 			panel.setVisible(true);
 		}
-		digestUtils.adjustHeight();
+		vegaUtils.adjustHeight();
 	}
 	
 	private void initJsonArrayModule(JSONValue result, String jsonFieldName, ComplexPanel panel, RemoveHandler removeHandler) {
@@ -607,11 +605,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			panel.getParent().setVisible(true);
 			panel.setVisible(true);
 		}
-		digestUtils.adjustHeight();
+		vegaUtils.adjustHeight();
 	}
 	
 	public void digestAlert(IllegalArgumentException e) {
-		digestUtils.alert(e.getMessage());
+		vegaUtils.alert(e.getMessage());
 	}
 
 	protected String getProjectId() {
@@ -645,7 +643,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@UiField
 	Image img8;
 	private void initImageHandler(){
-		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler();
+		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler(vegaUtils);
 		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8};
 		for(Image image : images){
 			image.addMouseDownHandler(mouseDownHandler);

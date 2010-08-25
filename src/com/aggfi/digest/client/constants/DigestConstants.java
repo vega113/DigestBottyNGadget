@@ -124,7 +124,8 @@ public interface DigestConstants extends Constants {
 	String waveIdFromExmpl();
 
 	String isPublicQuestion();
-
+	String isAdsEnabledQuestion();
+	String isAdsEnabledQuestionTtl();
 	String isPublicQuestionTtl();
 	
 	String exampleWord();

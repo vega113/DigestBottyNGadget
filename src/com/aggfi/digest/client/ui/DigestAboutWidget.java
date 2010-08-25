@@ -4,14 +4,12 @@ import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
-import com.aggfi.digest.client.utils.DigestUtils;
+import com.vegalabs.general.client.utils.VegaUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -35,6 +33,7 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 	@UiField
 	Anchor discussAnchor;
 	
+	private VegaUtils vegaUtils;
 	
 	private static DigestAboutWidgetUiBinder uiBinder = GWT
 			.create(DigestAboutWidgetUiBinder.class);
@@ -45,8 +44,9 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 
 
 	@Inject
-	public DigestAboutWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService) {
+	public DigestAboutWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService, final VegaUtils vegaUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.vegaUtils = vegaUtils;
 		aboutDigestBottyPnl.setHTML(constants.aboutDigestBottyStr());
 		aboutHelpPnl.setHTML(messages.aboutHlpMsg(resources.tooltip().getURL()));
 		aboutCreatePnl.setHTML(constants.aboutCreateStr());
@@ -56,8 +56,8 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				DigestUtils.getInstance().reportEvent("/aboutTab/click","install", DigestUtils.getInstance().retrUserId(), 1);
-				DigestUtils.getInstance().requestNavigateTo(constants.installDigestBottyUrl(), null);
+				vegaUtils.reportEvent("/aboutTab/click","install", vegaUtils.retrUserId(), 1);
+				vegaUtils.requestNavigateTo(constants.installDigestBottyUrl(), null);
 				event.preventDefault();
 			}
 		});
@@ -66,12 +66,12 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				DigestUtils.getInstance().reportEvent("/aboutTab/click","discuss", DigestUtils.getInstance().retrUserId(), 1);
-				DigestUtils.getInstance().requestNavigateTo(constants.discussDigestBottyUrl(), null);
+				vegaUtils.reportEvent("/aboutTab/click","discuss", vegaUtils.retrUserId(), 1);
+				vegaUtils.requestNavigateTo(constants.discussDigestBottyUrl(), null);
 				event.preventDefault();
 			}
 		});
-		DigestUtils.getInstance().recordPageView("/aboutTab/");
+		vegaUtils.reportPageview("/aboutTab/");
 	}
 	
 
@@ -84,7 +84,7 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 			
 			@Override
 			public void run() {
-				DigestUtils.getInstance().recordPageView("/aboutTab/");
+				vegaUtils.reportPageview("/aboutTab/");
 			}
 		};
 	}

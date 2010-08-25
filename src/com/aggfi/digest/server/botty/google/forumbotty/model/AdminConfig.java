@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import com.google.appengine.api.datastore.Text;
 
 import com.google.gson.annotations.Expose;
 
@@ -47,9 +48,28 @@ public class AdminConfig {
   @Persistent
   private List<String> managers;
 
+  
   @Expose
   @Persistent
   private Date updated;
+  
+  @Expose
+  @Persistent
+  private Date created = null;;
+  @Expose
+  @Persistent
+  Text adsense = null;
+  
+  public Date getCreated() {
+	return created;
+}
+
+@Persistent
+  @Expose
+  private Boolean isAdsEnabled = Boolean.FALSE;
+  public boolean isAdsEnabled() {
+	return isAdsEnabled != null ?  isAdsEnabled.booleanValue() : false;
+  }
 
   @Expose
   @Persistent(serialized = "true", defaultFetchGroup = "true")
@@ -57,13 +77,22 @@ public class AdminConfig {
 
   public AdminConfig() {
     this.updated = new Date();
+    this.created = new Date();
     this.autoTagRegexMap = new HashMap<String, Pattern>();
     this.defaultTags = new ArrayList<String>();
     this.defaultParticipants = new ArrayList<String>();
     this.managers = new ArrayList<String>();
   }
 
-  public AdminConfig(String id) {
+  public void setCreated(Date created) {
+	this.created = created;
+}
+
+public void setAdsEnabled(boolean isAdsEnabled) {
+	this.isAdsEnabled = isAdsEnabled;
+}
+
+public AdminConfig(String id) {
     this.id = id;
     this.updated = new Date();
     this.autoTagRegexMap = new HashMap<String, Pattern>();
@@ -129,4 +158,12 @@ public class AdminConfig {
 
 	    return this.managers;
 	  }
+
+	public Text getAdsense() {
+		return adsense != null ? adsense : new Text("");
+	}
+
+	public void setAdsense(Text adsense) {
+		this.adsense = adsense;
+	}
 }

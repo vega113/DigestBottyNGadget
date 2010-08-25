@@ -1,33 +1,32 @@
 package com.aggfi.digest.client;
 
 
-import com.aggfi.digest.client.inject.DigestGinjector; 
+import com.aggfi.digest.client.inject.DigestGinjector;
 import com.aggfi.digest.client.ui.DigestTabPanel;
-import com.aggfi.digest.client.utils.DigestUtils;
 import com.allen_sauer.gwt.log.client.DivLogger;
 import com.allen_sauer.gwt.log.client.Log;
-//import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.gadgets.client.AnalyticsFeature;
+import org.cobogw.gwt.waveapi.gadget.client.WaveFeature;
+import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
+import com.vegalabs.features.client.feature.minimessages.MiniMessagesFeature;
+import com.vegalabs.features.client.feature.minimessages.NeedsMiniMessages;
+import com.vegalabs.features.client.feature.views.NeedsViews;
+import com.vegalabs.features.client.feature.views.ViewsFeature;
+import com.vegalabs.general.client.objects.GoogleAnalyticsId;
 import com.google.gwt.gadgets.client.DynamicHeightFeature;
 import com.google.gwt.gadgets.client.GoogleAnalyticsFeature;
-import com.google.gwt.gadgets.client.NeedsAnalytics;
 import com.google.gwt.gadgets.client.NeedsDynamicHeight;
 import com.google.gwt.gadgets.client.NeedsGoogleAnalytics;
 import com.google.gwt.gadgets.client.UserPreferences;
-import com.google.gwt.gadgets.client.Gadget.AllowHtmlQuirksMode;
 import com.google.gwt.gadgets.client.Gadget.ModulePrefs;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.gadgets.client.Gadget.AllowHtmlQuirksMode;
 import com.google.gwt.gadgets.client.Gadget.UseLongManifestName;
 
-import org.cobogw.gwt.waveapi.gadget.client.WaveGadget;
-import com.aggfi.digest.client.feature.minimessages.MiniMessagesFeature;
-import com.aggfi.digest.client.feature.minimessages.NeedsMiniMessages;
-import com.aggfi.digest.client.feature.views.NeedsViews;
-import com.aggfi.digest.client.feature.views.ViewsFeature;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.inject.Provider;
 
 
 /**
@@ -43,13 +42,8 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 	@Override
 	protected void init(UserPreferences preferences) {
 		try{
+			waveFeature = getWave();
 			mmFeature.initMiniMessagesFeature();
-			DigestUtils.getInstance().setMiniMessages(mmFeature);
-			DigestUtils.getInstance().setHeight(dhFeature);
-			DigestUtils.getInstance().setAnalytics(analyticsFeature);
-			DigestUtils.getInstance().setViewsFeature(viewsFeature);
-			
-			DigestUtils.getInstance().setWave(getWave());// should be set before UI components will issue requests
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 			DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
 			RootPanel.get().add(new HTML("."));
@@ -69,43 +63,7 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 		timer.scheduleRepeating(800);
 	}
 
-	DynamicHeightFeature dhFeature;
-	@Override
-	public void initializeFeature(DynamicHeightFeature feature) {
-		dhFeature = feature;
-		
-	}
 	
-	private MiniMessagesFeature mmFeature;
-	@Override
-	public void initializeFeature(MiniMessagesFeature feature) {
-		this.mmFeature = feature;
-	}
-	
-	private GoogleAnalyticsFeature analyticsFeature;
-	@Override
-	public void initializeFeature(GoogleAnalyticsFeature analyticsFeature) {
-		this.analyticsFeature = analyticsFeature;
-	}
-	
-	private ViewsFeature viewsFeature;
-	@Override
-	public void initializeFeature(ViewsFeature feature) {
-		this.viewsFeature = feature;
-	}
-	
-	
-	/**
-	 * This is the entry point method.
-	 */
-	/*
-	public void onModuleLoad() {
-		DigestGinjector ginjector = GWT.create(DigestGinjector.class);
-		DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
-	    RootPanel.get("mainPanel").add(widget);
-	    initRemoteLogger(RootPanel.get("logPanel"));
-	}
-	*/
 	public void initRemoteLogger(AbsolutePanel panel){
 		Log.setUncaughtExceptionHandler();
 		if (panel != null) {
@@ -119,7 +77,80 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 	}
 
 
+static WaveFeature waveFeature;
 	
+	static DynamicHeightFeature dhFeature;
+	@Override
+	public void initializeFeature(DynamicHeightFeature feature) {
+		DigestBottyGadget.dhFeature = feature;
+		
+	}
+	
+	static private MiniMessagesFeature mmFeature;
+	@Override
+	public void initializeFeature(MiniMessagesFeature feature) {
+		DigestBottyGadget.mmFeature = feature;
+	}
+	
+	static private ViewsFeature viewsFeature;
+	@Override
+	public void initializeFeature(ViewsFeature feature) {
+		DigestBottyGadget.viewsFeature = feature;
+	}
+	
+	static private GoogleAnalyticsFeature analyticsFeature;
+	@Override
+	public void initializeFeature(GoogleAnalyticsFeature analyticsFeature) {
+		DigestBottyGadget.analyticsFeature = analyticsFeature;
+	}
+	
+	public static class AnalyticsFeatureProvider implements Provider<GoogleAnalyticsFeature>{
+		@Override
+		public GoogleAnalyticsFeature get() {
+			Log.info("Providing AnalyticsFeature");
+			return DigestBottyGadget.analyticsFeature;
+		}
+	}
+	
+	public static class MiniMessagesFeatureProvider implements Provider<MiniMessagesFeature>{
+		@Override
+		public MiniMessagesFeature get() {
+			Log.info("Providing MiniMessagesFeature");
+			return DigestBottyGadget.mmFeature;
+		}
+	}
+	
+	public static class DynamicHeightFeatureProvider implements Provider<DynamicHeightFeature>{
+		@Override
+		public DynamicHeightFeature get() {
+			Log.info("Providing DynamicHeightFeature");
+			return DigestBottyGadget.dhFeature;
+		}
+	}
+	
+	public static class WaveFeatureProvider implements Provider<WaveFeature>{
+		@Override
+		public WaveFeature get() {
+			Log.info("Providing WaveFeature");
+			return DigestBottyGadget.waveFeature;
+		}
+	}
+	
+	public static class ViewsFeatureProvider implements Provider<ViewsFeature>{
+		@Override
+		public ViewsFeature get() {
+			Log.info("Providing ViewsFeature");
+			return DigestBottyGadget.viewsFeature;
+		}
+	}
+	
+	public static class AnalyticsIdFeatureProvider implements Provider<GoogleAnalyticsId>{
+		@Override
+		public GoogleAnalyticsId get() {
+			Log.info("Providing GoogleAnalyticsId");
+			return new GoogleAnalyticsId("UA-13269470-3");
+		}
+	}
 
 
 	

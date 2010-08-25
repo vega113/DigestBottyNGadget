@@ -3,7 +3,6 @@ package com.aggfi.digest.server.botty.google.forumbotty;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -22,7 +21,6 @@ import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheManager;
 import org.waveprotocol.wave.model.id.WaveId;
 import org.waveprotocol.wave.model.id.WaveletId;
-
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
@@ -36,7 +34,6 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
-import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -51,10 +48,8 @@ import com.google.wave.api.Blip;
 import com.google.wave.api.BlipContentRefs;
 import com.google.wave.api.Context;
 import com.google.wave.api.ElementType;
-import com.google.wave.api.FormElement;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.JsonRpcResponse;
-import com.google.wave.api.Line;
 import com.google.wave.api.ParticipantProfile;
 import com.google.wave.api.Wavelet;
 import com.google.wave.api.JsonRpcConstant.ParamsProperty;
@@ -62,17 +57,17 @@ import com.google.wave.api.event.AbstractEvent;
 import com.google.wave.api.event.BlipSubmittedEvent;
 import com.google.wave.api.event.GadgetStateChangedEvent;
 import com.google.wave.api.event.OperationErrorEvent;
-import com.google.wave.api.event.WaveletParticipantsChangedEvent;
 import com.google.wave.api.event.WaveletSelfAddedEvent;
 import com.google.wave.api.impl.DocumentModifyAction.BundledAnnotation;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
 @Singleton
 public class ForumBotty extends AbstractRobot {
-  private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
+  private static final String TO_BOTTOM = "Link to Bottom";
+private static final String BACK_TO_TOP_OF_THIS_DIGEST = "Link to Top";
+private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
   private static final boolean DEBUG_MODE = false;
   
   public static final String SANDBOX_DOMAIN = "wavesandbox.com";
@@ -188,10 +183,39 @@ public class ForumBotty extends AbstractRobot {
 	  actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
 	  
 	  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
+		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+		  if( adminConfig.isAdsEnabled()){
+			  appendAd2Blip(wavelet.getRootBlip(), projectId, false);
+		  }
 		  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
-		  addBack2Digest2RootBlip(wavelet, projectId, wavelet.getRootBlip(),entry);
+		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
+		 
 	  }
-}
+  }
+
+	private void appendAd2Blip(Blip blip, String projectId, boolean isAdReplyBlip) {
+		String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/serveAd?id=" + projectId;
+		//check if blip already contains the add gadget. 
+		Gadget gadget = null;
+		BlipContentRefs gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
+		if(gadgetRef != null){
+			gadget = Gadget.class.cast(gadgetRef.value());
+			if(gadget == null){
+				gadget = new Gadget(gadgetUrl);
+				gadget.setProperty("projectId", projectId);
+				if(isAdReplyBlip){
+					blip = blip.reply(); //TODO should be continueThread instead of reply - but seems it doesn't work
+				}else{
+					blip.append("\n\n");
+				}
+				blip.at(blip.getContent().length()).insert(gadget);
+			}
+		}
+		
+		
+		
+	}
+
 
 protected void actOnBottyAdded(String projectId,
 		String proxyFor, Wavelet wavelet, Blip blip, String modifiedBy) {
@@ -209,15 +233,14 @@ protected void actOnBottyAdded(String projectId,
 		  wavelet.setTitle("DigestBotty [Admin Gadget]");
 		  submitWavelet(wavelet);
 	  }else{
-		// Add default participants
-		  for (String participant : this.adminConfigDao.getAdminConfig(projectId)
-				  .getDefaultParticipants()) {
-			  if(!wavelet.getParticipants().contains(participant)){
-				  wavelet.getParticipants().add(participant);
-			  }
-		  }
-
 		  if (isWorthy(wavelet)) {
+			// Add default participants
+			  for (String participant : this.adminConfigDao.getAdminConfig(projectId)
+					  .getDefaultParticipants()) {
+				  if(!wavelet.getParticipants().contains(participant)){
+					  wavelet.getParticipants().add(participant);
+				  }
+			  }
 			  ForumPost entry = addOrUpdateDigestWave(projectId, wavelet,blip,modifiedBy);
 
 			  for (String contributor : wavelet.getRootBlip().getContributors()) {
@@ -278,21 +301,19 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		entry.setBlipCount(wavelet.getBlips().size());
 		applyAutoTags(blip, projectId);
 		entry = forumPostDao.syncTags(projectId, entry, wavelet);
+		//add to digest wave-------------------
 		addEntry2DigestWave(entry);
+		//-------------------------
 		forumPostDao.save(entry);
 		//check if the wave was imported. if so - import the blips
 		Map<String,Blip> blips2Import = wavelet.getBlips();
 		Set<String> keys = blips2Import.keySet();
-		BlipSubmitedDao blipSubmitedDao = injector.getInstance(BlipSubmitedDao.class);
 		for(String key : keys){
 			Blip blip2Import = blips2Import.get(key);
 			String waveId = blip2Import.getWaveId().getDomain() + "!" + blip2Import.getWaveId().getId();
 			String blipId = blip2Import.getBlipId();
-			long version = blip2Import.getVersion();
-			BlipSubmitted blipSubmitted = blipSubmitedDao.getBlipByWaveIdBlipIdVersion(projectId,waveId, blipId, version);
-			if(blipSubmitted == null){
-				saveBlipSubmitted(blip2Import.getCreator(), blip2Import, projectId);
-			}
+			//save all blips
+			saveBlipSubmitted(blip2Import.getCreator(), blip2Import, projectId);
 		}
 	}
 	
@@ -349,40 +370,49 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
     
     //check if there's link to Digest Wave in the Root Blip, if one missing add it with annotation.
 	  if(wavelet.getRootBlip() != null){
-		  addBack2Digest2RootBlip(wavelet, projectId, wavelet.getRootBlip(),entry);
+		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+		  if( adminConfig.isAdsEnabled()){ 
+			  appendAd2Blip(wavelet.getRootBlip(), projectId, false);
+			  if(entry.getRootBlipsWithoutAdCount() == 5){ //XXX - should be configurable from admin gadget
+				  appendAd2Blip(event.getBlip(), projectId, true);
+				  entry.setRootBlipsWithoutAdCount(0);
+			  }else{
+				  if(event.getBlip().getParentBlipId() == null)
+				  entry.setRootBlipsWithoutAdCount(entry.getRootBlipsWithoutAdCount() +1);
+			  }
+		  }
+		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
+		  try{ 
+			  forumPostDao.save(entry);
+		  }catch(Exception e){
+			  LOG.log(Level.SEVERE,"",e);
+		  }
 	  }
-	 
+	  
    
   }
 
-protected void addBack2Digest2RootBlip(Wavelet wavelet, String projectId,
-		Blip rootBlip, ForumPost entry) {
-	Annotations annotations = rootBlip.getAnnotations();
-	  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
-	  List<Annotation> annotationsList =  annotations.get(backtodigestAnnotationName);
-	  if(annotationsList == null || annotationsList.size() == 0){
-		  List<ExtDigest> digestsList = extDigestDao.retrDigestsByProjectId(projectId);
-		  if(digestsList != null && digestsList.size() > 0 || true){
-			  String forumName = digestsList.size() > 0 ? digestsList.get(0).getName() : "";
-			  String back2digestWaveStr = " Back to " + forumName + " digest wave";
-			  int strLen = back2digestWaveStr.length();
-			  String lineStr = "\n\n_";
-			  for(int i = 0; i< strLen+ (int)Math.ceil(0.1*strLen); i++){
-				  lineStr += "_";
+  protected void addBack2Digest2RootBlip(String projectId,
+			Blip rootBlip, ForumPost entry) {
+		Annotations annotations = rootBlip.getAnnotations();
+		  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
+		  List<Annotation> annotationsList =  annotations.get(backtodigestAnnotationName);
+		  if(annotationsList == null || annotationsList.size() == 0){
+			  List<ExtDigest> digestsList = extDigestDao.retrDigestsByProjectId(projectId);
+			  if(digestsList != null && digestsList.size() > 0 ){
+				  String forumName = digestsList.size() > 0 ? digestsList.get(0).getName() : "";
+				  String back2digestWaveStr = " \nBack to \"" + forumName + "\" digest";
+				  LOG.info("content: " + rootBlip.getContent());
+				  BlipContentRefs rootBlipRef = rootBlip.at(rootBlip.getContent().length());
+				  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
+				  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
+				  rootBlipRef = rootBlip.at(rootBlip.getContent().length());
+				  rootBlipRef.insert(baList, back2digestWaveStr);
+				  LOG.fine("updated addBack2Digest2RootBlip " + rootBlip.getContent());
 			  }
-			  LOG.info("content: " + rootBlip.getContent());
-			  BlipContentRefs rootBlipRef = rootBlip.at(rootBlip.getContent().length());
-			  lineStr +="\n";
-			  rootBlipRef.insert(lineStr);
-			  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
-			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
-			  rootBlipRef = rootBlip.at(rootBlip.getContent().length());
-			  rootBlipRef.insert(baList, back2digestWaveStr);
-			  LOG.fine("updated addBack2Digest2RootBlip " + rootBlip.getContent());
+			  
 		  }
-		  
-	  }
-}
+	}
 
 private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	try{
@@ -440,7 +470,31 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 		  }
 		  String entryTitle = entry.getTitle();
 
-		  Blip blip = digestWavelet.reply("\n");
+		  Blip blip = null; // new 'new' blip
+		  Blip newLastBlip = digestWavelet.reply("\n");// add to this blip link to top and ad if ads for this forum are enabled 
+		  
+		  Map<String,Blip> blips = digestWavelet.getBlips();
+			 
+		  boolean isBottomBlipExists = true;
+		  if(digest.getLastDigestBlipId() != null){
+			  blip = blips.get(digest.getLastDigestBlipId());// find last digest blip - the one with link to top.
+		  }else{
+			  blip = newLastBlip;
+			  newLastBlip =digestWavelet.reply("\n");
+			  isBottomBlipExists = false;
+		  }
+		  
+		  String backToDigestTop = System.getProperty("APP_DOMAIN") + ".appspot.com/backtotop";
+		  String blipRef = "waveid://" + digestWaveDomain + "/" + digestWaveId + "/~/conv+root/" + digestWavelet.getRootBlipId();
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backToDigestTop,"done");
+		  newLastBlip.at(1).insert(baList, BACK_TO_TOP_OF_THIS_DIGEST);
+		  
+		  if (adminConfigDao.getAdminConfig(entry.getProjectId()).isAdsEnabled()){
+			  appendAd2Blip(newLastBlip, entry.getProjectId(),false);
+		  }
+		 
+		 
+		  blip.range(0, blip.getContent().length()).delete();// clean the blip.
 		  StringBuilderAnnotater sba = new StringBuilderAnnotater(blip);
 		  sba.append(entryTitle, StringBuilderAnnotater.LINK_WAVE, entry.getId());
 		  if(entry.getCreator() != null && !"".equals(entry.getCreator())){
@@ -450,15 +504,33 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 		  }
 		  sba.flush2Blip();
 		  try {
-			  LOG.log(Level.FINER, "trying to get newBlipIs fomr JsonRpcResponse");
+			  LOG.log(Level.FINER, "trying to get newBlipIs from JsonRpcResponse");
 			  List<JsonRpcResponse> submitResponseList = submit(digestWavelet, getRpcServerUrl());
+			  boolean isFoundFirstId = false;
 			  for(JsonRpcResponse res : submitResponseList){
 				  Map<ParamsProperty, Object> dataMap = res.getData();
 				  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
-					  entry.setDigestBlipId(String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID)));
-					  break;
+					  //Assumed the id are in order of creation
+					  if(isBottomBlipExists){
+						  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+						  entry.setDigestBlipId(blip.getBlipId());
+						  digest.setLastDigestBlipId(blipId);
+						  addOrUpdateLinkToBottomForDigestWave(digestWavelet, blipId);
+					  }else{
+						  if(!isFoundFirstId){
+							  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+							  entry.setDigestBlipId(blipId);// in case the forum is old - no blip with link to top
+							  isFoundFirstId = true;
+						  }else{
+							  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+							  digest.setLastDigestBlipId(blipId);// new blip with link to post is the one that was last before
+							  addOrUpdateLinkToBottomForDigestWave(digestWavelet, blipId);
+							  break;
+						  }
+					  }
 				  }
 			  }
+			  extDigestDao.save(digest);
 		  } catch (IOException e) {
 			  LOG.log(Level.SEVERE, "",e);
 		  }  
@@ -722,6 +794,38 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 		  LOG.severe(sw.toString());
 	  }
   }
+
+	public void addOrUpdateLinkToBottomForDigestWave(Wavelet digestWavelet,String blipId) throws IOException {
+		Blip rootBlip = digestWavelet.getRootBlip();
+		String backToDigestBottom = System.getProperty("APP_DOMAIN") + ".appspot.com/backtobottom";
+		if(rootBlip.getAnnotations().get(backToDigestBottom) != null){
+			//update
+			List<BundledAnnotation> baList = createToAnnotation(
+					digestWavelet, blipId, backToDigestBottom);
+			  int endPos = rootBlip.getContent().indexOf(TO_BOTTOM);
+			  LOG.info("TO_BOTTOM annotation found, endPos: " + endPos);
+			  rootBlip.range(endPos ,endPos + TO_BOTTOM.length()).delete();
+			  digestWavelet.getRootBlip().at(digestWavelet.getRootBlip().getContent().length()).insert(baList, TO_BOTTOM);
+		}else{
+			//add
+			LOG.warning("no TO_BOTTOM annotation found - inserting new!");
+			  List<BundledAnnotation> baList = createToAnnotation(
+					digestWavelet, blipId, backToDigestBottom);
+			  digestWavelet.getRootBlip().at(digestWavelet.getRootBlip().getContent().length()).insert(baList, "\n" + TO_BOTTOM);
+		}
+		
+		submit(digestWavelet, PREVIEW_RPC_URL);
+		
+
+		
+	}
+
+	public List<BundledAnnotation> createToAnnotation(
+			Wavelet digestWavelet, String blipId, String backToDigestBottom) {
+		String blipRef = "waveid://" + digestWavelet.getWaveId().getDomain() + "/" + digestWavelet.getWaveId().getId() + "/~/conv+root/" + blipId;
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backToDigestBottom,"done");
+		return baList;
+	}
 
   /*
   @Override

@@ -81,8 +81,9 @@ public class ForumPostDaoImpl implements ForumPostDao {
       String filters = "id == id_";
       query.setFilter(filters);
       List<ForumPost> entries = (List<ForumPost>) query.execute(id);
+      entries = (List<ForumPost>) pm.detachCopyAll(entries);
       if (entries.size() > 0) {
-        return pm.detachCopy(entries.get(0));
+        return entries.get(0);
       }
     } finally {
       pm.close();
@@ -102,8 +103,9 @@ public class ForumPostDaoImpl implements ForumPostDao {
       String filters = "id == id_";
       query.setFilter(filters);
       List<ForumPost> entries = (List<ForumPost>) query.execute(domain + "!" + waveId);
+      entries = (List<ForumPost>) pm.detachCopyAll(entries);
       if (entries.size() > 0) {
-        return pm.detachCopy(entries.get(0));
+        return entries.get(0);
       }
     } finally {
       pm.close();
@@ -217,6 +219,27 @@ public class ForumPostDaoImpl implements ForumPostDao {
     }
     return entries;
   }
+  
+  @SuppressWarnings("unchecked")
+@Override
+  public List<ForumPost> getForumPostsFromDate(String projectId, Date fromDate) {
+	    PersistenceManager pm = pmf.getPersistenceManager();
+	    List<ForumPost> entries = new ArrayList<ForumPost>();
+
+	    try {
+	      Query query = pm.newQuery(ForumPost.class);
+	      query.declareImports("import java.util.Date");
+	      query.declareParameters("String projectId_, Date fromDate_");
+	      query.setFilter("projectId == projectId_ && lastUpdated >= fromDate_");
+
+	      entries = (List<ForumPost>) query.execute(projectId,fromDate);
+	     
+	      entries = (List<ForumPost>) pm.detachCopyAll(entries);
+	    } finally {
+	      pm.close();
+	    }
+	    return entries;
+	  }
 
   @Override
   public List<ForumPost> getRecentlyUpdated(String projectId, int limit) {

@@ -24,6 +24,8 @@ public interface ForumPostDao {
 
   public abstract ForumPost syncTags(String projectId, ForumPost entry, Wavelet wavelet);
 
-  int getPostCount(String projectId, Date target);
+  public int getPostCount(String projectId, Date target);
+
+  public abstract List<ForumPost> getForumPostsFromDate(String projectId, Date fromDate);
 
 }

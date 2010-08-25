@@ -41,6 +41,7 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 		    	  }else if(extDigests.size() == 0){
 		    		  LOG.severe("Oops! no Digest for this project id: " + projectId);
 		    	  }
+		    	  extDigests = (List<ExtDigest>) pm.detachCopyAll(extDigests);
 		      } else {
 //		    	  LOG.log(Level.SEVERE, "There's no Digest Wave for project id: " + projectId);
 		      }
@@ -48,7 +49,7 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 		    	LOG.log(Level.SEVERE, "",e);
 		    }
 		    finally {
-//		      pm.close();
+		      pm.close();
 		    }
 		return extDigests;
 	}

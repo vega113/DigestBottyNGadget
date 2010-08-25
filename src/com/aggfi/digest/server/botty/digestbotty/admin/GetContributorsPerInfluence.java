@@ -1,7 +1,6 @@
 package com.aggfi.digest.server.botty.digestbotty.admin;
 
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -46,7 +44,7 @@ public class GetContributorsPerInfluence extends Command {
   static{
 	  try {
 	        Map<String, Integer> props1 = new HashMap<String, Integer>();
-	        props1.put(GCacheFactory.EXPIRATION_DELTA, 60*60);
+	        props1.put(GCacheFactory.EXPIRATION_DELTA, 60*5);
 	        cacheDailyInfluence = CacheManager.getInstance().getCacheFactory().createCache(props1);
 	        
 	        Map<String, Integer> props = new HashMap<String, Integer>();
@@ -95,9 +93,9 @@ public class GetContributorsPerInfluence extends Command {
     JSONArray jsonArray = new JSONArray();
     
     Object o = cache.get(projectId + GetContributorsPerInfluence.class.getName());
-    if(false && o != null){
+    if(o != null){
     	jsonArray = (JSONArray) new JSONArray((String)o);
-    	 LOG.info("taking result form cache");
+    	 LOG.finer("taking result form cache");
     }else{
     	int durationDays = 14;    
         if (!util.isNullOrEmpty(this.getParam("days"))) {      
@@ -124,47 +122,49 @@ public class GetContributorsPerInfluence extends Command {
         
        //go over durationDays and calculate influence per this day
         Map<String,Double> influencePerForum4AllPeriodMap = new HashMap<String,Double>();
+        Date startDate = null;
         for(int i=durationDays; i>=0; i--){ //for each day - get influence form cache - or calculate
-        	 Date startDate = new Date(target.getTime() - (ONE_DAY * i));
+        	 startDate = new Date(target.getTime() - (ONE_DAY * i));
         	 Influence inf = null;
         	 inf = (Influence)cacheDailyInfluence.get(createInfPerFormPerDayHash(projectId, startDate, InfluenceUtils.getSdf()));//try to get it from cache
         	 Map<String,Double> influencePerForum4TargetDayMap = inf == null ? null : inf.getInfluenceMap();
-        	 
-        	 if( influencePerForum4TargetDayMap == null && !InfluenceUtils.getSdf().format(startDate).equals(todayDate) ){ //not found in cache - try to get from DB
+        	 if(influencePerForum4TargetDayMap != null){
+        		 LOG.fine("Taking from Cache influence map for " + projectId + " at " + startDate.getTime());
+        	 }
+        	 if( influencePerForum4TargetDayMap == null && !InfluenceUtils.getSdf().format(startDate).equals(InfluenceUtils.getSdf().format(todayDate)) ){ //not found in cache - try to get from DB
         		 Influence influence = influenceDao.getInfluence(projectId, startDate);
         		 if(influence != null){
         			 LOG.fine("Taking from DB influence map for " + projectId + " at " + startDate.getTime());
         			 influencePerForum4TargetDayMap = influence.getInfluenceMap();
         			 cacheDailyInfluence.put(createInfPerFormPerDayHash(projectId, startDate, InfluenceUtils.getSdf()), influence);
         		 }
-        	 }else{
-        		 LOG.fine("Taking from Cache influence map for " + projectId + " at " + startDate.getTime());
         	 }
         	 if( influencePerForum4TargetDayMap == null){
-        		 LOG.fine("Calculating influence map for " + projectId + " at " + startDate.getTime());
-        		 Map<String,Double> contributorsReplyComplementaryProbMap  = calcComplimentaryReplyProb(startDate,projectId);
-
-        		 influencePerForum4TargetDayMap = new HashMap<String, Double>();
-        		 List<BlipSubmitted> blipsList = blipSubmitedDao.getBlipsDuringDate(projectId, startDate);
-        		 influencePerForum4TargetDayMap = calcInfluenceFromBlips(blipsList,contributorsReplyComplementaryProbMap);//calculate
-        		 Influence infNew = influenceDao.save(new Influence(projectId, startDate, influencePerForum4TargetDayMap));
-        		 LOG.info(startDate.toString() + ": " + createInfPerFormPerDayHash(projectId, startDate, InfluenceUtils.getSdf()));
-        		 cacheDailyInfluence.put(createInfPerFormPerDayHash(projectId, startDate, InfluenceUtils.getSdf()), infNew);
-        		 LOG.finest(infNew.toString());
+        		 LOG.fine("Calculating influence map for " + projectId + " at " + InfluenceUtils.getSdf().format(startDate));
+        		 try {
+					Map<String, Double> contributorsReplyComplementaryProbMap = calcComplimentaryReplyProb(
+							startDate, projectId);
+					influencePerForum4TargetDayMap = new HashMap<String, Double>();
+					List<BlipSubmitted> blipsList = blipSubmitedDao
+							.getBlipsDuringDate(projectId, startDate);
+					influencePerForum4TargetDayMap = calcInfluenceFromBlips(
+							blipsList, contributorsReplyComplementaryProbMap);//calculate
+					Influence infNew = influenceDao.save(new Influence(projectId, startDate,influencePerForum4TargetDayMap)); //Save 2 DB
+					LOG.fine(startDate.toString()
+							+ ": "
+							+ createInfPerFormPerDayHash(projectId, startDate,
+									InfluenceUtils.getSdf()));
+					cacheDailyInfluence.put(
+							createInfPerFormPerDayHash(projectId, startDate,
+									InfluenceUtils.getSdf()), infNew);
+					LOG.finest(infNew.toString());
+				} catch (com.google.apphosting.api.DeadlineExceededException e) {
+					 LOG.log(Level.WARNING,"Not enough time to calculate influence map for  " + projectId + " at " + InfluenceUtils.getSdf().format(startDate));
+					 throw new IllegalArgumentException("App Engine deadline of 30 seconds was reached, however, the calculations are not finished yet. Interupted when working on day: " + InfluenceUtils.getSdf().format(startDate) + ". All info was saved, so please retry the request for this report.");
+				}
 
         	 }
-        	 //update influence for all period with daily values
-        	 for(String key : influencePerForum4TargetDayMap.keySet()){
-    			 Double contributorInfluence4TargetDay = influencePerForum4TargetDayMap.get(key);
-    			 Double contributorInfluence4AllPeriod = influencePerForum4AllPeriodMap.get(key);
-    			 
-    			 if(contributorInfluence4AllPeriod == null){
-    				 influencePerForum4AllPeriodMap.put(key,contributorInfluence4TargetDay);
-    			 }else{
-    				 contributorInfluence4AllPeriod = contributorInfluence4AllPeriod + contributorInfluence4TargetDay;
-    				 influencePerForum4AllPeriodMap.put(key, contributorInfluence4AllPeriod);
-    			 }
-    		 }
+        	 updateInfluenceMap(influencePerForum4AllPeriodMap,influencePerForum4TargetDayMap);
         	
              
         }
@@ -203,6 +203,23 @@ public class GetContributorsPerInfluence extends Command {
     LOG.exiting(GetContributorsPerInfluence.class.getName(), "execute", jsonArray.toString());
     return json;       
   }
+
+protected void updateInfluenceMap(
+		Map<String, Double> influencePerForum4AllPeriodMap,
+		Map<String, Double> influencePerForum4TargetDayMap) {
+	//update influence for all period with daily values
+	 for(String key : influencePerForum4TargetDayMap.keySet()){
+		 Double contributorInfluence4TargetDay = influencePerForum4TargetDayMap.get(key);
+		 Double contributorInfluence4AllPeriod = influencePerForum4AllPeriodMap.get(key);
+		 
+		 if(contributorInfluence4AllPeriod == null){
+			 influencePerForum4AllPeriodMap.put(key,contributorInfluence4TargetDay);
+		 }else{
+			 contributorInfluence4AllPeriod = contributorInfluence4AllPeriod + contributorInfluence4TargetDay;
+			 influencePerForum4AllPeriodMap.put(key, contributorInfluence4AllPeriod);
+		 }
+	 }
+}
 
 protected String createInfPerFormPerDayHash(String projectId, Date startDate,SimpleDateFormat sdf) {
 	return INFLUENCE_PER_FORUM_PER_DAY + projectId + sdf.format(startDate.getTime());

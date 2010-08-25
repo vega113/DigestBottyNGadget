@@ -1,12 +1,11 @@
 package com.aggfi.digest.client.ui;
 
 import com.aggfi.digest.client.constants.DigestMessages;
-import com.aggfi.digest.client.utils.DigestUtils;
+import com.vegalabs.general.client.utils.VegaUtils;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.CellPanel;
 import com.google.gwt.user.client.ui.ComplexPanel;
 
 abstract class RemoveHandler {
@@ -15,6 +14,7 @@ abstract class RemoveHandler {
 	private AfterRemovalAsyncCallback afterRemovalAsyncCallback = new AfterRemovalAsyncCallback();
 	AddRemDefLabel widget = null;
 	private Runnable onProjectsLoadCallback = null;
+	private VegaUtils vegaUtils;
 	
 	protected class AfterRemovalAsyncCallback implements AsyncCallback<JSONValue>{
 		
@@ -27,11 +27,11 @@ abstract class RemoveHandler {
 				public void run() {
 					getPanel().remove(widget);
 					widget.setVisible(false);
-					DigestUtils.getInstance().adjustHeight();
+					vegaUtils.adjustHeight();
 				}
 			};
 			t.schedule(1500);
-			DigestUtils.getInstance().dismissAllStaticMessages();
+			vegaUtils.dismissAllStaticMessages();
 			String successMsg = "";
 			if(result.isNumber() != null){
 				int appliedCount = (int)result.isNumber().doubleValue();
@@ -40,7 +40,7 @@ abstract class RemoveHandler {
 				successMsg = messages.removeSuccessMsg(tag);
 			}
 			onProjectsLoadCallback.run();
-			DigestUtils.getInstance().showSuccessMessage(successMsg, 8);
+			vegaUtils.showSuccessMessage(successMsg, 8);
 		}
 
 		@Override
@@ -48,16 +48,17 @@ abstract class RemoveHandler {
 			widget.setFirstLblKey("");
 			widget.getFirstValLbl().setVisible(true);
 			Log.error("", caught);
-			DigestUtils.getInstance().alert(caught.getMessage());
+			vegaUtils.alert(caught.getMessage());
 		}
 
 	}
 	
-	public RemoveHandler(DigestMessages messages,ComplexPanel panel, Runnable onProjectsLoadCallback) {
+	public RemoveHandler(DigestMessages messages,ComplexPanel panel, Runnable onProjectsLoadCallback, VegaUtils vegaUtils) {
 		super();
 		this.messages = messages;
 		this.panel = panel;
 		this.onProjectsLoadCallback= onProjectsLoadCallback;
+		this.vegaUtils = vegaUtils;
 	}
 
 	/**

@@ -18,7 +18,8 @@
 	<inherits name="com.google.gwt.gadgets.Gadgets" />
 	<inherits name='org.cobogw.gwt.waveapi.gadget.WaveGadget' />
 	<inherits name='com.google.gwt.visualization.Visualization'/>
-	<inherits name="com.allen_sauer.gwt.log.gwt-log-ERROR" /> 
+	<inherits name='com.vegalabs.features.VegaWaveFeatures' />
+	<inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" /> 
 
 	<!-- Specify the app entry point class.                         -->
 	<entry-point class='com.aggfi.digest.client.DigestBottyGadget' />

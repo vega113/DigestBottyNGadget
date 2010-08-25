@@ -63,6 +63,9 @@ public class JsonRpcProcessor extends HttpServlet {
 						jsonExceptionHandler.send(resp, e);
 					} catch (IllegalArgumentException e) {
 						jsonExceptionHandler.send(resp, e);
+					}catch (com.google.apphosting.api.DeadlineExceededException e) {
+						IllegalArgumentException iae = new IllegalArgumentException("App Engine Deadline of 30 second reached. Please rety the request.");
+						jsonExceptionHandler.send(resp, iae);
 					}
 				}
 			}

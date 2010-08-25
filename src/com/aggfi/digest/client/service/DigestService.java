@@ -13,7 +13,7 @@ public interface DigestService {
 
 	void retrPrjectsPerUserId(String userId, AsyncCallback<JSONValue> callback) throws RequestException;
 
-	void retrPostCountsT(String value, AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+	void retrPostCounts(String value, AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
 	void removeDefaultParticipant(String projectId, String participantId,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
@@ -44,5 +44,12 @@ public interface DigestService {
 
 	void addWavesParticipant(String projectId, String participantId,
 			String tagName, AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+	
+	void retrBlipsCounts(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+	
+	void retrBlipsPerContributor(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void retrContributorsPerInfluence(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+	void retrPostsByActivity(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
 }

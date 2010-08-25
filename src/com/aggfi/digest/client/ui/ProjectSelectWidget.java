@@ -6,7 +6,7 @@ import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
-import com.aggfi.digest.client.utils.DigestUtils;
+import com.vegalabs.general.client.utils.VegaUtils;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -32,7 +32,7 @@ public class ProjectSelectWidget extends Composite {
 	DigestMessages messages;
 	DigestConstants constants;
 	GlobalResources resources;
-	DigestUtils digestUtils;
+	VegaUtils utils;
 
 	private static ProjectSelectWidgetUiBinder uiBinder = GWT
 	.create(ProjectSelectWidgetUiBinder.class);
@@ -43,7 +43,7 @@ public class ProjectSelectWidget extends Composite {
 
 
 	public ProjectSelectWidget(final DigestMessages messages, final DigestConstants constants,
-			final GlobalResources resources, final DigestService digestService, final Runnable onProjectsRetrCallback ) {
+			final GlobalResources resources, final DigestService digestService, final Runnable onProjectsRetrCallback, final VegaUtils utils ) {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		resources.globalCSS().ensureInjected();
@@ -51,14 +51,14 @@ public class ProjectSelectWidget extends Composite {
 		this.messages = messages;
 		this.constants = constants;
 		this.resources = resources;
-		this.digestUtils = DigestUtils.getInstance();
+		this.utils = utils;
 
-		final String userId = digestUtils.retrUserId();
+		final String userId = utils.retrUserId();
 		try {
 			
 			String msg = messages.loadingForumsListMsg(userId);
 			Log.debug(msg);
-			digestUtils.showStaticMessage(msg);
+			utils.showStaticMessage(msg);
 			digestService.retrPrjectsPerUserId(userId, new AsyncCallback<JSONValue>() {
 
 				@Override
@@ -76,7 +76,7 @@ public class ProjectSelectWidget extends Composite {
 							Log.debug("no projects are found in response" );
 							prjList.addItem("none","");
 							prjList.setEnabled(false);
-							digestUtils.dismissStaticMessage();
+							utils.dismissStaticMessage();
 							//								reportPanel.add(new HTML("User " + userId + " doesn't have any digests"));
 						}else{
 							prjList.clear();
@@ -93,7 +93,7 @@ public class ProjectSelectWidget extends Composite {
 							}
 							// Create a callback to be called when the visualization API
 							// has been loaded.
-							String digestId = digestUtils.getCurrentDigestId();
+							String digestId = utils.retrFromPrivateSate("CurrentDigestId");
 							if(digestId != null && !"".equals(digestId)){
 								int size = prjList.getItemCount();
 								for(int i = 0; i < size; i++){
@@ -102,7 +102,7 @@ public class ProjectSelectWidget extends Composite {
 									}
 								}
 							}
-							digestUtils.dismissStaticMessage();
+							utils.dismissStaticMessage();
 							onProjectsRetrCallback.run();
 						}
 					}else{
@@ -111,7 +111,7 @@ public class ProjectSelectWidget extends Composite {
 								JSONObject tryjson = JSONParser.parse(resultJsonValue.isString().stringValue()).isObject();
 							}catch (Exception e) {
 								Log.error("after try to parse to obj", e);
-								digestUtils.alert(e.getMessage());
+								utils.alert(e.getMessage());
 							}
 						}
 					}
@@ -119,7 +119,7 @@ public class ProjectSelectWidget extends Composite {
 			});
 		} catch (RequestException e) {
 			Log.error("", e);
-			digestUtils.alert(e.getMessage());
+			utils.alert(e.getMessage());
 		}
 
 	}
@@ -137,6 +137,6 @@ public class ProjectSelectWidget extends Composite {
 	@UiHandler(value="prjList")
 	public void onPrjIdSelectionChange(ChangeEvent event){
 		String currId = prjList.getValue(prjList.getSelectedIndex());
-		digestUtils.setCurrentDigestId(currId);
+		utils.putToPrivateSate("CurrentDigestId", currId);
 	}
 }
