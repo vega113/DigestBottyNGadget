@@ -204,7 +204,7 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 				gadget = new Gadget(gadgetUrl);
 				gadget.setProperty("projectId", projectId);
 				if(isAdReplyBlip){
-					blip = blip.reply(); //TODO should be continueThread instead of reply - but seems it doesn't work
+					blip = blip.reply(); //TODO should be continueThread instead of reply - Pamela said should work next week 26.08.2010
 				}else{
 					blip.append("\n\n");
 				}
@@ -480,7 +480,8 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 			  blip = blips.get(digest.getLastDigestBlipId());// find last digest blip - the one with link to top.
 		  }else{
 			  blip = newLastBlip;
-			  newLastBlip =digestWavelet.reply("\n");
+//			  newLastBlip =digestWavelet.reply("\n");
+			  newLastBlip = digestWavelet.getRootBlip().reply();
 			  isBottomBlipExists = false;
 		  }
 		  
