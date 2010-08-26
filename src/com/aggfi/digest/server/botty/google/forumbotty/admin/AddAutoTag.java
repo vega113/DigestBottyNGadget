@@ -62,7 +62,7 @@ public class AddAutoTag extends Command {
 	  Wavelet firstWavelet = null;
 	  try {
 		  this.adminConfigDao.addAutoTagRegex(projectId, tag, regex);
-		  if(sync != null && !"".equals(sync)){
+		  if(sync != null && !"".equals(sync) && Boolean.parseBoolean(sync)){
 			  //retrieve all forumPosts for this projectId
 
 			  Wavelet wavelet = null;
