@@ -8,8 +8,19 @@
 <!--<meta http-equiv="X-UA-Compatible" content="chrome=1">-->
 
 <title>Embedded Wave by DigestBotty</title>
+<script type="text/javascript">
+(function() {
+var s = document.createElement('SCRIPT'), s1 = document.getElementsByTagName('SCRIPT')[0];
+s.type = 'text/javascript';
+s.async = true;
+s.src = 'http://widgets.digg.com/buttons.js';
+s1.parentNode.insertBefore(s, s1);
+})();
+</script>
+
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
 <script type="text/javascript">
+var globalUrl = "http://" + "<%= request.getServerName() %>";
 	var waveIdToLoad = null;
 	var wavePanel = null;
     google.load("wave", "1");
@@ -30,6 +41,8 @@
     	  var idWave = "<%=request != null && request.getParameter("waveId") != null ? request.getParameter("waveId") : ""%>";
           if(idWave != null && idWave != ""){
         	  waveIdToLoad = idWave;
+        	  document.getElementById("likeFrame").src="http://www.facebook.com/plugins/like.php?href=" + globalUrl + "/showembedded?waveId=" + idWave + ";layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35";
+        	  document.getElementById("diggButton").href=globalUrl + "/showembedded?waveId=" + idWave;
         	  wavePanel.loadWave(waveIdToLoad);
           }
       }else if(waveIdToLoad != ""){
@@ -93,6 +106,8 @@ jQuery(document).ready(function() {
 				$("#forumIdInput").autocomplete(autoCompleteData); 
 				var forumId = "<%=request != null && request.getParameter("forumId") != null ? request.getParameter("forumId") : ""%>";
 				if(forumId != null && forumId != ""){
+					document.getElementById("likeFrame").src="http://www.facebook.com/plugins/like.php?href=" + globalUrl + "/showembedded?forumId=" + forumId + ";layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35";
+					document.getElementById("diggButton").href=globalUrl + "/showembedded?forumId=" + forumId;
 					waveIdToLoad = prjsMap[forumId];
 					initialize();
 				}
@@ -139,19 +154,37 @@ _gaq.push(['_trackPageview']);
 				<input type="text" id="waveSubmitId" style="width: 250px " />
 				<input type="button" id="submitWaveId" value="display"/>
 			</div>
+			<div style="height: 35px">
+				<iframe id="likeFrame" src="http://www.facebook.com/plugins/like.php?href=http://digestbotty.appspot.com/showembedded;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:35px;" allowTransparency="true"></iframe>
+			</div>
+			<div>
+				<a id="diggButton" class="DiggThisButton DiggMedium"
+						href="http://digg.com/submit?url=http%3A//mashable.com/2010/03/18/digg-social-news"></a>
+			</div>
+			<div>
+				<a id="openInGWave" href="#" onclick="openInGWave()"> Open natively in Google Wave</a>
+			</div>
 		</td>
 	</tr>
 </table>
 
 <script type="text/javascript">
 function linkClicked(){
-	var url = "http://" + "<%= request.getServerName() %>" + "/showembedded?id=googlewave.com!w+KNw8wPWXA";
+	var url =  "http://digestbotty.appspot.com/showembedded?waveId=googlewave.com!w+KNw8wPWXA";
 	try{
 		window.location.href = url;
 	//_trackEvent("/embed", "clickAd");
 	}catch(e){
 		alert(url + ": " + e);
 	}
+}
+
+function openInGWave(){
+	if(waveIdToLoad == null)
+		return;
+	var url =  "https://wave.google.com/wave/waveref/" + waveIdToLoad.replace("!", "/");
+	
+	window.open(url);
 }
 </script>
 </body>

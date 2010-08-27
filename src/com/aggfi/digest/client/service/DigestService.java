@@ -52,4 +52,7 @@ public interface DigestService {
 	void retrContributorsPerInfluence(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 	void retrPostsByActivity(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
+	void updateAtomFeedPublic(String projectId, boolean isMakeAtomFeedPublic,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
 }

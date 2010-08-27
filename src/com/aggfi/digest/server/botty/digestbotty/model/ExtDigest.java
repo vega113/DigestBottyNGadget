@@ -12,12 +12,13 @@ import com.google.gson.annotations.Expose;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class ExtDigest  extends Digest{
+	public final static int CURRENT_VERSION = 2;
 	Logger LOG = Logger.getLogger(this.getClass().getName());
 
 	public ExtDigest(String domain, String waveId, String projectId,
 			String description, String name, String installerThumbnailUrl,
 			String installerIconUrl, String robotThumbnailUrl,
-			String forumSiteUrl, String googlegroupsId, String ownerId,String author, int maxDigests) {
+			String forumSiteUrl, String googlegroupsId, String ownerId,String author, int maxDigests, int version) {
 		super(domain, waveId, projectId);
 		this.description = description;
 		this.name = name;
@@ -29,6 +30,7 @@ public class ExtDigest  extends Digest{
 		this.ownerId = ownerId;
 		this.author = author;
 		this.maxDigests = maxDigests;
+		this.version = version;
 	}
 
 	@Persistent
@@ -83,6 +85,9 @@ public class ExtDigest  extends Digest{
 	@Persistent
 	@Expose
 	private String firstDigestBlipId = null;
+	@Persistent
+	@Expose
+	Integer version = 0;
 
 	public String getDescription() {
 		return description;
@@ -192,6 +197,14 @@ public class ExtDigest  extends Digest{
 
 	public void setFirstDigestBlipId(String firstDigestBlipId) {
 		this.firstDigestBlipId = firstDigestBlipId;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
 	}
 
 }

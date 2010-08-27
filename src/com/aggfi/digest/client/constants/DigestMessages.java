@@ -52,4 +52,7 @@ public interface DigestMessages extends Messages {
   String removedFromWavesSuccessMsg(String what, int wavesNumber);
   String addSuccessMsg(String name);
   String removeSuccessMsg(String name);
+  
+  String sentRequest2UpdateAtomFeedPublic(String to);
+
 }

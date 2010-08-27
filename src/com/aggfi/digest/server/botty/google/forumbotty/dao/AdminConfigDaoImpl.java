@@ -36,6 +36,15 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 			List<AdminConfig> adminConfigs = (List<AdminConfig>) query.execute(id);
 			if (adminConfigs.size() > 0) {
 				adminConfig = pm.detachCopy(adminConfigs.get(0));
+				if(adminConfig.isAtomFeedPublic() == null){
+					if(adminConfig.getDefaultParticipants().contains("public@a.gwave.com") || adminConfig.getDefaultParticipants().contains(System.getProperty("PUBLIC_GROUP"))){
+						adminConfig.setAtomFeedPublic(true);
+					}else{
+						adminConfig.setAtomFeedPublic(false);
+					}
+					pm.makePersistent(adminConfig);
+					adminConfig = pm.detachCopy(adminConfig);
+				}
 			} else {
 				adminConfig = new AdminConfig(id);
 

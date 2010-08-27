@@ -24,9 +24,9 @@
 											ui:field="imgIsPublicCheckBox" />
 									</g:HorizontalPanel>
 
-									<g:HorizontalPanel>
+									<g:HorizontalPanel ui:field="isEnableAdsPanel">
 										<g:Label ui:field="isAdsEnabledQuestion" text='{constants.isAdsEnabledQuestion}'></g:Label>
-										<g:CheckBox ui:field="isAdsEnabledBox" checked="true"></g:CheckBox>
+										<g:CheckBox ui:field="isAdsEnabledBox" checked="false"></g:CheckBox>
 										<g:Image resource='{res.tooltip}'
 											title='{constants.isAdsEnabledQuestionTtl}'
 											ui:field="imgIsAdsEnabledCheckBox" />

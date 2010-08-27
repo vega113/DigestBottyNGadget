@@ -43,10 +43,8 @@ public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements Ne
 	protected void init(UserPreferences preferences) {
 		try{
 			waveFeature = getWave();
-			mmFeature.initMiniMessagesFeature();
 			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
 			DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
-			RootPanel.get().add(new HTML("."));
 			dhFeature.getContentDiv().add(widget);
 			initRemoteLogger(RootPanel.get());
 		}catch(Exception e){

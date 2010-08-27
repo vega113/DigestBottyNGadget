@@ -34,6 +34,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,7 +67,7 @@ import org.json.JSONObject;
 @Singleton
 public class ForumBotty extends AbstractRobot {
   private static final String TO_BOTTOM = "Link to Bottom";
-private static final String BACK_TO_TOP_OF_THIS_DIGEST = "Link to Top";
+private static final String TO_TOP = "Link to Top";
 private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
   private static final boolean DEBUG_MODE = false;
   
@@ -180,7 +181,11 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 	  Wavelet wavelet = event.getWavelet();
 	  Blip blip = event.getBlip();
 
-	  actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
+	  try {
+		actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
+	} catch (IOException e) {
+		LOG.log(Level.SEVERE,"",e);
+	}
 	  
 	  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
 		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
@@ -218,7 +223,7 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 
 
 protected void actOnBottyAdded(String projectId,
-		String proxyFor, Wavelet wavelet, Blip blip, String modifiedBy) {
+		String proxyFor, Wavelet wavelet, Blip blip, String modifiedBy) throws IOException {
 	if (projectId == null) {
 		  LOG.log(Level.SEVERE, "actOnBottyAdded:Missing proxy-for project id");
 		  return;
@@ -231,12 +236,15 @@ protected void actOnBottyAdded(String projectId,
 
 	  if (isDigestAdmin(proxyFor)) {
 		  wavelet.setTitle("DigestBotty [Admin Gadget]");
-		  submitWavelet(wavelet);
+		  submit(wavelet, PREVIEW_RPC_URL);
 	  }else{
 		  if (isWorthy(wavelet)) {
 			// Add default participants
-			  for (String participant : this.adminConfigDao.getAdminConfig(projectId)
-					  .getDefaultParticipants()) {
+			  List<String> participants = this.adminConfigDao.getAdminConfig(projectId).getDefaultParticipants();
+			  if(participants.size() == 0){
+				  LOG.warning("participants.size() == 0");
+			  }
+			  for (String participant : participants) {
 				  if(!wavelet.getParticipants().contains(participant)){
 					  wavelet.getParticipants().add(participant);
 				  }
@@ -251,10 +259,11 @@ protected void actOnBottyAdded(String projectId,
 
 			  // Apply default and auto tags to the wave
 			  applyAutoTags(blip, projectId);
+			  submit(wavelet, PREVIEW_RPC_URL);
 		  }
 		 
 	  }
-
+	  
 	  
 }
 
@@ -343,11 +352,6 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
       return;
     } 
     
-    // If this is from the "*-gadget" proxy, skip processing.
-    if (isDigestAdmin(event.getBundle().getProxyingFor())) {
-      return;
-    } 
-
     // If this is unworthy wavelet (empty), skip processing.
     if (!isWorthy(event.getWavelet()) && event.getBlip().isRoot()) {
     	event.getWavelet().setTitle(event.getBlip().getContent().split(" ")[0]);
@@ -356,13 +360,26 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
     }
 
     Wavelet wavelet = event.getWavelet();
+   
 
     String projectId = getCurrentProjectId(event);
     if (projectId == null) {
       LOG.log(Level.SEVERE, "onBlipSubmitted:Missing proxy-for project id");
       return;
     }
-
+    
+    if(event.getBlip().isRoot()){
+    	List<String> participants = this.adminConfigDao.getAdminConfig(projectId).getDefaultParticipants();
+		  if(participants.size() == 0){
+			  LOG.warning("participants.size() == 0");
+		  }
+		  for (String participant : participants) {
+			  if(!wavelet.getParticipants().contains(participant)){
+				  wavelet.getParticipants().add(participant);
+			  }
+		  }
+    }
+    
     ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
 
   //here is the place to save blipSubmitted
@@ -406,7 +423,6 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 				  BlipContentRefs rootBlipRef = rootBlip.at(rootBlip.getContent().length());
 				  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
 				  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
-				  rootBlipRef = rootBlip.at(rootBlip.getContent().length());
 				  rootBlipRef.insert(baList, back2digestWaveStr);
 				  LOG.fine("updated addBack2Digest2RootBlip " + rootBlip.getContent());
 			  }
@@ -458,8 +474,9 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	  Wavelet digestWavelet = null;
 	  ExtDigestDao extDigestDao = injector.getInstance(ExtDigestDao.class);
 	  List<ExtDigest> entries =  extDigestDao.retrDigestsByProjectId(entry.getProjectId());
+	  ExtDigest digest = null;
 	  if(entries.size() > 0){
-		  ExtDigest digest = extDigestDao.retrDigestsByProjectId(entry.getProjectId()).get(0);
+		  digest = entries.get(0);
 		  String digestWaveDomain = digest.getDomain();
 		  String digestWaveId = digest.getWaveId();
 		  LOG.log(Level.FINER, "digestWaveDomain: " + digestWaveDomain + ", digestWaveId: " + digestWaveId);
@@ -469,33 +486,15 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 			  LOG.log(Level.INFO,"can happen if the robot was removed manually from the wave.",e);
 		  }
 		  String entryTitle = entry.getTitle();
-
-		  Blip blip = null; // new 'new' blip
-		  Blip newLastBlip = digestWavelet.reply("\n");// add to this blip link to top and ad if ads for this forum are enabled 
-		  
-		  Map<String,Blip> blips = digestWavelet.getBlips();
-			 
-		  boolean isBottomBlipExists = true;
-		  if(digest.getLastDigestBlipId() != null){
-			  blip = blips.get(digest.getLastDigestBlipId());// find last digest blip - the one with link to top.
+		  Blip blip = null;
+		  //check the digest version
+		  if(digest.getVersion() != null && digest.getVersion().intValue() > 1){
+			  blip = digestWavelet.getRootBlip().reply();// new  version
 		  }else{
-			  blip = newLastBlip;
-//			  newLastBlip =digestWavelet.reply("\n");
-			  newLastBlip = digestWavelet.getRootBlip().reply();
-			  isBottomBlipExists = false;
+			  blip = digestWavelet.reply("\n");// old  version
 		  }
 		  
-		  String backToDigestTop = System.getProperty("APP_DOMAIN") + ".appspot.com/backtotop";
-		  String blipRef = "waveid://" + digestWaveDomain + "/" + digestWaveId + "/~/conv+root/" + digestWavelet.getRootBlipId();
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backToDigestTop,"done");
-		  newLastBlip.at(1).insert(baList, BACK_TO_TOP_OF_THIS_DIGEST);
 		  
-		  if (adminConfigDao.getAdminConfig(entry.getProjectId()).isAdsEnabled()){
-			  appendAd2Blip(newLastBlip, entry.getProjectId(),false);
-		  }
-		 
-		 
-		  blip.range(0, blip.getContent().length()).delete();// clean the blip.
 		  StringBuilderAnnotater sba = new StringBuilderAnnotater(blip);
 		  sba.append(entryTitle, StringBuilderAnnotater.LINK_WAVE, entry.getId());
 		  if(entry.getCreator() != null && !"".equals(entry.getCreator())){
@@ -507,28 +506,16 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 		  try {
 			  LOG.log(Level.FINER, "trying to get newBlipIs from JsonRpcResponse");
 			  List<JsonRpcResponse> submitResponseList = submit(digestWavelet, getRpcServerUrl());
-			  boolean isFoundFirstId = false;
 			  for(JsonRpcResponse res : submitResponseList){
 				  Map<ParamsProperty, Object> dataMap = res.getData();
 				  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
-					  //Assumed the id are in order of creation
-					  if(isBottomBlipExists){
-						  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
-						  entry.setDigestBlipId(blip.getBlipId());
-						  digest.setLastDigestBlipId(blipId);
-						  addOrUpdateLinkToBottomForDigestWave(digestWavelet, blipId);
-					  }else{
-						  if(!isFoundFirstId){
-							  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
-							  entry.setDigestBlipId(blipId);// in case the forum is old - no blip with link to top
-							  isFoundFirstId = true;
-						  }else{
-							  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
-							  digest.setLastDigestBlipId(blipId);// new blip with link to post is the one that was last before
-							  addOrUpdateLinkToBottomForDigestWave(digestWavelet, blipId);
-							  break;
-						  }
+					  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+					  entry.setDigestBlipId(blipId);
+					  digest.setLastDigestBlipId(blipId);
+					  if(digest.getVersion() == null || digest.getVersion() == 1){
+						  addOrUpdateLinkToBottomOrTopForDigestWave(digestWavelet.getRootBlip(), blipId, true);
 					  }
+					  break;
 				  }
 			  }
 			  extDigestDao.save(digest);
@@ -796,35 +783,40 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	  }
   }
 
-	public void addOrUpdateLinkToBottomForDigestWave(Wavelet digestWavelet,String blipId) throws IOException {
-		Blip rootBlip = digestWavelet.getRootBlip();
-		String backToDigestBottom = System.getProperty("APP_DOMAIN") + ".appspot.com/backtobottom";
-		if(rootBlip.getAnnotations().get(backToDigestBottom) != null){
+  	/**
+  	 * 
+  	 * @param blipToUpdate
+  	 * @param blipId
+  	 * @param isBottom
+  	 * @throws IOException
+  	 */
+	public void addOrUpdateLinkToBottomOrTopForDigestWave(Blip blipToUpdate,String blipId, boolean isBottom) throws IOException {
+		String toLocationStr = isBottom ? TO_BOTTOM : TO_TOP;
+		String linkToAnnonationName = System.getProperty("APP_DOMAIN") + (isBottom ?  ".appspot.com/backtobottom" :  ".appspot.com/backtotop");
+		if(blipToUpdate.getAnnotations().get(linkToAnnonationName) != null){
 			//update
 			List<BundledAnnotation> baList = createToAnnotation(
-					digestWavelet, blipId, backToDigestBottom);
-			  int endPos = rootBlip.getContent().indexOf(TO_BOTTOM);
-			  LOG.info("TO_BOTTOM annotation found, endPos: " + endPos);
-			  rootBlip.range(endPos ,endPos + TO_BOTTOM.length()).delete();
-			  digestWavelet.getRootBlip().at(digestWavelet.getRootBlip().getContent().length()).insert(baList, TO_BOTTOM);
+					blipToUpdate, blipId, linkToAnnonationName);
+			  int endPos = blipToUpdate.getContent().indexOf(toLocationStr);
+			  LOG.fine(toLocationStr + " annotation found, endPos: " + endPos);
+			  blipToUpdate.range(endPos ,endPos + toLocationStr.length()).replace(baList, toLocationStr);
 		}else{
 			//add
-			LOG.warning("no TO_BOTTOM annotation found - inserting new!");
+			LOG.warning(toLocationStr +" annotation not found - inserting new!");
 			  List<BundledAnnotation> baList = createToAnnotation(
-					digestWavelet, blipId, backToDigestBottom);
-			  digestWavelet.getRootBlip().at(digestWavelet.getRootBlip().getContent().length()).insert(baList, "\n" + TO_BOTTOM);
+					  blipToUpdate, blipId, linkToAnnonationName);
+			  blipToUpdate.at(blipToUpdate.getContent().length()).insert(baList, toLocationStr);
 		}
 		
-		submit(digestWavelet, PREVIEW_RPC_URL);
+		submit(blipToUpdate.getWavelet(), PREVIEW_RPC_URL);
 		
 
 		
 	}
 
-	public List<BundledAnnotation> createToAnnotation(
-			Wavelet digestWavelet, String blipId, String backToDigestBottom) {
-		String blipRef = "waveid://" + digestWavelet.getWaveId().getDomain() + "/" + digestWavelet.getWaveId().getId() + "/~/conv+root/" + blipId;
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backToDigestBottom,"done");
+	public List<BundledAnnotation> createToAnnotation(Blip blipToUpdate, String blipId, String linkToAnnonationName) {
+		String blipRef = "waveid://" + blipToUpdate.getWaveId().getDomain() + "/" + blipToUpdate.getWaveId().getId() + "/~/conv+root/" + blipId;
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",linkToAnnonationName,"done");
 		return baList;
 	}
 

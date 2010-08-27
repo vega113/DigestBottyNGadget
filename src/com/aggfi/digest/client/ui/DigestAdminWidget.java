@@ -13,6 +13,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONArray;
@@ -78,6 +79,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	CheckBox syncAutoTagCheckBox;
 	
 	@UiField
+	CheckBox isAtomFeedPublicCheckBox;
+	@UiField
+	Button isAtomFeedPublicUpdateBtn;
+	
+	@UiField
 	CaptionPanel addParticipantWaveCaption;//FIXME remove
 	
 	ProjectSelectWidget projectSelectWidget;
@@ -106,7 +112,6 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	@Inject
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService, final VegaUtils vegaUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
-		initImageHandler();
 		hideAll();
 		defaultTagsCaptPnl.setVisible(false);//TODO remove the caption panel entirely later
 		resources.globalCSS().ensureInjected();
@@ -115,7 +120,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		this.constants = constants;
 		this.resources = resources;
 		this.vegaUtils = vegaUtils;
-
+		initImageHandler();
 
 		onProjectsLoadCallback = new Runnable() { //will be run after projectIds list is loaded
 
@@ -137,6 +142,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 							initJsonArrayModule(result,"defaultTags",defaultTagsPanel,removeDefaultTagHandler);
 							initJsonMapModule(result,"autoTagRegexMap",autoTagsPanel,removeAutoTagHandler);
 							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
+							boolean isAtomFeedPublic = result.isObject().get("isAtomFeedPublic").isBoolean().booleanValue();
+							isAtomFeedPublicCheckBox.setValue(isAtomFeedPublic);
 							Log.debug("dismissMessage");
 							vegaUtils.dismissStaticMessage();
 						}
@@ -325,6 +332,44 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 			}
 			clearAll();
 			onProjectsLoadCallback.run();
+		}
+	}
+	
+	@UiHandler("isAtomFeedPublicUpdateBtn")
+	protected void atomFeedPublicUpdate(ClickEvent event){
+		if(getProjectId().equals("")){
+			vegaUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
+		boolean isMakeAtomFeedPublic = isAtomFeedPublicCheckBox.getValue();
+		try{
+			try {
+				String isPublicStr = isMakeAtomFeedPublic ? constants.publicStr() : constants.privateStr();
+				vegaUtils.showStaticMessage(messages.sentRequest2UpdateAtomFeedPublic(isPublicStr));
+				digestService.updateAtomFeedPublic(getProjectId(), isMakeAtomFeedPublic, new AsyncCallback<JSONValue>() {
+
+					@Override
+					public void onSuccess(JSONValue result) {
+						vegaUtils.dismissStaticMessage();
+						vegaUtils.showSuccessMessage(constants.successStr(), 3);
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						vegaUtils.alert(caught.getMessage());
+
+					}
+				});
+			} catch (RequestException e) {
+				Log.error("", e);
+			}
+		}catch(IllegalArgumentException e){
+			digestAlert(e);
+		}
+		try{
+			vegaUtils.reportEvent("/admin/update","atomFeedPublicUpdate", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
 		}
 	}
 	
@@ -642,9 +687,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	Image img7;
 	@UiField
 	Image img8;
+	@UiField
+	Image img9;
 	private void initImageHandler(){
 		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler(vegaUtils);
-		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8};
+		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8, img9};
 		for(Image image : images){
 			image.addMouseDownHandler(mouseDownHandler);
 		}

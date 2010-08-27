@@ -43,7 +43,7 @@ public class ForumPost {
   private Date created = null;
   @Persistent
   @Expose
-  private int rootBlipsWithoutAdCount = 0;
+  private Integer rootBlipsWithoutAdCount = 0;
   
 
 @Persistent
@@ -72,12 +72,7 @@ public class ForumPost {
     this.created = new Date();
     this.title = wavelet.getTitle();
     this.blipCount = wavelet.getBlips().size();
-    Set<String> participants = wavelet.getParticipants();
-    if(participants.contains("public@a.gwave.com") || participants.contains(System.getProperty("PUBLIC_GROUP"))){
-    	 if(wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent() != null){
-    		 this.firstBlipContent = new Text(wavelet.getRootBlip().getContent()); 
-    	    }
-    }
+    this.firstBlipContent = new Text(wavelet.getRootBlip().getContent()); 
   }
 
   public String getId() {

@@ -74,6 +74,8 @@ public class CreateDigest extends Command {
 	    	boolean isAdsEnabled = Boolean.parseBoolean(getParam("isAdsEnabled"));
 			AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
 			adminConfig.setAdsEnabled(isAdsEnabled);
+			boolean isPublicOnCreate = Boolean.parseBoolean(this.getParam("publicOnCreate"));
+			adminConfig.setAtomFeedPublic(isPublicOnCreate);
 			adminConfigDao.save(adminConfig);
 	    	
 	    	String senderId = this.getParam("senderId");
@@ -89,13 +91,14 @@ public class CreateDigest extends Command {
 	    	if(!ownerId.equals(System.getProperty("BOTTY_OWNER_WAVE_ID")) && numOfOwnerDigests > Integer.parseInt(System.getProperty("MAX_DIGESTS"))){
 	    		throw new IllegalArgumentException("Max number of Digests per owner is: " + System.getProperty("MAX_DIGESTS")); 
 	    	}
-	    	boolean isPublicOnCreate = Boolean.parseBoolean(this.getParam("publicOnCreate"));
 	    	Wavelet wavelet = null;
 	    	try{
 	    		wavelet = createDigestWave(digestWaveDomain,ownerId,projectId,projectName,googlegroups, isPublicOnCreate);
 	    	}catch(IOException ioe){
 	    		if(ioe.getMessage().indexOf("Timeout") > -1){
+	    			//------------------------
 	    			wavelet = createDigestWave(digestWaveDomain,ownerId,projectId,projectName,googlegroups, isPublicOnCreate);
+	    			//----------------------------
 	    		}else{
 	    			throw ioe;
 	    		}
@@ -190,22 +193,7 @@ public class CreateDigest extends Command {
 		
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 	
-		
-		List<JsonRpcResponse> submitResponseList = robot.submit(newWavelet, rpcUrl);
-		  boolean rootBlipFound = false;
-		  for(JsonRpcResponse res : submitResponseList){
-			  Map<ParamsProperty, Object> dataMap = res.getData();
-			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
-				  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
-				  robot.addOrUpdateLinkToBottomForDigestWave(digestWavelet, blipId);
-				  rootBlipFound = true;
-			  }
-		  }
-		if(!rootBlipFound){
-			LOG.warning("BLip id of root blip not found in createFAQ - can't add to bottom link!");
-		}
-
-		
+		robot.submit(newWavelet, rpcUrl);
 		//add this post to the digest
 		robot.addOrUpdateDigestWave(projectId, newWavelet, null, null);
 	}
@@ -373,7 +361,7 @@ public class CreateDigest extends Command {
 				maxDigests = 2;
 			}
 		}
-		ExtDigest digest = new ExtDigest(domain, "TBD_ID", projectId, description, name, installerThumbnailUrl, installerIconUrl, robotThumbnailUrl, forumSiteUrl, googlegroupsId, ownerId,author,maxDigests);
+		ExtDigest digest = new ExtDigest(domain, "TBD_ID", projectId, description, name, installerThumbnailUrl, installerIconUrl, robotThumbnailUrl, forumSiteUrl, googlegroupsId, ownerId,author,maxDigests, ExtDigest.CURRENT_VERSION);
 		return digest;
 	}
 	
@@ -399,22 +387,38 @@ public class CreateDigest extends Command {
 		}
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 		
-		String titleStr = projectName + " Digest Wave";
+		String titleStr = projectName  + " digest wave";
 		newWavelet.setTitle(titleStr);
 		BlipContentRefs.range(newWavelet.getRootBlip(), 1, titleStr.length()+1).annotate("style/fontSize","2em");
-		BlipContentRefs.range(newWavelet.getRootBlip(), 1, projectName.length()+1).annotate("style/fontWeight","bold");
+		BlipContentRefs.range(newWavelet.getRootBlip(), 1, projectName.length()).annotate("style/fontWeight","bold");
 		String gadgetUrl = System.getProperty("CLICK_GADGET_URL");
 		Gadget gadget = new Gadget(gadgetUrl);
 		gadget.setProperty("waveid", newWavelet.getWaveletId().getId());
 		newWavelet.getRootBlip().append(gadget);
 		newWavelet.getRootBlip().append("\n");
+		Blip bottomBlip = newWavelet.reply("\n");
 		if(adminConfigDao.getAdminConfig(projectId).isAdsEnabled()){
 			String adGadgetUrl = "http://" + System.getProperty("APP_DOMAIN") +  ".appspot.com/serveAd?id="+projectId;
-			Gadget adGadget = new Gadget(adGadgetUrl);
+			Gadget adGadgetTop = new Gadget(adGadgetUrl);
 			gadget.setProperty("projectId", projectId);
-			newWavelet.getRootBlip().append(adGadget);
+			newWavelet.getRootBlip().append(adGadgetTop);
+			
+			Gadget adGadgetBottom = new Gadget(adGadgetUrl);
+			gadget.setProperty("projectId", projectId);
+			bottomBlip.append(adGadgetBottom);
+			
 		}
-		robot.submit(newWavelet, rpcUrl);
+		
+		
+		List<JsonRpcResponse> submitResponseList = robot.submit(newWavelet, rpcUrl);
+		  for(JsonRpcResponse res : submitResponseList){
+			  Map<ParamsProperty, Object> dataMap = res.getData();
+			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
+				  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+				  robot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true);
+			  }
+		  }
+		  robot.addOrUpdateLinkToBottomOrTopForDigestWave(bottomBlip, newWavelet.getRootBlipId(), false);
 		return newWavelet;
 	}
 

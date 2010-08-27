@@ -18,7 +18,7 @@ public class DigestTabPanel extends DecoratedTabPanel {
 	@Inject
 	public DigestTabPanel(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources,
 			DigestCreateWidget digestCreateWidget, final DigestReportWidget digestReportWidget,
-			final DigestAdminWidget digestAdminWidget, final DigestAboutWidget digestAboutWidget, final VegaUtils utils){
+			final DigestAdminWidget digestAdminWidget, final DigestAboutWidget digestAboutWidget, final AdsenseWidget adsenseWidget, final VegaUtils utils){
 		this.messages = messages;
 		this.constants = constants;
 		this.resources = resources;
@@ -31,6 +31,7 @@ public class DigestTabPanel extends DecoratedTabPanel {
 		this.add(digestCreateWidget, constants.createTabStr());
 		this.add(digestAdminWidget, constants.adminTabStr());
 		this.add(digestReportWidget, constants.reportTabStr());
+//		this.add(adsenseWidget, constants.adsenseTabStr());
 		
 		this.addSelectionHandler(new SelectionHandler<Integer>() {
 			

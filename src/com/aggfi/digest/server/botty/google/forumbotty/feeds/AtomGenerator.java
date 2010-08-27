@@ -19,8 +19,10 @@ import net.sf.jsr107cache.CacheManager;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -32,6 +34,7 @@ public class AtomGenerator extends HttpServlet {
 
   private ForumPostDao forumPostDao = null;
   private ExtDigestDao extDigestDao = null;
+  private AdminConfigDao adminConfigDao = null;
   private Util util = null;
 
   private static Cache cache = null;
@@ -49,9 +52,10 @@ public class AtomGenerator extends HttpServlet {
   }
 
   @Inject
-  public AtomGenerator(ForumPostDao forumPostDao, ExtDigestDao extDigestDao, Util util) {
+  public AtomGenerator(ForumPostDao forumPostDao, ExtDigestDao extDigestDao, AdminConfigDao adminConfigDao, Util util) {
     this.forumPostDao = forumPostDao;
     this.extDigestDao = extDigestDao;
+    this.adminConfigDao = adminConfigDao;
     this.util = util;
   }
 
@@ -70,6 +74,7 @@ public class AtomGenerator extends HttpServlet {
     if (cache.containsKey(FEED_CACHE_NAME+"."+projectId)) {
       resp.setHeader("content-type", "application/atom+xml");
       resp.getWriter().println(cache.get(FEED_CACHE_NAME+"."+projectId));
+      LOG.info("taking content from cache: " + cache.get(FEED_CACHE_NAME+"."+projectId));
     } 
     else
     {
@@ -99,6 +104,8 @@ public class AtomGenerator extends HttpServlet {
       content.append("<author><name>" + System.getProperty("APP_DOMAIN") + "</name></author>");
       content.append(String.format("<updated>%s</updated>", String.format("%sT%s", dateFormat
           .format(latestUpdate), timeFormat.format(latestUpdate))));
+      
+      boolean isAtomFeedPublic = adminConfigDao.getAdminConfig(projectId).isAtomFeedPublic();
 
       for (ForumPost entry : entries) {
         String author = entry.getCreator();
@@ -110,7 +117,10 @@ public class AtomGenerator extends HttpServlet {
         String id = URLEncoder.encode(entry.getId(), "UTF-8");
 
         String waveUrl = String.format("https://wave.google.com/wave/waveref/%s", id.replaceFirst("%21", "/"));
-        String feedTxt = entry.getFirstBlipContent() != null ? entry.getFirstBlipContent().getValue() + "\n\nlink: " + waveUrl : waveUrl;
+        
+       
+        
+        String feedTxt = entry.getFirstBlipContent() != null && isAtomFeedPublic ? entry.getFirstBlipContent().getValue() + "\n\nlink: " + waveUrl : waveUrl;
 
         content.append("<entry>");
         content.append(String.format("<id>http://%s/post/%s</id>", serverHost, id));
@@ -130,6 +140,7 @@ public class AtomGenerator extends HttpServlet {
 
       resp.setHeader("content-type", "application/atom+xml");
       resp.getWriter().println(content.toString());
+      LOG.info("taking content from DB: " + content.toString());
     }
   }
 

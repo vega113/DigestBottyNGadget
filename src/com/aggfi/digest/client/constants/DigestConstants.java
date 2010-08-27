@@ -17,6 +17,7 @@ public interface DigestConstants extends Constants {
 	String adminTabStr();
 	String reportTabStr();
 	String aboutTabStr();
+	String adsenseTabStr();
 	
 	String aboutCreateStr();
 	String aboutDigestBottyStr();
@@ -64,7 +65,6 @@ public interface DigestConstants extends Constants {
 	String submitBtnStr();
 
 	String outputStr();
-	
 	
 	String ownerTitle();
 
@@ -129,6 +129,11 @@ public interface DigestConstants extends Constants {
 	String isPublicQuestionTtl();
 	
 	String exampleWord();
+	
+	String publicStr();
+	String privateStr();
+	String successStr();
+	String isAtomFeedPublicTagExpl();
 
 	/**
 	 * Google Apps domain Id of the DigestBotty
@@ -160,6 +165,9 @@ public interface DigestConstants extends Constants {
 	String tagStr();
 	String regexStr();
 	String syncStr();
+	String setUpAtomFeedStr();
+	String makeTheFeedPublicQuestionStr();
+	String updateStr();
 	
 	String newWavesLast14Days();
 	String breakDown4AllTags();
@@ -179,9 +187,9 @@ public interface DigestConstants extends Constants {
 	@DefaultStringValue(value="aggfiwave")
 	String appDomain();
 	//urls
-	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252BVIL2ZrZkBSb")
+	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252B0R06HrZkBhE%252F")
 	String discussDigestBottyUrl();
-	@DefaultStringValue(value="#restored:search:group%253Agoogle-wave-extension-gallery-all%2540googlegroups.com,restored:wave:googlewave.com%252Fw%252B0R06HrZkCAQ")
+	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252BKNw8wPWXA")
 	String installDigestBottyUrl();
 	
 	@DefaultStringValue(value="UA-13269470-3")
@@ -214,5 +222,6 @@ public interface DigestConstants extends Constants {
 	int itemCreateHeight();
 	@DefaultStringValue(value="238px")
 	String aboutTabScrollHeight();
+	
 	
 }

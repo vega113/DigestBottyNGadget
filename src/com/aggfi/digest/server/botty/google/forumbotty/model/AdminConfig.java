@@ -59,6 +59,9 @@ public class AdminConfig {
   @Expose
   @Persistent
   Text adsense = null;
+  @Expose
+  @Persistent
+  private Boolean  isAtomFeedPublic = Boolean.FALSE;
   
   public Date getCreated() {
 	return created;
@@ -165,5 +168,14 @@ public AdminConfig(String id) {
 
 	public void setAdsense(Text adsense) {
 		this.adsense = adsense;
+	}
+
+	public void setAtomFeedPublic(boolean isPublicOnCreate) {
+		this.isAtomFeedPublic = isPublicOnCreate;
+		
+	}
+	
+	public Boolean isAtomFeedPublic(){
+		return isAtomFeedPublic;
 	}
 }

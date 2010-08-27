@@ -64,6 +64,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	CheckBox isPublicBox;
 	@UiField
 	CheckBox isAdsEnabledBox;
+	@UiField
+	HorizontalPanel isEnableAdsPanel;
 	
 	@UiField
 	HTML isPublicQuestion;
@@ -104,6 +106,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		isPublicQuestion.setText(constants.isPublicQuestion());
 		isPublicQuestion.setTitle(constants.isPublicQuestionTtl());
 		isPublicBox.setTitle(constants.isPublicQuestionTtl());
+		
+		isEnableAdsPanel.setVisible(false);//XXX remove
 
 		submitBtn.addClickHandler(new ClickHandler() {
 			@Override

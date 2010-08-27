@@ -154,6 +154,15 @@
 					</g:ScrollPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
+			<g:CaptionPanel captionText='{constants.setUpAtomFeedStr}'>
+				<g:HorizontalPanel>
+					<g:Label text='{constants.makeTheFeedPublicQuestionStr}'></g:Label>
+					<g:CheckBox ui:field="isAtomFeedPublicCheckBox"></g:CheckBox>
+					<g:Image resource='{res.tooltip}' title='{constants.isAtomFeedPublicTagExpl}' ui:field="img9"/>
+					<g:HTML width="20px"></g:HTML>
+					<g:Button text='{constants.updateStr}' ui:field="isAtomFeedPublicUpdateBtn"></g:Button>
+				</g:HorizontalPanel>
+			</g:CaptionPanel>
 		</g:VerticalPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

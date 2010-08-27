@@ -11,6 +11,7 @@ import com.aggfi.digest.server.botty.digestbotty.admin.GetNextPubPerProject;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetPostByActivity;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
 import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
+import com.aggfi.digest.server.botty.digestbotty.admin.UpdateAtomFeedPublic;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddDefaultParticipant;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddDefaultTag;
@@ -50,6 +51,7 @@ public enum CommandType {
   GET_CONTRIBUTORS_PER_INFLUENCE(GetContributorsPerInfluence.class),
   GET_POST_BY_ACTIVITY(GetPostByActivity.class),
   GET_NEXT_PUB_PER_PROJECT(GetNextPubPerProject.class),
+  UPDATE_ATOM_FEED_PUBLIC(UpdateAtomFeedPublic.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;
