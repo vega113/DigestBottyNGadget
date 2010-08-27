@@ -9,23 +9,39 @@
 
 <title>Embedded Wave by DigestBotty</title>
 <script type="text/javascript">
-(function() {
+function loadDigg() {
 var s = document.createElement('SCRIPT'), s1 = document.getElementsByTagName('SCRIPT')[0];
 s.type = 'text/javascript';
 s.async = true;
 s.src = 'http://widgets.digg.com/buttons.js';
 s1.parentNode.insertBefore(s, s1);
-})();
+
+};
 </script>
 
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
 <script type="text/javascript">
-var globalUrl = "http://" + "<%= request.getServerName() %>";
 	var waveIdToLoad = null;
 	var wavePanel = null;
+	var globalUrl = "http://" + "<%= request.getServerName() %>";
     google.load("wave", "1");
-
+    
+    function createDiggLink(href){
+    	var newlink = document.getElementById("diggLink");
+		var diggSpan = document.getElementById("diggSpan");
+		var title = "<%=request.getParameter("title") != null ? request.getParameter("title") : ""%>";
+		var description= "<%=request.getParameter("description") != null ? request.getParameter("description") : ""%>";
+		diggSpan.innerHTML = description;
+		if(title != null && title != ""){
+			newlink.setAttribute('class', 'DiggThisButton DiggCompact');
+			var newHref = "http://digg.com/submit?url=" + escape(href) + "&amp;title=" + escape(title);
+			newlink.setAttribute('href',newHref );
+		}
+		
+    }
+    
     function initialize() {
+    	
       var waveFrame = document.getElementById("waveframe");
       var embedOptions = {
         target: waveFrame,
@@ -36,20 +52,117 @@ var globalUrl = "http://" + "<%= request.getServerName() %>";
       if(wavePanel == null){
     	  wavePanel = new google.wave.WavePanel(embedOptions);
       }
-     
-      if(waveIdToLoad == null){
-    	  var idWave = "<%=request != null && request.getParameter("waveId") != null ? request.getParameter("waveId") : ""%>";
-          if(idWave != null && idWave != ""){
-        	  waveIdToLoad = idWave;
-        	  document.getElementById("likeFrame").src="http://www.facebook.com/plugins/like.php?href=" + globalUrl + "/showembedded?waveId=" + idWave + ";layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35";
-        	  document.getElementById("diggButton").href=globalUrl + "/showembedded?waveId=" + idWave;
-        	  wavePanel.loadWave(waveIdToLoad);
-          }
-      }else if(waveIdToLoad != ""){
+      var idWave = "<%=request.getParameter("waveId") != null ? request.getParameter("waveId") : ""%>";
+      if(idWave != null && idWave != ""){
+    	  waveIdToLoad = idWave;
+    	  document.getElementById("likeFrame").src="http://www.facebook.com/plugins/like.php?href=" + escape(globalUrl) + "/showembedded?waveId=" + escape(idWave) + ";layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35";
+    	  loadDigg();
+    	  createDiggLink(globalUrl + "/showembedded?waveId=" + escape(idWave));
     	  wavePanel.loadWave(waveIdToLoad);
+    	  var title = "<%=request.getParameter("title") != null ? request.getParameter("title") : ""%>";
+    	  if(title != null && title != ""){
+    		  document.title=title;
+    	  }
+    	  var description = "<%=request.getParameter("description") != null ? request.getParameter("description") : ""%>";
+    	  if(description != null && description != ""){
+    		  var forumDescription = document.getElementById("forumDescription");
+    		  forumDescription.style.display="inline";
+    		  forumDescription.innerHTML="<b>Forum description</b>: " + description;
+    	  }else{
+    		  var forumDescription = document.getElementById("forumDescription");
+    		  forumDescription.style.display="none";
+    		  forumDescription.innerHTML="";
+    	  }
       }
       
+     
+      jQuery('#submitForumId').click(function() {
+		  var selectedProjId = document.getElementById('forumIdInput').value;
+		  var waveId = prjsMap[selectedProjId];
+		  var description = null;
+		  waveIdToLoad = waveId;
+		  var title = null;
+		  if(titlesMap != null && titlesMap[waveIdToLoad] != null && titlesMap[waveIdToLoad].length > 0){
+			  title = titlesMap[waveIdToLoad];
+		  }
+		  if(descriptionsMap != null && descriptionsMap[waveIdToLoad] != null && descriptionsMap[waveIdToLoad].length > 0){
+			  description = descriptionsMap[waveIdToLoad];
+		  }
+		  if(waveId != null && waveId != ""){
+			 
+			  var url =   globalUrl + "/showembedded?waveId=" + escape(waveIdToLoad);
+			  if(title != null){
+				  url = url +  "&title=" + escape(title);
+			  }
+			  if(description != null){
+				  url = url +  "&description=" + escape(description);
+			  }
+				try{
+					window.location.href = url;
+				//_trackEvent("/embed", "clickAd");
+				}catch(e){
+					alert(url + ": " + e);
+				}
+		  }
+		  
+	  });
+
+	  jQuery('#submitWaveId').click(function() {
+		  var selectedWaveId = document.getElementById('waveSubmitId').value;
+		  if(selectedWaveId != null && selectedWaveId != ""){
+			  waveIdToLoad = selectedWaveId;
+			  var url =  globalUrl + "/showembedded?waveId=" + waveIdToLoad;
+				try{
+					window.location.href = url;
+				//_trackEvent("/embed", "clickAd");
+				}catch(e){
+					alert(url + ": " + e);
+				}
+		  }
+		  
+	  });
+	  
+    	  jsonrpc.makeRequest("GET_ALL_FORUMS_IDS", null, function(data) {
+    	      try {
+    		      json = JSON.parse(data);
+    		      if(!json.error){
+    		    	  prjsMap = json.result;
+    		    	  titlesMap = json.resultTitles;
+    		    	  descriptionsMap = json.resultDescriptions;
+    					var prjValues = "";
+    					for (prjId in prjsMap) {  
+    						var prjIdElems = prjId.split("-");
+    						var realPrjId = prjIdElems[prjIdElems.length-1];
+    						if(prjIdElems.length == 2){
+    							realPrjId = realPrjId + " (" + prjIdElems[0] +")";
+    						}else if(prjIdElems.length  == 3){
+    							var user = prjIdElems[0] + "@" + prjIdElems[1] + ".com";
+    							realPrjId = realPrjId  +  "(" + user  +")";
+    						}
+    						prjValues = prjValues + realPrjId + "#" + prjId + "#";
+    						prjsMap[realPrjId] = prjsMap[prjId];
+    					}
+    					var autoCompleteData = prjValues.split("#");
+    					$("#forumIdInput").autocomplete(autoCompleteData); 
+    					var forumId = "<%=request != null && request.getParameter("forumId") != null ? request.getParameter("forumId") : ""%>";
+    					if(forumId != null && forumId != ""){
+    						waveIdToLoad = prjsMap[forumId];
+    						var url =  "http://digestbotty.appspot.com/showembedded?waveId=" + waveIdToLoad + "&title=" + escape(titlesMap[waveIdToLoad]) + "&description=" + escape(descriptionsMap[waveIdToLoad]);
+    						try{
+    							window.location.href = url;
+    						//_trackEvent("/embed", "clickAd");
+    						}catch(e){
+    							alert(url + ": " + e);
+    						}
+    					}
+    		      }
+    	      } catch (exception) {
+    	        alert(exception);
+    	      }
+    	  });
+      
     }
+    
     google.setOnLoadCallback(initialize);
 </script>
 
@@ -64,59 +177,8 @@ var globalUrl = "http://" + "<%= request.getServerName() %>";
 <script type="text/javascript">
 var prjsMap = null;
 var json = null;
-jQuery(document).ready(function() {  
-  jQuery('#submitForumId').click(function() {
-	  var selectedProjId = document.getElementById('forumIdInput').value;
-	  var waveId = prjsMap[selectedProjId];
-	  if(waveId != null && waveId != ""){
-		  waveIdToLoad = waveId;
-			initialize();
-	  }
-	  
-  });
-
-  jQuery('#submitWaveId').click(function() {
-	  var selectedWaveId = document.getElementById('waveSubmitId').value;
-	  if(selectedWaveId != null && selectedWaveId != ""){
-		  waveIdToLoad = selectedWaveId;
-			initialize();
-	  }
-	  
-  });
-
-  jsonrpc.makeRequest("GET_ALL_FORUMS_IDS", null, function(data) {
-      try {
-	      json = JSON.parse(data);
-	      if(!json.error){
-	    	  prjsMap = json.result;
-				var prjValues = "";
-				for (prjId in prjsMap) {  
-					var prjIdElems = prjId.split("-");
-					var realPrjId = prjIdElems[prjIdElems.length-1];
-					if(prjIdElems.length == 2){
-						realPrjId = realPrjId + " (" + prjIdElems[0] +")";
-					}else if(prjIdElems.length  == 3){
-						var user = prjIdElems[0] + "@" + prjIdElems[1] + ".com";
-						realPrjId = realPrjId  +  "(" + user  +")";
-					}
-					prjValues = prjValues + realPrjId + "#" + prjId + "#";
-					prjsMap[realPrjId] = prjsMap[prjId];
-				}
-				var autoCompleteData = prjValues.split("#");
-				$("#forumIdInput").autocomplete(autoCompleteData); 
-				var forumId = "<%=request != null && request.getParameter("forumId") != null ? request.getParameter("forumId") : ""%>";
-				if(forumId != null && forumId != ""){
-					document.getElementById("likeFrame").src="http://www.facebook.com/plugins/like.php?href=" + globalUrl + "/showembedded?forumId=" + forumId + ";layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35";
-					document.getElementById("diggButton").href=globalUrl + "/showembedded?forumId=" + forumId;
-					waveIdToLoad = prjsMap[forumId];
-					initialize();
-				}
-	      }
-      } catch (exception) {
-        alert(exception);
-      }
-  });
-});
+var titlesMap = null;
+var descriptionsMap = null;
 </script>
 
 <script type="text/javascript">
@@ -139,6 +201,7 @@ _gaq.push(['_trackPageview']);
 		Create Wave-based forum with <a href="#" onclick="linkClicked()">DigestBotty</a></div>
 		</td>
 	</tr>
+	<tr align="center"><td><div id="forumDescription" style="display: none"></div></td></tr>
 	<tr align="center">
 		<td align="center">
 		<div id="waveframe" style="width: 800px; height: 700px"></div>
@@ -154,18 +217,19 @@ _gaq.push(['_trackPageview']);
 				<input type="text" id="waveSubmitId" style="width: 250px " />
 				<input type="button" id="submitWaveId" value="display"/>
 			</div>
-			<div style="height: 35px">
-				<iframe id="likeFrame" src="http://www.facebook.com/plugins/like.php?href=http://digestbotty.appspot.com/showembedded;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:35px;" allowTransparency="true"></iframe>
-			</div>
-			<div>
-				<a id="diggButton" class="DiggThisButton DiggMedium"
-						href="http://digg.com/submit?url=http%3A//mashable.com/2010/03/18/digg-social-news"></a>
-			</div>
 			<div>
 				<a id="openInGWave" href="#" onclick="openInGWave()"> Open natively in Google Wave</a>
 			</div>
+			<div>
+				<a id='diggLink'><span style="display:none" id="diggSpan"></span></a>
+			</div>
+			<div style="height: 125px">
+				<iframe id="likeFrame"  scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:75px;" allowTransparency="true"></iframe>
+			</div>
+			
 		</td>
 	</tr>
+	
 </table>
 
 <script type="text/javascript">
