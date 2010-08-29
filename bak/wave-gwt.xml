@@ -1,0 +1,108 @@
+<project name="Ant Build Script with Git Support">
+	<!-- ================================= 
+          target: name              
+         ================================= -->
+	<target name="backup_gwt" description="backup_wave">
+		<copy file="./src/com/aggfi/digest/client/feature/minimessages/MiniMessagesFeature.java" tofile="./bak_gwt/MiniMessagesFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/minimessages/NeedsMiniMessages.java" tofile="./bak_gwt/NeedsMiniMessages.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/views/ViewsFeature.java" tofile="./bak_gwt/ViewsFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/views/NeedsViews.java" tofile="./bak_gwt/NeedsViews.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/views/Views.java" tofile="./bak_gwt/Views.java" overwrite="true" failonerror="false">
+				</copy>
+		<copy file="./src/com/aggfi/digest/client/inject/DigestGinModule.java" tofile="./bak_gwt/DigestGinModule.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/request/WaveRequestServiceImpl.java" tofile="./bak_gwt/WaveRequestServiceImpl.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/utils/DigestUtils.java" tofile="./bak_gwt/DigestUtils.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/DigestBottyGadget.java" tofile="./bak_gwt/DigestBottyGadget.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" tofile="./bak_gwt/DigestBottyGadget.gwt.xml" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./war/localdebug.html" tofile="./bak_gwt/localdebug.html" overwrite="true" failonerror="false">
+		</copy>
+	</target>
+
+	<!-- ================================= 
+          target: name              
+         ================================= -->
+	<target name="restore_gwt"  description="restore_wave">
+		<copy file="./bak_gwt/MiniMessagesFeature.java" tofile="./src/com/aggfi/digest/client/feature/minimessages/MiniMessagesFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/NeedsMiniMessages.java" tofile="./src/com/aggfi/digest/client/feature/minimessages/NeedsMiniMessages.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/ViewsFeature.java" tofile="./src/com/aggfi/digest/client/feature/views/ViewsFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/NeedsViews.java" tofile="./src/com/aggfi/digest/client/feature/views/NeedsViews.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/Views.java" tofile="./src/com/aggfi/digest/client/feature/views/Views.java" overwrite="true" failonerror="false">
+				</copy>
+		<copy file="./bak_gwt/DigestGinModule.java" tofile="./src/com/aggfi/digest/client/inject/DigestGinModule.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/WaveRequestServiceImpl.java" tofile="./src/com/aggfi/digest/client/request/WaveRequestServiceImpl.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/DigestUtils.java" tofile="./src/com/aggfi/digest/client/utils/DigestUtils.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/DigestBottyGadget.java" tofile="./src/com/aggfi/digest/client/DigestBottyGadget.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_gwt/DigestBottyGadget.gwt.xml" tofile="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" overwrite="true" failonerror="false">
+		</copy>
+	</target>
+
+
+	<target name="backup_wave" description="backup_wave">
+		<copy file="./src/com/aggfi/digest/client/feature/minimessages/MiniMessagesFeature.java" tofile="./bak_wave/MiniMessagesFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/minimessages/NeedsMiniMessages.java" tofile="./bak_wave/NeedsMiniMessages.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/views/ViewsFeature.java" tofile="./bak_wave/ViewsFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/views/NeedsViews.java" tofile="./bak_wave/NeedsViews.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/feature/views/Views.java" tofile="./bak_wave/Views.java" overwrite="true" failonerror="false">
+				</copy>
+		<copy file="./src/com/aggfi/digest/client/inject/DigestGinModule.java" tofile="./bak_wave/DigestGinModule.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/request/WaveRequestServiceImpl.java" tofile="./bak_wave/WaveRequestServiceImpl.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/utils/DigestUtils.java" tofile="./bak_wave/DigestUtils.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/client/DigestBottyGadget.java" tofile="./bak_wave/DigestBottyGadget.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" tofile="./bak_wave/DigestBottyGadget.gwt.xml" overwrite="true" failonerror="false">
+		</copy>
+	</target>
+
+	<!-- ================================= 
+	          target: name              
+	         ================================= -->
+	<target name="restore_wave"  description="restore_wave">
+		<copy file="./bak_wave/MiniMessagesFeature.java" tofile="./src/com/aggfi/digest/client/feature/minimessages/MiniMessagesFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/NeedsMiniMessages.java" tofile="./src/com/aggfi/digest/client/feature/minimessages/NeedsMiniMessages.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/ViewsFeature.java" tofile="./src/com/aggfi/digest/client/feature/views/ViewsFeature.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/NeedsViews.java" tofile="./src/com/aggfi/digest/client/feature/views/NeedsViews.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/Views.java" tofile="./src/com/aggfi/digest/client/feature/views/Views.java" overwrite="true" failonerror="false">
+				</copy>
+		<copy file="./bak_wave/DigestGinModule.java" tofile="./src/com/aggfi/digest/client/inject/DigestGinModule.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/WaveRequestServiceImpl.java" tofile="./src/com/aggfi/digest/client/request/WaveRequestServiceImpl.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/DigestUtils.java" tofile="./src/com/aggfi/digest/client/utils/DigestUtils.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/DigestBottyGadget.java" tofile="./src/com/aggfi/digest/client/DigestBottyGadget.java" overwrite="true" failonerror="false">
+		</copy>
+		<copy file="./bak_wave/DigestBottyGadget.gwt.xml" tofile="./src/com/aggfi/digest/DigestBottyGadget.gwt.xml" overwrite="true" failonerror="false">
+		</copy>
+		<delete file="./home/vega/wavetrady_27_04/DigestBottyNGadget/war/localdebug.html">
+		</delete>
+	</target>
+</project>
+
