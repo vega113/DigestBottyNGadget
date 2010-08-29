@@ -314,4 +314,19 @@ public class DigestServiceImpl implements DigestService {
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);
 	}
+	
+	@Override
+	public void addSecurePostGadget(String projectId, String userId, AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("userId", new JSONString(userId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_SECURE_POST_GADGET"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
 }

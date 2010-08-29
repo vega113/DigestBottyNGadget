@@ -2,6 +2,8 @@ package com.aggfi.digest.client.ui;
 
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.resources.GlobalResources;
@@ -82,6 +84,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	CheckBox isAtomFeedPublicCheckBox;
 	@UiField
 	Button isAtomFeedPublicUpdateBtn;
+	@UiField
+	Button addSecurePostGadgetBtn;
 	
 	@UiField
 	CaptionPanel addParticipantWaveCaption;//FIXME remove
@@ -602,6 +606,37 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 		}
 	}
 	
+	@UiHandler("addSecurePostGadgetBtn")
+	protected void addSecurePostGadget(ClickEvent event){
+		if(getProjectId().equals("")){
+			vegaUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
+		String projectId = getProjectId();
+		String userId = vegaUtils.retrUserId();
+		String msg = messages.sentRequest2Add1(constants.secureGadgetStr());
+		vegaUtils.showStaticMessage(msg);
+		try {
+			digestService.addSecurePostGadget(projectId, userId, new AsyncCallback<JSONValue>() {
+				
+				@Override
+				public void onSuccess(JSONValue result) {
+					vegaUtils.dismissStaticMessage();
+					vegaUtils.showSuccessMessage(constants.successStr(), 3);
+					Log.debug(result.toString());
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					vegaUtils.dismissAllStaticMessages();
+					vegaUtils.alert(caught.getMessage());
+					Log.error("", caught);
+				}
+			});
+		} catch (RequestException e) {
+		}
+	}
+	
 	
 	
 	private void initJsonMapModule(JSONValue result,String jsonFieldName, ComplexPanel panel,RemoveHandler removeHandler) {
@@ -689,13 +724,17 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	Image img8;
 	@UiField
 	Image img9;
+	@UiField
+	Image img10;
 	private void initImageHandler(){
 		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler(vegaUtils);
-		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8, img9};
+		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8, img9,img10};
 		for(Image image : images){
 			image.addMouseDownHandler(mouseDownHandler);
 		}
 	}
+	
+	@Override
 	public String getName(){
 		return "admin";
 	}

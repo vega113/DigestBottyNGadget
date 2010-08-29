@@ -1,8 +1,10 @@
 package com.aggfi.digest.server.botty.google.forumbotty.admin;
 
 import com.aggfi.digest.server.botty.digestbotty.admin.AddDigestManager;
+import com.aggfi.digest.server.botty.digestbotty.admin.AddReadOnlyPostGadget;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddWavesParticipant;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
+import com.aggfi.digest.server.botty.digestbotty.admin.CreateNewPost;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetAllForumIds;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsCount;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsPerContributor;
@@ -52,6 +54,8 @@ public enum CommandType {
   GET_POST_BY_ACTIVITY(GetPostByActivity.class),
   GET_NEXT_PUB_PER_PROJECT(GetNextPubPerProject.class),
   UPDATE_ATOM_FEED_PUBLIC(UpdateAtomFeedPublic.class),
+  CREATE_NEW_POST(CreateNewPost.class),
+  ADD_SECURE_POST_GADGET(AddReadOnlyPostGadget.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

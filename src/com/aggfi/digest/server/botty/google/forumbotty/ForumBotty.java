@@ -198,7 +198,7 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 	  }
   }
 
-	private void appendAd2Blip(Blip blip, String projectId, boolean isAdReplyBlip) {
+	public void appendAd2Blip(Blip blip, String projectId, boolean isAdReplyBlip) {
 		String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/serveAd?id=" + projectId;
 		//check if blip already contains the add gadget. 
 		Gadget gadget = null;
@@ -351,6 +351,12 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
     if (isDigestWave(event.getBundle().getProxyingFor())) {
       return;
     } 
+    //if it is a gadget event - skip
+    if (isDigestAdmin(event.getBundle().getProxyingFor())) {
+        return;
+      } 
+    
+    
     
     // If this is unworthy wavelet (empty), skip processing.
     if (!isWorthy(event.getWavelet()) && event.getBlip().isRoot()) {
@@ -409,7 +415,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
    
   }
 
-  protected void addBack2Digest2RootBlip(String projectId,
+  public void addBack2Digest2RootBlip(String projectId,
 			Blip rootBlip, ForumPost entry) {
 		Annotations annotations = rootBlip.getAnnotations();
 		  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
@@ -418,8 +424,8 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 			  List<ExtDigest> digestsList = extDigestDao.retrDigestsByProjectId(projectId);
 			  if(digestsList != null && digestsList.size() > 0 ){
 				  String forumName = digestsList.size() > 0 ? digestsList.get(0).getName() : "";
-				  String back2digestWaveStr = " \nBack to \"" + forumName + "\" digest";
-				  LOG.info("content: " + rootBlip.getContent());
+				  String back2digestWaveStr = "\nBack to \"" + forumName + "\" digest";
+				  LOG.fine("content: " + rootBlip.getContent());
 				  BlipContentRefs rootBlipRef = rootBlip.at(rootBlip.getContent().length());
 				  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
 				  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
@@ -725,8 +731,16 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	    }
 	  JSONObject json = new JSONObject();
 	  Blip blip = e.getBlip();
-	  String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml";
-	  Gadget gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
+	  Gadget gadget = null;
+	  String[] gadgetUrls = createGadgetUrlsArr();
+	  int i = 0;
+	  String gadgetUrl = null;
+	  while(gadget == null){
+		  gadgetUrl = gadgetUrls[i];
+		  gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
+		  i++;
+	  }
+	  
 	  try{
 		  if(gadget!=null)
 		  {
@@ -736,8 +750,6 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 				  String postBody = gadget.getProperty(key);
 				  if(split != null && split.length == 3 && split[0].equalsIgnoreCase("request") && postBody != null){
 					  String responseKey = "response#" + split[1] + "#" +  split[2];
-					  long currTime = System.currentTimeMillis();
-					  long requestTime = Long.parseLong(split[2]);
 					  LOG.info("Found request: " + key + ", body: " + postBody);
 					  Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 					  JsonRpcRequest jsonRpcRequest = gson.fromJson(postBody, JsonRpcRequest.class);
@@ -782,6 +794,13 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 		  LOG.severe(sw.toString());
 	  }
   }
+
+protected String[] createGadgetUrlsArr() {
+	String gadgetUrl1 = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/digestbottygadget/com.aggfi.digest.client.DigestBottyGadget.gadget.xml";
+	  String gadgetUrl2 = System.getProperty("READONLYPOST_GADGET_URL");
+	  String[] gadgetUrls = {gadgetUrl1, gadgetUrl2};
+	return gadgetUrls;
+}
 
   	/**
   	 * 

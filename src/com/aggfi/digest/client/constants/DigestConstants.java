@@ -134,6 +134,9 @@ public interface DigestConstants extends Constants {
 	String privateStr();
 	String successStr();
 	String isAtomFeedPublicTagExpl();
+	String addSecureGadgetExpl();
+	String addSecureGadgetQuestionStr();
+	String secureGadgetStr();
 
 	/**
 	 * Google Apps domain Id of the DigestBotty

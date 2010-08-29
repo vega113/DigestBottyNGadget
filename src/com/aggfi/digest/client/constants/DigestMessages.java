@@ -46,6 +46,7 @@ public interface DigestMessages extends Messages {
   String aboutHlpMsg(String imageUrl);
 
   String sentRequest2Add(String what, String name);
+  String sentRequest2Add1(String what);
   String sentRequest2Remove(String what, String name);
   
   String add2WavesSuccessMsg(String what, int wavesNumber);

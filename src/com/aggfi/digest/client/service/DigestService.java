@@ -55,4 +55,7 @@ public interface DigestService {
 	void updateAtomFeedPublic(String projectId, boolean isMakeAtomFeedPublic,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
+	void addSecurePostGadget(String projectId, String userId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
 }

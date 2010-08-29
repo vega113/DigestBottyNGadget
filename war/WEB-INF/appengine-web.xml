@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
   <application>digestbotty</application>
-  <version>beta0284</version>
+  <version>beta029</version>
   
   <!-- Configure java.util.logging -->
   <system-properties>
@@ -27,6 +27,7 @@
     <property name="MAX_WAVELET_FETCH_SIZE" value="1000"/>
     <property name="PUBLIC_GROUP" value="digestbotty-public@googlegroups.com"/>
     <property name="CLICK_GADGET_URL" value="http://waveclick.appspot.com/waveclick/com.aggfi.wave.waveclick.client.WaveClick.gadget.xml"/>
+    <property name="READONLYPOST_GADGET_URL" value="http://readonlypost.appspot.com/readonlygadget/com.aggfi.digest.client.ReadOnlyGadget.gadget.xml"/>
     <property name="DIGESTBOTTY_FORUM_FAQ_LINK" value="googlewave.com!w+VIL2ZrZkBSb"/>
     <property name="DIGESTBOTTY_DIGEST_LINK" value="googlewave.com!w+0R06HrZkBhE"/>
     <property name="PROFILE_URL" value="https://wave.google.com/wave/waveref/googlewave.com/w+0R06HrZkBhE"/>

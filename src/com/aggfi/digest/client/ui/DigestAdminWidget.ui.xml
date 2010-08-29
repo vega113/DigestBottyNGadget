@@ -155,13 +155,32 @@
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 			<g:CaptionPanel captionText='{constants.setUpAtomFeedStr}'>
-				<g:HorizontalPanel>
+				<g:VerticalPanel>
+					<g:HorizontalPanel>
 					<g:Label text='{constants.makeTheFeedPublicQuestionStr}'></g:Label>
 					<g:CheckBox ui:field="isAtomFeedPublicCheckBox"></g:CheckBox>
 					<g:Image resource='{res.tooltip}' title='{constants.isAtomFeedPublicTagExpl}' ui:field="img9"/>
 					<g:HTML width="20px"></g:HTML>
-					<g:Button text='{constants.updateStr}' ui:field="isAtomFeedPublicUpdateBtn"></g:Button>
+					<g:HorizontalPanel>
+						<g:HTML width="34px"></g:HTML>
+						<g:Button text='{constants.updateStr}' ui:field="isAtomFeedPublicUpdateBtn"></g:Button>
+					</g:HorizontalPanel>
+					
 				</g:HorizontalPanel>
+				<g:VerticalPanel>
+					<g:HTML height="10px"></g:HTML>
+				</g:VerticalPanel>
+				<g:HorizontalPanel>
+					<g:Label text='{constants.addSecureGadgetQuestionStr}'></g:Label>
+					<g:HTML width='10px'></g:HTML>
+					<g:Image resource='{res.tooltip}' title='{constants.addSecureGadgetExpl}' ui:field="img10"/>
+					<g:HTML width="20px"></g:HTML>
+					<g:HorizontalPanel>
+						<g:HTML width='34px'></g:HTML>
+						<g:Button text='{constants.addBtnName}' ui:field="addSecurePostGadgetBtn"></g:Button>
+					</g:HorizontalPanel>
+				</g:HorizontalPanel>
+				</g:VerticalPanel>
 			</g:CaptionPanel>
 		</g:VerticalPanel>
 	</g:HTMLPanel>

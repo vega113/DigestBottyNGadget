@@ -2,6 +2,7 @@ package com.aggfi.digest.server.botty.google.forumbotty.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.jdo.annotations.IdentityType;
@@ -67,7 +68,16 @@ public class ForumPost {
     this.domain = wavelet.getWaveId().getDomain();
     this.waveId = wavelet.getWaveId().getId();
     this.id = domain + "!" + wavelet.getWaveId().getId();
-    this.creator = wavelet.getCreator();
+    List<String> contributors = wavelet.getRootBlip().getContributors();
+    String creator = null;
+    for(String contributor : contributors){
+    	//the first modifier besides rusty@a.gwave.com is probably the creator
+    	if(contributor.indexOf("gwave.com") < 0 && contributor.indexOf("appspot.com") < 0){
+    		creator = contributor;
+    		break;
+    	}
+    }
+    this.creator = creator;
     this.lastUpdated = new Date();
     this.created = new Date();
     this.title = wavelet.getTitle();
@@ -190,5 +200,9 @@ public int getRootBlipsWithoutAdCount() {
 
 public void setRootBlipsWithoutAdCount(int rootBlipsWithoutAdCount) {
 	this.rootBlipsWithoutAdCount = rootBlipsWithoutAdCount;
+}
+
+public void setCreator(String creator) {
+	this.creator = creator;
 }
 }
