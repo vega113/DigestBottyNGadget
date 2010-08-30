@@ -76,6 +76,10 @@ public class CreateDigest extends Command {
 			adminConfig.setAdsEnabled(isAdsEnabled);
 			boolean isPublicOnCreate = Boolean.parseBoolean(this.getParam("publicOnCreate"));
 			adminConfig.setAtomFeedPublic(isPublicOnCreate);
+			adminConfig.setDiggBtnEnabled(isPublicOnCreate);
+			adminConfig.setBuzzBtnEnabled(isPublicOnCreate);
+			adminConfig.setTweetBtnEnabled(isPublicOnCreate);
+			adminConfig.setFaceBtnEnabled(isPublicOnCreate);
 			adminConfigDao.save(adminConfig);
 	    	
 	    	String senderId = this.getParam("senderId");

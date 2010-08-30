@@ -86,6 +86,18 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	Button isAtomFeedPublicUpdateBtn;
 	@UiField
 	Button addSecurePostGadgetBtn;
+	@UiField
+	Button isSocialBtnsUpdateBtn;
+	
+	@UiField
+	CheckBox isDiggEnabledCheckBox;
+	@UiField
+	CheckBox isBuzzEnabledCheckBox;
+	@UiField
+	CheckBox isTweetEnabledCheckBox;
+	@UiField
+	CheckBox isFaceEnabledCheckBox;
+	
 	
 	@UiField
 	CaptionPanel addParticipantWaveCaption;//FIXME remove
@@ -148,7 +160,17 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 							initJsonArrayModule(result,"managers",managersPanel,removeManagerHandler);
 							boolean isAtomFeedPublic = result.isObject().get("isAtomFeedPublic").isBoolean().booleanValue();
 							isAtomFeedPublicCheckBox.setValue(isAtomFeedPublic);
-							Log.debug("dismissMessage");
+							
+							boolean isDiggEnabled = result.isObject().get("isDiggBtnEnabled").isBoolean().booleanValue();
+							isDiggEnabledCheckBox.setValue(isDiggEnabled);
+							boolean isBuzzEnabled = result.isObject().get("isBuzzBtnEnabled").isBoolean().booleanValue();
+							isBuzzEnabledCheckBox.setValue(isBuzzEnabled);
+							boolean isTweetEnabled = result.isObject().get("isTweetBtnEnabled").isBoolean().booleanValue();
+							isTweetEnabledCheckBox.setValue(isTweetEnabled);
+							boolean isFaceEnabled = result.isObject().get("isFaceBtnEnabled").isBoolean().booleanValue();
+							isFaceEnabledCheckBox.setValue(isFaceEnabled);
+							
+							Log.debug(result.toString());
 							vegaUtils.dismissStaticMessage();
 						}
 
@@ -356,15 +378,62 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 					public void onSuccess(JSONValue result) {
 						vegaUtils.dismissStaticMessage();
 						vegaUtils.showSuccessMessage(constants.successStr(), 3);
+						Log.info(result.toString());
 					}
 
 					@Override
 					public void onFailure(Throwable caught) {
+						vegaUtils.dismissStaticMessage();
 						vegaUtils.alert(caught.getMessage());
 
 					}
 				});
 			} catch (RequestException e) {
+				Log.error("", e);
+			}
+		}catch(IllegalArgumentException e){
+			digestAlert(e);
+		}
+		try{
+			vegaUtils.reportEvent("/admin/update","atomFeedPublicUpdate", getProjectId(), 1);
+		}catch (Exception e) {
+			Log.error("", e);
+		}
+	}
+	
+	@UiHandler("isSocialBtnsUpdateBtn")
+	protected void socialBtnsUpdate(ClickEvent event){
+		if(getProjectId().equals("")){
+			vegaUtils.alert(constants.noForumSelectedWarning());
+			return;
+		}
+		Boolean isDiggEnabled = isDiggEnabledCheckBox.getValue();
+		Boolean isBuzzEnabled = isBuzzEnabledCheckBox.getValue();
+		Boolean isTweetEnabled = isTweetEnabledCheckBox.getValue();
+		Boolean isFaceEnabled = isFaceEnabledCheckBox.getValue();
+		
+		
+		try{
+			try {
+				vegaUtils.showStaticMessage(messages.sentRequest2UpdateSocialBtns(isDiggEnabled.toString(),isBuzzEnabled.toString(),isTweetEnabled.toString(),isFaceEnabled.toString()));
+				digestService.updateSocialBtnsSettings(getProjectId(), isDiggEnabled, isBuzzEnabled, isTweetEnabled, isFaceEnabled, new AsyncCallback<JSONValue>() {
+
+					@Override
+					public void onSuccess(JSONValue result) {
+						vegaUtils.dismissStaticMessage();
+						vegaUtils.showSuccessMessage(constants.successStr(), 3);
+						Log.info(result.toString());
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						vegaUtils.dismissStaticMessage();
+						vegaUtils.alert(caught.getMessage());
+
+					}
+				});
+			} catch (RequestException e) {
+				vegaUtils.dismissStaticMessage();
 				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
@@ -726,9 +795,11 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect 
 	Image img9;
 	@UiField
 	Image img10;
+	@UiField
+	Image img11;
 	private void initImageHandler(){
 		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler(vegaUtils);
-		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8, img9,img10};
+		Image[] images = {img1,img2,img3,img4,img5,img6,img7,img8, img9,img10,img11};
 		for(Image image : images){
 			image.addMouseDownHandler(mouseDownHandler);
 		}

@@ -55,21 +55,17 @@ public class AddReadOnlyPostGadget extends Command {
 	    participantsSet.add(userId);
 	    Wavelet newWavelet = null;
 		try {
-			newWavelet = robot.newWave(robot.getDomain(), participantsSet ,"NEW_POST","gadget",robot.getRpcServerUrl());
+			newWavelet = robot.newWave(robot.getDomain(), participantsSet ,"NEW_POST",projectId,robot.getRpcServerUrl());
 		} catch (IOException e) {
 			LOG.log(Level.SEVERE, "", e);
 		}
-		String title = "Create \"View Only\" posts here.";
+		String title = "New Secure Post";
 		newWavelet.setTitle(title);
-		 if(newWavelet.getParticipants().contains("public@a.gwave.com")){
+		if(newWavelet.getParticipants().contains(System.getProperty("PUBLIC_GROUP"))){
+			newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
+		}else if(newWavelet.getParticipants().contains("public@a.gwave.com")){
 			newWavelet.getParticipants().setParticipantRole("public@a.gwave.com", Participants.Role.READ_ONLY);
 		}
-		 for(String participant : newWavelet.getParticipants()){
-				if(participant.indexOf("googlegroups.com") > 0){
-					newWavelet.getParticipants().setParticipantRole(participant, Participants.Role.READ_ONLY);
-				}
-		}
-		 newWavelet.getParticipants().add(System.getProperty("APP_DOMAIN") + "+" + projectId + "@appspot.com");
 		
 		ForumPost entry = robot.addOrUpdateDigestWave(projectId, newWavelet, newWavelet.getRootBlip(), userId);
 		String projectName = extDigestDao.retrDigestsByProjectId(projectId).get(0).getName();

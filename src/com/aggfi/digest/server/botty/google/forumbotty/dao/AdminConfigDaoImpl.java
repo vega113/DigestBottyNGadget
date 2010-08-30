@@ -36,15 +36,39 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 			List<AdminConfig> adminConfigs = (List<AdminConfig>) query.execute(id);
 			if (adminConfigs.size() > 0) {
 				adminConfig = pm.detachCopy(adminConfigs.get(0));
+				boolean isForumPublic = isForumPublicByGroup(adminConfig);
+				
+				boolean isUpdate = false;
 				if(adminConfig.isAtomFeedPublic() == null){
-					if(adminConfig.getDefaultParticipants().contains("public@a.gwave.com") || adminConfig.getDefaultParticipants().contains(System.getProperty("PUBLIC_GROUP"))){
-						adminConfig.setAtomFeedPublic(true);
-					}else{
-						adminConfig.setAtomFeedPublic(false);
-					}
+					adminConfig.setAtomFeedPublic(isForumPublic);
+					isUpdate = true;
+				}
+				
+				if(adminConfig.isDiggBtnEnabled() == null){
+					adminConfig.setDiggBtnEnabled(isForumPublic);
+					isUpdate = true;
+				}
+				if(adminConfig.isDiggBtnEnabled() == null){
+					adminConfig.setDiggBtnEnabled(isForumPublic);
+					isUpdate = true;
+				}
+				if(adminConfig.isBuzzBtnEnabled() == null){
+					adminConfig.setBuzzBtnEnabled(isForumPublic);
+					isUpdate = true;
+				}
+				if(adminConfig.isTweetBtnEnabled() == null){
+					adminConfig.setTweetBtnEnabled(isForumPublic);
+					isUpdate = true;
+				}
+				if(adminConfig.isFaceBtnEnabled() == null){
+					adminConfig.setFaceBtnEnabled(isForumPublic);
+					isUpdate = true;
+				}
+				if(isUpdate == true){
 					pm.makePersistent(adminConfig);
 					adminConfig = pm.detachCopy(adminConfig);
 				}
+				
 			} else {
 				adminConfig = new AdminConfig(id);
 
@@ -67,6 +91,10 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 		}
 
 		return adminConfig;
+	}
+
+	public boolean isForumPublicByGroup(AdminConfig adminConfig) {
+		return adminConfig.getDefaultParticipants().contains("public@a.gwave.com") || adminConfig.getDefaultParticipants().contains(System.getProperty("PUBLIC_GROUP"));
 	}
 
 	@Override

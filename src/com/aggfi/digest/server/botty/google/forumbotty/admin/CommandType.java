@@ -14,6 +14,7 @@ import com.aggfi.digest.server.botty.digestbotty.admin.GetPostByActivity;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
 import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
 import com.aggfi.digest.server.botty.digestbotty.admin.UpdateAtomFeedPublic;
+import com.aggfi.digest.server.botty.digestbotty.admin.UpdateSocialBtnsSettings;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddDefaultParticipant;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddDefaultTag;
@@ -56,6 +57,7 @@ public enum CommandType {
   UPDATE_ATOM_FEED_PUBLIC(UpdateAtomFeedPublic.class),
   CREATE_NEW_POST(CreateNewPost.class),
   ADD_SECURE_POST_GADGET(AddReadOnlyPostGadget.class),
+  UPDATE_SOCIAL_BTNS_SETTINGS(UpdateSocialBtnsSettings.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

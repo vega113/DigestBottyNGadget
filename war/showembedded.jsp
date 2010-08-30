@@ -7,7 +7,10 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <!--<meta http-equiv="X-UA-Compatible" content="chrome=1">-->
 
-<title>Embedded Wave by DigestBotty</title>
+<title><%=request.getParameter("title") != null ? request.getParameter("title") : ""%></title> 
+<script type="text/javascript">
+
+</script>
 <script type="text/javascript">
 function loadDigg() {
 var s = document.createElement('SCRIPT'), s1 = document.getElementsByTagName('SCRIPT')[0];
@@ -29,7 +32,6 @@ s1.parentNode.insertBefore(s, s1);
     function createDiggLink(href){
     	var newlink = document.getElementById("diggLink");
 		var diggSpan = document.getElementById("diggSpan");
-		var title = "<%=request.getParameter("title") != null ? request.getParameter("title") : ""%>";
 		var description= "<%=request.getParameter("description") != null ? request.getParameter("description") : ""%>";
 		diggSpan.innerHTML = description;
 		if(title != null && title != ""){
@@ -59,7 +61,6 @@ s1.parentNode.insertBefore(s, s1);
     	  loadDigg();
     	  createDiggLink(globalUrl + "/showembedded?waveId=" + escape(idWave));
     	  wavePanel.loadWave(waveIdToLoad);
-    	  var title = "<%=request.getParameter("title") != null ? request.getParameter("title") : ""%>";
     	  if(title != null && title != ""){
     		  document.title=title;
     	  }

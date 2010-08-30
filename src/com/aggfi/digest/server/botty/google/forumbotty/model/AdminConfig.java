@@ -63,6 +63,22 @@ public class AdminConfig {
   @Persistent
   private Boolean  isAtomFeedPublic = Boolean.FALSE;
   
+  @Expose
+  @Persistent
+  private Boolean  isDiggBtnEnabled = Boolean.FALSE;
+  
+  @Expose
+  @Persistent
+  private Boolean  isBuzzBtnEnabled = Boolean.FALSE;
+  
+  @Expose
+  @Persistent
+  private Boolean  isTweetBtnEnabled = Boolean.FALSE;
+  
+  @Expose
+  @Persistent
+  private Boolean  isFaceBtnEnabled = Boolean.FALSE;
+  
   public Date getCreated() {
 	return created;
 }
@@ -177,5 +193,37 @@ public AdminConfig(String id) {
 	
 	public Boolean isAtomFeedPublic(){
 		return isAtomFeedPublic;
+	}
+
+	public Boolean isDiggBtnEnabled() {
+		return isDiggBtnEnabled;
+	}
+
+	public void setDiggBtnEnabled(Boolean isDiggBtnEnabled) {
+		this.isDiggBtnEnabled = isDiggBtnEnabled;
+	}
+
+	public Boolean isBuzzBtnEnabled() {
+		return isBuzzBtnEnabled;
+	}
+
+	public void setBuzzBtnEnabled(Boolean isBuzzBtnEnabled) {
+		this.isBuzzBtnEnabled = isBuzzBtnEnabled;
+	}
+
+	public Boolean isTweetBtnEnabled() {
+		return isTweetBtnEnabled;
+	}
+
+	public void setTweetBtnEnabled(Boolean isTweetBtnEnabled) {
+		this.isTweetBtnEnabled = isTweetBtnEnabled;
+	}
+
+	public Boolean isFaceBtnEnabled() {
+		return isFaceBtnEnabled;
+	}
+
+	public void setFaceBtnEnabled(Boolean isFaceBtnEnabled) {
+		this.isFaceBtnEnabled = isFaceBtnEnabled;
 	}
 }

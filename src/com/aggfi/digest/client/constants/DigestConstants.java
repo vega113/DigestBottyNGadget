@@ -137,6 +137,13 @@ public interface DigestConstants extends Constants {
 	String addSecureGadgetExpl();
 	String addSecureGadgetQuestionStr();
 	String secureGadgetStr();
+	
+	String digg();
+	String buzz();
+	String tweet();
+	String face();
+	String addSocialBtnsQuestion();
+	String addSocialBtnstExpl();
 
 	/**
 	 * Google Apps domain Id of the DigestBotty

@@ -3,6 +3,8 @@ package com.aggfi.digest.server.botty.google.forumbotty;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -50,6 +52,7 @@ import com.google.wave.api.BlipContentRefs;
 import com.google.wave.api.Context;
 import com.google.wave.api.ElementType;
 import com.google.wave.api.Gadget;
+import com.google.wave.api.Image;
 import com.google.wave.api.JsonRpcResponse;
 import com.google.wave.api.ParticipantProfile;
 import com.google.wave.api.Wavelet;
@@ -509,6 +512,13 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 			  sba.append("] ", null, null);
 		  }
 		  sba.flush2Blip();
+		  //now add social buttons
+		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(entry.getProjectId());
+		  boolean isDiggButtonEnabled = adminConfig.isDiggBtnEnabled();
+		  boolean isBuzzButtonEnabled = adminConfig.isBuzzBtnEnabled();
+		  boolean isTweetButtonEnabled = adminConfig.isTweetBtnEnabled();
+		  boolean isFaceButtonEnabled = adminConfig.isFaceBtnEnabled();
+		  addSocialButtons(blip,digestWaveId,digestWaveDomain,entryTitle,digest.getInstallerThumbnailUrl(),  isDiggButtonEnabled,isBuzzButtonEnabled,isTweetButtonEnabled,isFaceButtonEnabled);
 		  try {
 			  LOG.log(Level.FINER, "trying to get newBlipIs from JsonRpcResponse");
 			  List<JsonRpcResponse> submitResponseList = submit(digestWavelet, getRpcServerUrl());
@@ -537,7 +547,71 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	  }
   }
   
-  private void updateEntryInDigestWave(ForumPost entry) {
+  private void addSocialButtons(Blip blip, String waveId, String domain,String title, String imageUrl,boolean isDiggButtonEnabled, boolean isBuzzButtonEnabled,boolean isTweetButtonEnabled, boolean isFaceEnabled) {
+	  String waveUrl = "https://wave.google.com/wave/#restored:wave:" + domain + "%252F" + URLEncoder.encode(waveId);
+	  String embeddedUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/showembedded?waveId=" + waveId + "&title=" + URLEncoder.encode(title);
+	  if(!isDiggButtonEnabled && !isDiggButtonEnabled && !isTweetButtonEnabled && !isFaceEnabled){
+		  return;
+	  }else{
+		  blip.append("\n");
+	  }
+	  if(isDiggButtonEnabled){
+		  String imgUrl = "http://widgets.digg.com/img/button/diggThisDigger.png";
+		  MessageFormat fmt = new MessageFormat("http://digg.com/submit?url={0}&amp;title={1}");
+		  Object[] args = {URLEncoder.encode(embeddedUrl),URLEncoder.encode(title)};
+		  Image diggImage = new Image(imgUrl, 16, 16, "digg it");
+		  blip.append(diggImage);
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+		  LOG.fine("inserting digg button");
+		  blifRef.insert(baList, "digg");
+		  blip.append(" ");
+	  }
+	  if(isBuzzButtonEnabled){
+		  MessageFormat fmt = new MessageFormat("http://www.google.com/buzz/post?message={0}&url={1}&imageurl={2}");
+		  Object[] args = {title.replace(" ", "%"),URLEncoder.encode(embeddedUrl), imageUrl};
+		  
+		  String imgUrl = "http://code.google.com/apis/buzz/images/google-buzz-16x16.png";
+		  Image buzzImage = new Image(imgUrl, 16, 16, "buzz it");
+		  blip.append(buzzImage);
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+		  LOG.fine("inserting buzz button");
+		  blifRef.insert(baList, "buzz");
+		  blip.append(" ");
+	  }
+	  if(isTweetButtonEnabled){
+		  MessageFormat fmt = new MessageFormat("http://twitter.com/share?text={0}&url={1}");
+		  Object[] args = {URLEncoder.encode(title),URLEncoder.encode(embeddedUrl)};
+		  
+		  String imgUrl = "http://twitter-badges.s3.amazonaws.com/t_mini-b.png";
+		  Image tweetImage = new Image(imgUrl, 16, 16, "tweet it");
+		  blip.append(tweetImage);
+		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+		  LOG.fine("inserting tweet button");
+		  blifRef.insert(baList, "tweet");
+		  blip.append(" ");
+	  }
+	  if(isFaceEnabled){
+		  MessageFormat fmt = new MessageFormat("http://www.facebook.com/sharer.php?u={0}&t={1}");
+		  Object[] args = {URLEncoder.encode(embeddedUrl), URLEncoder.encode(title)};
+		  
+		  String imgUrl = "http://inprod.net/imgs/facebook_icon_small.png";
+		  Image tweetImage = new Image(imgUrl, 16, 16, "tweet it");
+		  blip.append(tweetImage);
+		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+		  LOG.fine("inserting facebook button");
+		  blifRef.insert(baList, "share");
+		  blip.append(" ");
+	  }
+	  
+		  
+	  	
+}
+
+private void updateEntryInDigestWave(ForumPost entry) {
 	  LOG.entering(this.getClass().getName(), "updateEntryInDigestWave", entry);
 	  try{
 		  Wavelet digestWavelet = null;

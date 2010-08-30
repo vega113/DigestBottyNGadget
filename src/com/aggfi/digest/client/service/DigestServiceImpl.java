@@ -10,6 +10,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.inject.Inject;
 
 public class DigestServiceImpl implements DigestService {
@@ -325,6 +326,28 @@ public class DigestServiceImpl implements DigestService {
 		paramsJson.put("userId", new JSONString(userId));
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_SECURE_POST_GADGET"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+
+
+
+	@Override
+	public void updateSocialBtnsSettings(String projectId,
+			boolean isDiggEnabled, boolean isBuzzEnabled,
+			boolean isTweetEnabled, boolean isFaceEnabled,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("isDiggEnabled", new JSONString(String.valueOf(isDiggEnabled)));
+		paramsJson.put("isBuzzEnabled", new JSONString(String.valueOf(isBuzzEnabled)));
+		paramsJson.put("isTweetEnabled", new JSONString(String.valueOf(isTweetEnabled)));
+		paramsJson.put("isFaceEnabled", new JSONString(String.valueOf(isFaceEnabled)));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("UPDATE_SOCIAL_BTNS_SETTINGS"));
 		
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);

@@ -58,4 +58,9 @@ public interface DigestService {
 	void addSecurePostGadget(String projectId, String userId,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
+	void updateSocialBtnsSettings(String projectId,
+			boolean isDiggEnabled, boolean isBuzzEnabled,
+			boolean isTweetEnabled, boolean isFaceEnabled,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
 }

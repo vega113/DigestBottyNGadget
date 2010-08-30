@@ -14,7 +14,8 @@
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addDefaultParticipantBox" title='{constants.defaultParticipantExpl}'
 							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.defaultParticipantExpl}' ui:field="img1"/>
+						<g:Image resource='{res.tooltip}' title='{constants.defaultParticipantExpl}'
+							ui:field="img1" />
 						<g:Button ui:field="addDefaultParticipantBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -28,12 +29,14 @@
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 
-			<g:CaptionPanel captionText='{constants.setUpDefaultTagsStr}' ui:field="defaultTagsCaptPnl">
+			<g:CaptionPanel captionText='{constants.setUpDefaultTagsStr}'
+				ui:field="defaultTagsCaptPnl">
 				<g:VerticalPanel>
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addDefaultTagBox" title='{constants.defaultTagExpl}'
 							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.defaultTagExpl}' ui:field="img2"/>
+						<g:Image resource='{res.tooltip}' title='{constants.defaultTagExpl}'
+							ui:field="img2" />
 						<g:Button ui:field="addDefaultTagBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -51,7 +54,8 @@
 					<g:HorizontalPanel>
 						<g:TextBox ui:field="addManagerBox" title='{constants.managersExpl}'
 							width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-						<g:Image resource='{res.tooltip}' title='{constants.managersExpl}' ui:field="img3"/>
+						<g:Image resource='{res.tooltip}' title='{constants.managersExpl}'
+							ui:field="img3" />
 						<g:Button ui:field="addManagergBtn" text='{constants.addBtnName}'></g:Button>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -75,7 +79,8 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addAutoTagNameBox" title='{constants.autoTagExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.autoTagNameExpl}' ui:field="img4"/>
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagNameExpl}'
+									ui:field="img4" />
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 						<g:HTML width="10px"></g:HTML>
@@ -87,21 +92,23 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addAutoTagValBox" title='{constants.autoTagExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.autoTagExpl}' ui:field="img5"/>
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagExpl}'
+									ui:field="img5" />
 								<g:Button ui:field="addAutoTagBtn" text='{constants.addBtnName}'></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 						<g:HTML width="1px"></g:HTML>
 						<g:CaptionPanel>
 							<g:VerticalPanel>
-							<g:HorizontalPanel>
-								<g:Label text='{constants.syncStr}'></g:Label> 
-							</g:HorizontalPanel>
-							<g:HorizontalPanel>
-								<g:CheckBox ui:field="syncAutoTagCheckBox"></g:CheckBox>
-								<g:Image resource='{res.tooltip}' title='{constants.autoTagSyncExpl}' ui:field="img6"/>
-							</g:HorizontalPanel>
-						</g:VerticalPanel>
+								<g:HorizontalPanel>
+									<g:Label text='{constants.syncStr}'></g:Label>
+								</g:HorizontalPanel>
+								<g:HorizontalPanel>
+									<g:CheckBox ui:field="syncAutoTagCheckBox"></g:CheckBox>
+									<g:Image resource='{res.tooltip}' title='{constants.autoTagSyncExpl}'
+										ui:field="img6" />
+								</g:HorizontalPanel>
+							</g:VerticalPanel>
 						</g:CaptionPanel>
 					</g:HorizontalPanel>
 					<g:cell height="10px">
@@ -127,7 +134,8 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addParticipantWavesBox" title='{constants.participantWavesExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.participantWavesExpl}' ui:field="img7"/>
+								<g:Image resource='{res.tooltip}' title='{constants.participantWavesExpl}'
+									ui:field="img7" />
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 						<g:HTML width="10px"></g:HTML>
@@ -139,7 +147,8 @@
 							<g:HorizontalPanel>
 								<g:TextBox ui:field="addParticipanTagtWavesBox" title='{constants.participantWavesExpl}'
 									width='{constants.basicTextBoxWidthStr}'></g:TextBox>
-								<g:Image resource='{res.tooltip}' title='{constants.participantWavesTagExpl}' ui:field="img8"/>
+								<g:Image resource='{res.tooltip}' title='{constants.participantWavesTagExpl}'
+									ui:field="img8" />
 								<g:Button ui:field="addParticipantWavesBtn" text='{constants.addBtnName}'></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
@@ -156,30 +165,71 @@
 			</g:CaptionPanel>
 			<g:CaptionPanel captionText='{constants.setUpAtomFeedStr}'>
 				<g:VerticalPanel>
-					<g:HorizontalPanel>
-					<g:Label text='{constants.makeTheFeedPublicQuestionStr}'></g:Label>
-					<g:CheckBox ui:field="isAtomFeedPublicCheckBox"></g:CheckBox>
-					<g:Image resource='{res.tooltip}' title='{constants.isAtomFeedPublicTagExpl}' ui:field="img9"/>
-					<g:HTML width="20px"></g:HTML>
-					<g:HorizontalPanel>
-						<g:HTML width="34px"></g:HTML>
-						<g:Button text='{constants.updateStr}' ui:field="isAtomFeedPublicUpdateBtn"></g:Button>
-					</g:HorizontalPanel>
-					
-				</g:HorizontalPanel>
-				<g:VerticalPanel>
-					<g:HTML height="10px"></g:HTML>
-				</g:VerticalPanel>
-				<g:HorizontalPanel>
-					<g:Label text='{constants.addSecureGadgetQuestionStr}'></g:Label>
-					<g:HTML width='10px'></g:HTML>
-					<g:Image resource='{res.tooltip}' title='{constants.addSecureGadgetExpl}' ui:field="img10"/>
-					<g:HTML width="20px"></g:HTML>
-					<g:HorizontalPanel>
-						<g:HTML width='34px'></g:HTML>
-						<g:Button text='{constants.addBtnName}' ui:field="addSecurePostGadgetBtn"></g:Button>
-					</g:HorizontalPanel>
-				</g:HorizontalPanel>
+					<g:CaptionPanel width='{constants.smallerWidthStr}'>
+						<g:HorizontalPanel>
+							<g:Label text='{constants.makeTheFeedPublicQuestionStr}'></g:Label>
+							<g:CheckBox ui:field="isAtomFeedPublicCheckBox"></g:CheckBox>
+							<g:Image resource='{res.tooltip}' title='{constants.isAtomFeedPublicTagExpl}'
+								ui:field="img9" />
+							<g:HorizontalPanel>
+								<g:HTML width="188px"></g:HTML>
+								<g:Button text='{constants.updateStr}' ui:field="isAtomFeedPublicUpdateBtn"></g:Button>
+							</g:HorizontalPanel>
+						</g:HorizontalPanel>
+					</g:CaptionPanel>
+					<g:VerticalPanel>
+						<g:HTML height="10px"></g:HTML>
+					</g:VerticalPanel>
+					<g:CaptionPanel width='{constants.smallerWidthStr}'>
+						<g:HorizontalPanel>
+							<g:Label text='{constants.addSecureGadgetQuestionStr}'></g:Label>
+							<g:HTML width='6px'></g:HTML>
+							<g:Image resource='{res.tooltip}' title='{constants.addSecureGadgetExpl}'
+								ui:field="img10" />
+							<g:HorizontalPanel>
+								<g:HTML width='214px'></g:HTML>
+								<g:Button text='{constants.addBtnName}' ui:field="addSecurePostGadgetBtn"></g:Button>
+							</g:HorizontalPanel>
+						</g:HorizontalPanel>
+					</g:CaptionPanel>
+					<g:VerticalPanel>
+						<g:HTML height="10px"></g:HTML>
+					</g:VerticalPanel>
+					<g:CaptionPanel width='{constants.smallerWidthStr}'>
+						<g:VerticalPanel>
+							<g:HorizontalPanel>
+							<g:Label text='{constants.addSocialBtnsQuestion}'></g:Label>
+							<g:HTML width='6px'></g:HTML>
+							<g:Image resource='{res.tooltip}' title='{constants.addSocialBtnstExpl}'
+								ui:field="img11" />
+							<g:HorizontalPanel>
+								<g:HTML width='140px'></g:HTML>
+								<g:Button text='{constants.updateStr}' ui:field="isSocialBtnsUpdateBtn"></g:Button>
+							</g:HorizontalPanel>
+						</g:HorizontalPanel>
+						<g:HorizontalPanel>
+							<g:HorizontalPanel>
+								<g:Label text='{constants.digg}'></g:Label>
+								<g:CheckBox checked='true' ui:field="isDiggEnabledCheckBox"></g:CheckBox>
+							</g:HorizontalPanel>
+							<g:HTML width='6px'></g:HTML>
+							<g:HorizontalPanel>
+								<g:Label text='{constants.buzz}'></g:Label>
+								<g:CheckBox checked='true' ui:field="isBuzzEnabledCheckBox"></g:CheckBox>
+							</g:HorizontalPanel>
+							<g:HTML width='6px'></g:HTML>
+							<g:HorizontalPanel>
+								<g:Label text='{constants.tweet}'></g:Label>
+								<g:CheckBox checked='true' ui:field="isTweetEnabledCheckBox"></g:CheckBox>
+							</g:HorizontalPanel>
+							<g:HTML width='6px'></g:HTML>
+							<g:HorizontalPanel>
+								<g:Label text='{constants.face}'></g:Label>
+								<g:CheckBox checked='true' ui:field="isFaceEnabledCheckBox"></g:CheckBox>
+							</g:HorizontalPanel>
+						</g:HorizontalPanel>
+						</g:VerticalPanel>
+					</g:CaptionPanel>
 				</g:VerticalPanel>
 			</g:CaptionPanel>
 		</g:VerticalPanel>

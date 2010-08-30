@@ -55,5 +55,7 @@ public interface DigestMessages extends Messages {
   String removeSuccessMsg(String name);
   
   String sentRequest2UpdateAtomFeedPublic(String to);
+  
+  String sentRequest2UpdateSocialBtns(String isDigg, String isBuzz, String isTweet, String isFace);
 
 }
