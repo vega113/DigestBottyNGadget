@@ -46,18 +46,22 @@ public class ContributorDaoImpl implements ContributorDao{
 		PersistenceManager pm = pmf.getPersistenceManager();
 		Contributor entry = null;
 		try{
-			entry = pm.getObjectById(Contributor.class, participantId);
+			try{
+				entry = pm.getObjectById(Contributor.class, participantId);
+			}catch(Exception npe){
+				LOG.warning(npe.getMessage());
+			};
+			if(entry == null){
+				entry = new Contributor(participantId);
+				entry.setProps(new HashMap<String, Object>());
+				try {
+					entry = pm.makePersistent(entry);
+					entry = pm.detachCopy(entry);
+				}catch(Exception e){
+					LOG.warning(e.getMessage());
+				}
+			}
 		}catch(Exception e){}
-		if(entry == null){
-			entry = new Contributor(participantId);
-			entry.setProps(new HashMap<String, Object>());
-		}
-		try {
-			entry = pm.makePersistent(entry);
-			entry = pm.detachCopy(entry);
-		}catch(Exception e){
-			LOG.warning(e.getMessage());
-		}
 		finally {
 			pm.close();
 		}

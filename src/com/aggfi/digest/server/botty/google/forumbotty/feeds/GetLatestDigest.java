@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.DigestDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.Digest;
 import com.google.inject.Inject;

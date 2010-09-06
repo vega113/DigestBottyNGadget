@@ -4,15 +4,13 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.vegalabs.general.server.rpc.util.Util;
+import com.vegalabs.general.server.command.Command;
 import com.google.inject.Inject;
 
 public class GetBlipsCount extends Command {

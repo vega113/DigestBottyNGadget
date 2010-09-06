@@ -47,6 +47,7 @@ public class DigestServiceImpl implements DigestService {
 		
 		paramsJson.put("userId", new JSONString(userId));
 		postDataJson.put("params", paramsJson);
+		postDataJson.put("senderId", new JSONString(userId));
 		postDataJson.put("method", new JSONString("GET_PROJECTS_PER_USER"));
 		
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
@@ -348,6 +349,42 @@ public class DigestServiceImpl implements DigestService {
 		paramsJson.put("isFaceEnabled", new JSONString(String.valueOf(isFaceEnabled)));
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("UPDATE_SOCIAL_BTNS_SETTINGS"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
+	@Override
+	public void addAdSenseCode(String projectId, String userId, String adSenseCode, String userName, String userThumbnailUrl, boolean isAdSenseUpdate4User,  AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("userId", new JSONString(userId));
+		paramsJson.put("adSenseCode", new JSONString(adSenseCode));
+		paramsJson.put("userName", new JSONString(userName));
+		paramsJson.put("userThumbnailUrl", new JSONString(userThumbnailUrl));
+		paramsJson.put("isAdSenseUpdate4User", new JSONString(String.valueOf(isAdSenseUpdate4User)));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_ADSENSE_CODE"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
+
+	@Override
+	public void getAdSenseCode(String projectId, String userId, boolean isAdSenseUpdate4User,  AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("userId", new JSONString(userId));
+		paramsJson.put("isAdSenseUpdate4User", new JSONString(String.valueOf(isAdSenseUpdate4User)));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_ADSENSE_CODE"));
 		
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);

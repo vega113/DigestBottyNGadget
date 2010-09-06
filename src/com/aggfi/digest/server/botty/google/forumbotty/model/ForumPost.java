@@ -12,6 +12,8 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Text;
 import com.google.gson.annotations.Expose;
+import com.google.wave.api.Annotation;
+import com.google.wave.api.Range;
 import com.google.wave.api.Wavelet;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
@@ -82,7 +84,15 @@ public class ForumPost {
     this.created = new Date();
     this.title = wavelet.getTitle();
     this.blipCount = wavelet.getBlips().size();
-    this.firstBlipContent = new Text(wavelet.getRootBlip().getContent()); 
+    String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
+    List<Annotation> annonList = wavelet.getRootBlip().getAnnotations().get(backtodigestAnnotationName);
+    Range range = null;
+    if(annonList != null && annonList.size() > 0){
+    	range = annonList.get(0).getRange();
+    	this.firstBlipContent = new Text(wavelet.getRootBlip().getContent().replace(wavelet.getRootBlip().getContent().substring(range.getStart(), range.getEnd()), "")); 
+    }else{
+    	this.firstBlipContent = new Text(wavelet.getRootBlip().getContent()); 
+    }
   }
 
   public String getId() {

@@ -5,12 +5,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Text;
 import com.google.gson.annotations.Expose;
-
+@PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class Contributor {
 	@Expose
 	@Persistent
@@ -39,7 +41,7 @@ public class Contributor {
 	private String website = null;
 	@Expose
 	@Persistent
-	private String pubId = null;
+	private Text googleAdsenseCode = null;
 	@Expose
 	@Persistent
 	private int pubFetchedCount = 0;
@@ -52,6 +54,15 @@ public class Contributor {
 	@Expose
 	@Persistent
 	private Date updated = null;
+	@Expose
+	@Persistent
+	private Integer maxForumsAllowed = 10;
+	@Expose
+	@Persistent
+	private Integer countForums = 0;
+	@Expose
+	@Persistent
+	private Integer countAdSenseForums = 0;
 	@Override
 	public String toString() {
 		final int maxLen = 10;
@@ -73,7 +84,7 @@ public class Contributor {
 		builder.append(", website=");
 		builder.append(website);
 		builder.append(", pubId=");
-		builder.append(pubId);
+		builder.append(googleAdsenseCode);
 		builder.append(", pubFetchedCount=");
 		builder.append(pubFetchedCount);
 		builder.append(", props=");
@@ -83,6 +94,8 @@ public class Contributor {
 		builder.append(created);
 		builder.append(", updated=");
 		builder.append(updated);
+		builder.append(", maxForumsAllowed=");
+		builder.append(maxForumsAllowed);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -151,11 +164,11 @@ public class Contributor {
 	public void setWebsite(String website) {
 		this.website = website;
 	}
-	public String getPubId() {
-		return pubId;
+	public Text getGoogleAdsenseCode() {
+		return googleAdsenseCode;
 	}
-	public void setPubId(String pubId) {
-		this.pubId = pubId;
+	public void setGoogleAdsenseCode(Text code) {
+		this.googleAdsenseCode = code;
 	}
 	public int getPubFetchedCount() {
 		return pubFetchedCount;
@@ -180,5 +193,23 @@ public class Contributor {
 	}
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+	public Integer getMaxForumsAllowed() {
+		return maxForumsAllowed != null ? maxForumsAllowed : Integer.parseInt(System.getProperty("MAX_DIGESTS"));
+	}
+	public void setMaxForumsAllowed(Integer maxForumsAllowed) {
+		this.maxForumsAllowed = maxForumsAllowed;
+	}
+	public Integer getCountAdSenseForums() {
+		return countAdSenseForums != null ? countAdSenseForums : 0;
+	}
+	public void setCountAdSenseForums(Integer countAdSenseForums) {
+		this.countAdSenseForums = countAdSenseForums;
+	}
+	public Integer getCountForums() {
+		return countForums != null ? countForums : 0;
+	}
+	public void setCountForums(Integer countForums) {
+		this.countForums = countForums;
 	}
 }

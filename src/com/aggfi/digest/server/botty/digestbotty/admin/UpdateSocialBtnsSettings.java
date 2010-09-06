@@ -4,12 +4,11 @@ import java.util.logging.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
-import com.google.gwt.json.client.JSONString;
 import com.google.inject.Inject;
+import com.vegalabs.general.server.command.Command;
 
 public class UpdateSocialBtnsSettings extends Command {
   private static final Logger LOG = Logger.getLogger(UpdateSocialBtnsSettings.class.getName());

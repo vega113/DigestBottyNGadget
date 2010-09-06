@@ -6,10 +6,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
+import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.vegalabs.general.server.command.Command;
 
 @Singleton
 public class GetAdminConfig extends Command {
@@ -37,9 +39,9 @@ public class GetAdminConfig extends Command {
 //    if (!util.isNullOrEmpty(senderId)) {
 //      verifyUserAccess(extDigestDao, projectId, senderId);
 //    }
-
+    AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
     JSONObject json = new JSONObject();
-    json.put("result", new JSONObject(util.toJson(adminConfigDao.getAdminConfig(projectId))));
+    json.put("result", new JSONObject(util.toJson(adminConfig)));
     return json;
   }
 }

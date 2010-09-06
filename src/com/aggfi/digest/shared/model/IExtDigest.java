@@ -111,4 +111,6 @@ public interface IExtDigest extends IDigest{
 
 	public void setAdsEnabled(boolean isAdsEnabled);
 
+	void setCopyAdSenseFromUser(boolean isCopyAdSenseFromUser);
+
 }

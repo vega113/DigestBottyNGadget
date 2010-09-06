@@ -2,6 +2,7 @@ package com.aggfi.digest.server.botty.digestbotty.admin;
 
 
 import java.text.SimpleDateFormat;
+import com.vegalabs.general.server.command.Command;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -12,17 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheManager;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import umontreal.iro.lecuyer.probdist.NormalDist;
-
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ComplReplyProbDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.InfluenceDao;
@@ -30,8 +27,7 @@ import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
 import com.aggfi.digest.server.botty.digestbotty.model.ComplReplyProb;
 import com.aggfi.digest.server.botty.digestbotty.model.Influence;
 import com.aggfi.digest.server.botty.digestbotty.utils.InfluenceUtils;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.inject.Inject;
 
@@ -185,7 +181,7 @@ public class GetContributorsPerInfluence extends Command {
         		break;
         	JSONObject entry = new JSONObject();
             try {
-            	double influence = blipDataSortHelper.getInfluence()/influenceSum*1000;
+            	double influence = influenceSum == 0 ? 0 : blipDataSortHelper.getInfluence()/influenceSum*1000;
             	sb.append("ParticipantId: " + blipDataSortHelper.getParticipantId() + ", Influence: " + influence + ".\n");
               entry.put("participant", blipDataSortHelper.getParticipantId());
               entry.put("influence", influence);

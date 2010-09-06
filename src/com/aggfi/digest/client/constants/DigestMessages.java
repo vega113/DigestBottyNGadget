@@ -58,4 +58,11 @@ public interface DigestMessages extends Messages {
   
   String sentRequest2UpdateSocialBtns(String isDigg, String isBuzz, String isTweet, String isFace);
 
+  String loadingAdSenseCode4Msg(String userOrForumName );
+
+  String helloUserMsg(String userName);
+
+ String adSenseCaptionMsg(String name);
+
+String savingAdSense4Msg(String userOrForumStr, String nameStr);
 }

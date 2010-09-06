@@ -11,8 +11,6 @@ import org.json.JSONObject;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
@@ -20,6 +18,8 @@ import com.google.inject.Inject;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
+import com.vegalabs.general.server.command.Command;
+import com.vegalabs.general.server.rpc.util.Util;
 
 public class AddReadOnlyPostGadget extends Command {
 	  private static final Logger LOG = Logger.getLogger(AddReadOnlyPostGadget.class.getName());
@@ -76,7 +76,7 @@ public class AddReadOnlyPostGadget extends Command {
 		gadget.setProperty("projectName", projectName);
 		newWavelet.getRootBlip().append(gadget);
 		 if( adminConfig.isAdsEnabled()){
-			  robot.appendAd2Blip(newWavelet.getRootBlip(), projectId, false);
+			  robot.appendAd2Blip(newWavelet.getRootBlip(),newWavelet.getRootBlip().getBlipId(), projectId, false);
 		  }
 		  robot.addBack2Digest2RootBlip(projectId, newWavelet.getRootBlip(), entry);
 		

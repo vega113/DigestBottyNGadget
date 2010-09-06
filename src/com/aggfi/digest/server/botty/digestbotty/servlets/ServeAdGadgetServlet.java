@@ -1,21 +1,17 @@
-package com.aggfi.digest.server.botty.digestbotty.genads;
+package com.aggfi.digest.server.botty.digestbotty.servlets;
 
 
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.logging.Logger;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
-import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.google.inject.Inject;
@@ -54,37 +50,63 @@ public class ServeAdGadgetServlet extends HttpServlet{
 	}
 
 	public String generateAdSenseGadgetXml(String projectId) {
-		AdminConfig adminConfig= adminConfigDao.getAdminConfig(projectId);
-		
 		String adsenseStr = null;
-		adsenseStr = adminConfig.getAdsense().getValue();
-		if(adsenseStr == null || "".equals(adsenseStr)){
-			adsenseStr = "		<script type=\"text/javascript\"><!--\n" +
-								"google_ad_client = \"pub-3589749845269196\";\n"+
-								"/* 468x60, created 8/23/10 */\n" +
-								"google_ad_slot = \"7979283764\";\n"+
-								"google_ad_width = 468;\n"+
-								"google_ad_height = 60;\n"+
-								"//-->\n"+
-								"</script>\n"+
-								"<script type=\"text/javascript\"\n"+
-								"src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">\n"+
-								"</script>\n";
+		if(projectId != null &&  projectId.equals("vega113@googlewave.com")){
+			adsenseStr = "<script type=\"text/javascript\"><!--\n" +
+			"google_ad_client = \"pub-3589749845269196\";\n"+
+			"/* 468x60, created 8/23/10 */\n" +
+			"google_ad_slot = \"7979283764\";\n"+
+			"google_ad_width = 468;\n"+
+			"google_ad_height = 60;\n"+
+			"//-->\n"+
+			"</script>\n"+
+			"<script type=\"text/javascript\"\n"+
+			"src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">\n"+
+			"</script>\n";
+			LOG.info("Adding Ad by DB");
+		}else{
+			AdminConfig adminConfig= adminConfigDao.getAdminConfig(projectId);
+			
+			
+			adsenseStr = adminConfig.getAdsense() != null ? adminConfig.getAdsense().getValue() : "";
+			if("".equals(adsenseStr)){
+				throw new IllegalArgumentException("Invalid forumId!");
+			}
+//			if(adsenseStr == null || "".equals(adsenseStr)){
+//				adsenseStr = "		<script type=\"text/javascript\"><!--\n" +
+//									"google_ad_client = \"pub-3589749845269196\";\n"+
+//									"/* 468x60, created 8/23/10 */\n" +
+//									"google_ad_slot = \"7979283764\";\n"+
+//									"google_ad_width = 468;\n"+
+//									"google_ad_height = 60;\n"+
+//									"//-->\n"+
+//									"</script>\n"+
+//									"<script type=\"text/javascript\"\n"+
+//									"src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">\n"+
+//									"</script>\n";
+//				LOG.info("Adding Ad by DB");
+//			}else{
+//				LOG.fine("Adding Ad for " + projectId);
+//			}
 		}
+		
 		//let's find the width;
 		String width = "\"" + (Integer.parseInt(extractValue(adsenseStr, "google_ad_width")) + 4) + "\"";
 		String height = "\"" + (Integer.parseInt(extractValue(adsenseStr, "google_ad_height")) +4) + "\"" ;
 		
-		Object[] args = {width,height,adsenseStr};
+		String adtrackStr =  "<script type=\"text/javascript\">document.write(unescape(\"%3Cscript src='\" + \"http://\" + \"aggfiwave.appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E\"));</script>";
+		
+		Object[] args = {width,height,adsenseStr,adtrackStr};
 		
 		String extensionStr = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> <Module> <ModulePrefs title=\"AdSense Gadget\" width={0} height={1}><Require feature=\"wave\" />  </ModulePrefs> <Content type=\"html\">  <![CDATA[" + 
-			"<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"></head><body><iframe src=\"javascript:''\" id=\"frameId\" tabIndex='-1' style=\"position:absolute;width:0;height:0;border:0\"></iframe><table align=\"center\"><tr><td>{2}</td> </tr></table></body></html>" +
+			"<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">{3}</head><body><iframe id=\"frameId\" tabIndex='-1' style=\"position:absolute;width:0;height:0;border:0\"></iframe><table align=\"center\"><tr><td>{2}</td> </tr></table></body></html>" +
 			"]]></Content></Module>";
 		
 		
 		MessageFormat fmt = new MessageFormat(extensionStr);
 		String out = fmt.format(args);
+		LOG.info("Serving ad for " + projectId + "\n" + out);
 		return out;
 	}
 

@@ -56,8 +56,8 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-model-20100802.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/wave-robot-api-20100802.jar" sourcepath="war/WEB-INF/lib/wave-robot-api-20100802-src.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/VegaGeneral"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/VegaWaveFeatures"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/vegageneral.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/vegawavefeatures.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

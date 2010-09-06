@@ -2,14 +2,13 @@ package com.aggfi.digest.server.botty.digestbotty.admin;
 
 
 import java.util.List;
+import com.vegalabs.general.server.command.Command;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.google.inject.Inject;
 
 public class GetProjectsPerUser extends Command {
@@ -25,9 +24,9 @@ public class GetProjectsPerUser extends Command {
 	@Override
 	public JSONObject execute() throws JSONException {      
 		String userId = this.getParam("userId");
-//		if (util.isNullOrEmpty(userId)) {
-//			throw new IllegalArgumentException("Missing required param: userId");
-//		}    
+		if (util.isNullOrEmpty(userId)) {
+			throw new IllegalArgumentException("Missing required param: userId");
+		}    
 		String senderId = this.getParam("senderId");
 	    if (senderId != null && !senderId.equals(userId)) {
 	    	throw new RuntimeException(userId  + " and " + senderId + " do not match!" );

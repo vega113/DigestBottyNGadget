@@ -9,7 +9,7 @@
 
 <title><%=request.getParameter("title") != null ? request.getParameter("title") : ""%></title> 
 <script type="text/javascript">
-
+var title = "<%=request.getParameter("title") != null ? request.getParameter("title") : ""%>";
 </script>
 <script type="text/javascript">
 function loadDigg() {

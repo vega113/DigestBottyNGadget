@@ -1,20 +1,17 @@
 package com.aggfi.digest.server.botty.digestbotty.admin;
 
 
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import com.vegalabs.general.server.command.Command;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.inject.Inject;

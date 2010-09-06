@@ -6,11 +6,16 @@
 	<ui:with field='constants'
 		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
-		<g:CaptionPanel captionText='{constants.selectDigestStr}'>
+		<g:HorizontalPanel stylePrimaryName='{res.globalCSS.highlightRow}' width='{constants.basicWidthStr}'>
+			<g:CaptionPanel captionText='{constants.selectDigestStr}' ui:field="outerCptnPnl" width='{constants.smallerBiggerWidthStr}'>
 					<g:HorizontalPanel>
 						<g:HTML width="10px"></g:HTML>
 						<g:ListBox ui:field="prjList"></g:ListBox>
+						<g:HorizontalPanel ui:field="refresBtnhPnl">
+								<g:HTML width='15px'></g:HTML>
+						</g:HorizontalPanel>
 					</g:HorizontalPanel>
-				</g:CaptionPanel>
+		</g:CaptionPanel>
+		</g:HorizontalPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

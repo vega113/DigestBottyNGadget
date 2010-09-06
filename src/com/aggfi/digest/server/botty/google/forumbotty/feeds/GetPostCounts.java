@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

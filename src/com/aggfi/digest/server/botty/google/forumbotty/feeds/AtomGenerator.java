@@ -18,14 +18,14 @@ import net.sf.jsr107cache.CacheManager;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.vegalabs.general.server.rpc.util.Util;
+
 
 @SuppressWarnings("unchecked")
 @Singleton

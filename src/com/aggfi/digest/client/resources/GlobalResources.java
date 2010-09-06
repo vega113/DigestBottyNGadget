@@ -18,5 +18,10 @@ public interface GlobalResources extends ClientBundle {
 	@Source("images/images3.jpg")
 	ImageResource tooltip();
 
+	@Source("images/Refresh-icon.png")
+	ImageResource refresh();
+	
+	@Source("images/spinner.1.gif")
+	ImageResource spinner();
 
 }

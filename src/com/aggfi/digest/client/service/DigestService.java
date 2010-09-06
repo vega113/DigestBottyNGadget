@@ -63,4 +63,13 @@ public interface DigestService {
 			boolean isTweetEnabled, boolean isFaceEnabled,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
 
+	void addAdSenseCode(String projectId, String userId, String adSenseCode,
+			String userName, String userThumbnailUrl,
+			boolean isAdSenseUpdate4User, AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException;
+
+	void getAdSenseCode(String projectId, String userId,
+			boolean isAdSenseUpdate4User, AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException;
+
 }

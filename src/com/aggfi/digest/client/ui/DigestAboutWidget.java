@@ -71,7 +71,6 @@ public class DigestAboutWidget extends Composite implements RunnableOnTabSelect{
 				event.preventDefault();
 			}
 		});
-		vegaUtils.reportPageview("/aboutTab/");
 	}
 	
 

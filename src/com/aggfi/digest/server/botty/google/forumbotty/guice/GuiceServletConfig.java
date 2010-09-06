@@ -9,11 +9,16 @@ import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.dao.ComplReplyProbDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ComplReplyProbDaoImpl;
+import com.aggfi.digest.server.botty.digestbotty.dao.ContributorDao;
+import com.aggfi.digest.server.botty.digestbotty.dao.ContributorDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.dao.InfluenceDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.InfluenceDaoImpl;
-import com.aggfi.digest.server.botty.digestbotty.genads.ServeAdGadgetServlet;
+import com.aggfi.digest.server.botty.digestbotty.dao.TrackerEventDao;
+import com.aggfi.digest.server.botty.digestbotty.dao.TrackerEventDaoImpl;
+import com.aggfi.digest.server.botty.digestbotty.servlets.ServeAdGadgetServlet;
+import com.aggfi.digest.server.botty.digestbotty.servlets.ServeEmbedServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallGadgetServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallServlet;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
@@ -30,6 +35,9 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import com.vegalabs.features.server.GadgetRPCServlet;
+import com.vegalabs.general.server.command.CommandFetcher;
+import com.vegalabs.general.server.rpc.JsonRpcProcessor;
 
 public class GuiceServletConfig extends GuiceServletContextListener {
   private static final Logger LOG = Logger.getLogger(GuiceServletConfig.class.getName());
@@ -55,6 +63,10 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         serve("/installNew").with(InstallServlet.class); 
         serve("/installGadget").with(InstallGadgetServlet.class); 
         serve("/serveAd").with(ServeAdGadgetServlet.class); 
+        serve("/gadgetRPC").with(GadgetRPCServlet.class); 
+        serve("/embed").with(ServeEmbedServlet.class); 
+        
+        
         
         
         
@@ -78,7 +90,11 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         bind(BlipSubmitedDao.class).to(BlipSubmitedDaoImpl.class);
         bind(InfluenceDao.class).to(InfluenceDaoImpl.class);
         bind(ComplReplyProbDao.class).to(ComplReplyProbDaoImpl.class);
+        bind(ContributorDao.class).to(ContributorDaoImpl.class);
+        bind(CommandFetcher.class).to(CommandFetcherImpl.class);
+        bind(TrackerEventDao.class).to(TrackerEventDaoImpl.class);
         
+
       }
 
       @Provides

@@ -8,7 +8,7 @@
 	<g:HTMLPanel>
 		<g:DecoratorPanel>
 			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}'
-				width='{constants.smallerBiggerWidthStr}'>
+				width='{constants.createWidthStr}'>
 				<g:cell>
 					<g:FlexTable ui:field="createGadgetFlexTbl"></g:FlexTable>
 				</g:cell>
@@ -17,19 +17,31 @@
 						<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
 							<g:HorizontalPanel>
 								<g:VerticalPanel>
-									<g:HorizontalPanel>
-										<g:HTML ui:field="isPublicQuestion"></g:HTML>
+									<g:HorizontalPanel >
+										<g:HTML ui:field="isPublicQuestion" width="{constants.createPnlQuestionsWidth}"></g:HTML>
 										<g:CheckBox ui:field="isPublicBox" checked="true"></g:CheckBox>
 										<g:Image resource='{res.tooltip}' title='{constants.isPublicQuestionTtl}'
 											ui:field="imgIsPublicCheckBox" />
 									</g:HorizontalPanel>
 
-									<g:HorizontalPanel ui:field="isEnableAdsPanel">
-										<g:Label ui:field="isAdsEnabledQuestion" text='{constants.isAdsEnabledQuestion}'></g:Label>
+									<g:HorizontalPanel ui:field="isEnableAdsPanel" >
+										<g:Label ui:field="isAdsEnabledQuestion" text='{constants.isAdsEnabledQuestion}' width="{constants.createPnlQuestionsWidth}"></g:Label>
 										<g:CheckBox ui:field="isAdsEnabledBox" checked="false"></g:CheckBox>
 										<g:Image resource='{res.tooltip}'
 											title='{constants.isAdsEnabledQuestionTtl}'
 											ui:field="imgIsAdsEnabledCheckBox" />
+									</g:HorizontalPanel>
+									<g:HorizontalPanel ui:field="isCopyAdsPanel" >
+										<g:Label ui:field="isCopyAdsQuestion" text='{constants.isCopyAdsQuestion}'
+										width="{constants.createPnlQuestionsWidth}"></g:Label>
+										<g:CheckBox ui:field="isCopyAdsBox" checked="false"></g:CheckBox>
+										<g:Image resource='{res.spinner}'
+											title='{constants.loadingStr}'
+											ui:field="imgIsCopyAdsLoadingImg" />
+										<g:Image resource='{res.tooltip}'
+											title='{constants.isCopyAdsQuestionTtl}'
+											ui:field="imgIsCopyAdsCheckBox" />
+											
 									</g:HorizontalPanel>
 
 								</g:VerticalPanel>

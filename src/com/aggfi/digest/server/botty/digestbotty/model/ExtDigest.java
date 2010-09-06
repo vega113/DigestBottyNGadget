@@ -8,6 +8,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 import com.aggfi.digest.server.botty.google.forumbotty.model.Digest;
+import com.google.appengine.api.datastore.Text;
 import com.google.gson.annotations.Expose;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
@@ -88,6 +89,10 @@ public class ExtDigest  extends Digest{
 	@Persistent
 	@Expose
 	Integer version = 0;
+	
+	@Expose
+	@Persistent
+	private Text googleAdsenseCode = null;
 
 	public String getDescription() {
 		return description;
@@ -206,5 +211,10 @@ public class ExtDigest  extends Digest{
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
-
+	public Text getGoogleAdsenseCode() {
+		return googleAdsenseCode;
+	}
+	public void setGoogleAdsenseCode(Text code) {
+		this.googleAdsenseCode = code;
+	}
 }

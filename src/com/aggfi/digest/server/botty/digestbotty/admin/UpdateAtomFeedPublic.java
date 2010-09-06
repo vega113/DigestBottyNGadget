@@ -2,11 +2,10 @@ package com.aggfi.digest.server.botty.digestbotty.admin;
 
 
 import java.util.logging.Logger;
-
+import com.vegalabs.general.server.command.Command;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
-import com.aggfi.digest.server.botty.google.forumbotty.admin.Command;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.google.inject.Inject;

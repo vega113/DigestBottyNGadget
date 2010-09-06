@@ -11,15 +11,15 @@ import org.json.JSONObject;
 import org.waveprotocol.wave.model.id.WaveId;
 import org.waveprotocol.wave.model.id.WaveletId;
 
-import com.aggfi.digest.server.botty.digestbotty.admin.AddWavesParticipant;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.inject.Inject;
 import com.google.wave.api.Blip;
 import com.google.wave.api.Wavelet;
+import com.vegalabs.general.server.command.Command;
 
 public class AddAutoTag extends Command {
   private static final Logger LOG = Logger.getLogger(AddAutoTag.class.getName());

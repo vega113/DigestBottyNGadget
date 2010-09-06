@@ -11,18 +11,22 @@
 			<g:VerticalPanel>
 				<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
 				<g:HorizontalPanel>
-					<g:CaptionPanel captionText='{constants.selectReportTypeStr}'> 
+					<g:CaptionPanel captionText='{constants.selectReportTypeStr}' width='{constants.smallerBiggerWidthStr}'> 
 						<g:HorizontalPanel>
 							<g:HTML width="10px"></g:HTML>
 							<g:ListBox ui:field="reportTypesList"></g:ListBox>
+							<g:HorizontalPanel ui:field="refresBtnhPnl">
+								<g:HTML width='15px'></g:HTML>
+							</g:HorizontalPanel>
 						</g:HorizontalPanel>
 					</g:CaptionPanel>
 				</g:HorizontalPanel>
-				<g:VerticalPanel>
+				<g:HorizontalPanel>
 <!--					<g:DecoratorPanel>-->
-						<g:VerticalPanel ui:field="reportPanel"></g:VerticalPanel>
+						<g:HTML width='10px'></g:HTML>
+						<g:VerticalPanel ui:field="reportPanel" width='{constants.basicItemWidthStr}'></g:VerticalPanel>
 <!--					</g:DecoratorPanel>-->
-				</g:VerticalPanel>
+				</g:HorizontalPanel>
 			</g:VerticalPanel>
 		</g:VerticalPanel>
 	</g:HTMLPanel>

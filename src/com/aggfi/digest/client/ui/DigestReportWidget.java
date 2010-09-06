@@ -18,13 +18,21 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONValue;
@@ -63,6 +71,8 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	ListBox reportTypesList;
 	@UiField
 	SimplePanel prjListContainer;
+	@UiField
+	HorizontalPanel refresBtnhPnl;
 	ProjectSelectWidget projectSelectWidget;
 	
 	DigestService digestService;
@@ -74,6 +84,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	private VegaUtils utils;
 	protected Runnable onProjectsLoadCallback;
 	private Runnable runOnTabSelect;
+	private PushButton refreshBtn;
 	
 	
 
@@ -89,6 +100,20 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		this.constants = constants;
 		this.resources = resources;
 		this.utils = utils;
+		refreshBtn = new PushButton(new Image(resources.refresh()));
+		refreshBtn.setEnabled(false);
+		refreshBtn.setTitle(constants.refreshChartStr());
+		refresBtnhPnl.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		refresBtnhPnl.add(refreshBtn);
+		
+		refreshBtn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				handleOnSelectPrjList();
+			}
+		});
+		
 		
 		reportTypesList.addItem(constantsReport.newWavesLast14Days(),NEW_WAVES);
 		reportTypesList.addItem(constantsReport.newBlipsLast14Days(),NEW_BLIPS);
@@ -113,10 +138,10 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			@Override
 			public void run() {
 					initReportWidget();
+					utils.reportPageview("/reportTab/");
 					utils.adjustHeight();
 			}
 		};
-		utils.reportPageview("/reportTab/");
 	}
 
 
@@ -126,10 +151,11 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 
 
 	private void initReportWidget() {
-		this.projectSelectWidget =new com.aggfi.digest.client.ui.ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback,utils );
+		if(projectSelectWidget == null){
+			this.projectSelectWidget =new com.aggfi.digest.client.ui.ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback,utils );
+		}
 		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
-		utils.reportPageview("/reportTab/");
 	}
 	
 	//start TagsBreakdown
@@ -207,7 +233,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 
 	private Options createTagsBreakdownOptions(ConstantsImpl constants) {
 	    Options options = Options.create();
-	    options.setWidth(constants.basicWidthInt() - 10);
+	    options.setWidth(constants.basicWidthInt());
 	    options.setHeight(constants.basicReportHeightInt());
 	    options.set3D(true);
 	    options.setTitle(constants.breakDown4AllTags());
@@ -612,7 +638,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 
 		private com.google.gwt.visualization.client.visualizations.BarChart.Options createPostsByActivityOptions(ConstantsImpl constants) {
 			com.google.gwt.visualization.client.visualizations.BarChart.Options options = com.google.gwt.visualization.client.visualizations.BarChart.Options.create();
-		    options.setWidth(constants.basicWidthInt()-10);//TODO there's problem with left edge, need to fix it some how.
+		    options.setWidth(constants.basicWidthInt());
 		    options.setHeight(constants.basicReportHeightInt());
 		    options.setTitle(constants.postsByActivity14Days());
 		    options.setLegend(LegendPosition.NONE);
@@ -869,7 +895,7 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		
 		//end BlipsCounts
 	  
-		void handleOnSelectPrjList(ChangeEvent event){
+		void handleOnSelectPrjList(){
 			hideAll();
 			if(getProjectId() != null && !"".equals(getProjectId())){
 				reportTypesList.setEnabled(true);
@@ -895,21 +921,28 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 			}
 		}
 	  
-	  @UiHandler("reportTypesList")
+//	  @UiHandler("reportTypesList")
 	  void handleOnSelectReportTypesList(ChangeEvent event){
-		  handleOnSelectPrjList(event);
+		  handleOnSelectPrjList();
 	  }
 
 
 	private void initReport() {
 		Runnable onLoadCallback = new Runnable() {
 		  public void run() {
-			drawNewWavesLineChart(messagesReport,constantsReport,resources,digestService,reportPanel);
+//			drawNewWavesLineChart(messagesReport,constantsReport,resources,digestService,reportPanel);
+			  utils.dismissStaticMessage();
+			  utils.showSuccessMessage(constants.successStr(), 3);
+			  refreshBtn.setEnabled(true);
+			  Log.debug("Loaded VisualizationApi");
 		  }
 		};
 
 		// Load the visualization api, passing the onLoadCallback to be called
 		// when loading is done.
+		utils.showStaticMessage(constants.loadingVisualizationsApiStr());
+		Log.debug(constants.loadingVisualizationsApiStr());
+		refreshBtn.setEnabled(false);
 		VisualizationUtils.loadVisualizationApi(onLoadCallback, PieChart.PACKAGE,LineChart.PACKAGE );
 	}
 
@@ -922,4 +955,5 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	public String getName(){
 		return "report";
 	}
+	
 }

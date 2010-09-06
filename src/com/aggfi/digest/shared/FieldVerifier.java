@@ -113,4 +113,29 @@ public class FieldVerifier {
 			throw new IllegalArgumentException(messages.fieldShouldBeAlphaNumericExcptn(fieldname,origField));
 		}
 	}
+	
+	public static void verifyAdSenseCode(String codeStr) throws IllegalArgumentException{
+		boolean isCodeValid = true;
+		if("".equals(codeStr))
+			return;
+		//check length
+		if(codeStr.length() > 320){
+			isCodeValid = false;
+		}
+		String[] valuesToVerifyExistence = {"src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\"", "google_ad_client", "google_ad_slot", "google_ad_width", "google_ad_height", "text/javascript"};
+		for(String value : valuesToVerifyExistence){
+			if(codeStr.indexOf(value) < 0){
+				isCodeValid = false;
+			}
+		}
+		
+		if(codeStr.split("src=").length > 2){
+			isCodeValid = false;
+		}
+		
+		if(!isCodeValid){
+			throw new IllegalArgumentException("The AdSense code provided is invlaid! Please make sure you have the exact copy of the source code provided by Google AdSense!");
+		}
+		
+	}
 }

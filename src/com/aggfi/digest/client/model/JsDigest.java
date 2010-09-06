@@ -147,6 +147,12 @@ public class JsDigest extends JavaScriptObject implements IExtDigest {
 	public final native void setAdsEnabled(boolean isAdsEnabled) /*-{
 		this.isAdsEnabled = isAdsEnabled;
 	}-*/;
+
+	@Override
+	public final native void setCopyAdSenseFromUser(boolean isCopyAdSenseFromUser) /*-{
+		this.isCopyAdSenseFromUser = isCopyAdSenseFromUser;
+	}-*/;
+	
 	
 	
 	

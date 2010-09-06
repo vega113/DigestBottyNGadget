@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

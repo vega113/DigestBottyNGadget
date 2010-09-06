@@ -18,6 +18,7 @@ public interface DigestConstants extends Constants {
 	String reportTabStr();
 	String aboutTabStr();
 	String adsenseTabStr();
+	String personalTabStr();
 	
 	String aboutCreateStr();
 	String aboutDigestBottyStr();
@@ -144,6 +145,15 @@ public interface DigestConstants extends Constants {
 	String face();
 	String addSocialBtnsQuestion();
 	String addSocialBtnstExpl();
+	
+	String participantSettingsStr();
+	String generalSettingsStr();
+	
+	String refreshChartStr();
+	String refreshPrjsList();
+	
+	String userStr();
+	String forumStr();
 
 	/**
 	 * Google Apps domain Id of the DigestBotty
@@ -194,7 +204,30 @@ public interface DigestConstants extends Constants {
 	String participantWavesExpl();
 	String participantWavesTagExpl();
 	
-	@DefaultStringValue(value="aggfiwave")
+	String helloUserStr();
+	String pleaseSelectMode();
+	String viewModeStr();
+	String editModeStr();
+	
+	String adsenseCodeCaptionStr();
+	
+	String isCopyAdsQuestion();
+	
+	String personalAdSenseExpl();
+	String forumAdSenseExpl();
+	
+	String copyProjAdsense4PersonalQuestionStr();
+	String copyProjAdsense4PersonalQuestionExpl();
+	String copyBtnName();
+	String personalAdsenseCodeIsEmpty();
+	
+	String loadingStr();
+	String isCopyAdsQuestionTtl();
+	String isCopyAdsQuestionTtlNone();
+	
+	String loadingVisualizationsApiStr();
+	
+	@DefaultStringValue(value="aggfiwave") //Change it when switching domains
 	String appDomain();
 	//urls
 	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252B0R06HrZkBhE%252F")
@@ -206,9 +239,9 @@ public interface DigestConstants extends Constants {
 	String trackerUIStr();
 	//size
 	/** width of the whole gadget*/
-	@DefaultStringValue(value="520px")//change both
+	@DefaultStringValue(value="540px")//change both
 	String basicWidthStr();
-	@DefaultIntValue(value=520)//change both
+	@DefaultIntValue(value=540)//change both
 	int basicWidthInt();
 	
 	/**  width of scroll panel */
@@ -217,6 +250,10 @@ public interface DigestConstants extends Constants {
 	/** widht of create panel*/
 	@DefaultStringValue(value="510px")
 	String smallerBiggerWidthStr();
+	@DefaultStringValue(value="530px")
+	String createWidthStr();
+	@DefaultStringValue(value="502px")
+	String smaller2BiggerWidthStr();
 	
 	@DefaultIntValue(value=320)
 	int basicReportHeightInt();
@@ -232,6 +269,8 @@ public interface DigestConstants extends Constants {
 	int itemCreateHeight();
 	@DefaultStringValue(value="238px")
 	String aboutTabScrollHeight();
+	@DefaultStringValue(value="300px")
+	String createPnlQuestionsWidth();
 	
 	
 }

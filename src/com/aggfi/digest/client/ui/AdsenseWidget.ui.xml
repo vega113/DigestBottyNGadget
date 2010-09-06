@@ -4,38 +4,53 @@
 	<ui:with field='res'
 		type='com.aggfi.digest.client.resources.GlobalResources' />
 	<ui:with field='constants'
-		type='com.aggfi.digest.client.constants.ConstantsImpl' /> 
-		<g:HTMLPanel>
-		<g:VerticalPanel width='{constants.basicWidthStr}' stylePrimaryName='{res.globalCSS.highlightRow}'>
+		type='com.aggfi.digest.client.constants.ConstantsImpl' />
+	<ui:with field='digestConstants'
+		type='com.aggfi.digest.client.constants.DigestConstants' />
+		
+	<g:HTMLPanel>
+		<g:VerticalPanel width='{constants.smallerWidthStr}'
+			stylePrimaryName='{res.globalCSS.highlightRow}'>
 			<g:VerticalPanel>
 				<g:VerticalPanel>
+					<g:CaptionPanel ui:field="adsenseTitle4Cptn" captionText='{digestConstants.adsenseCodeCaptionStr}'>
 						<g:VerticalPanel ui:field="adsensePanel">
-							<g:Label text='Please select the mode:'></g:Label>
-							<g:HorizontalPanel>
-								<g:RadioButton name="mode" checked='true' ui:field="radioBtnViewMode"></g:RadioButton>
-								<g:Label text='View'></g:Label>
-								<g:HTML width="50px"></g:HTML>
-								<g:RadioButton name="mode" ui:field="radioBtnEditMode"></g:RadioButton>
-								<g:Label text='Edit'></g:Label>
-							</g:HorizontalPanel >
-							<g:CaptionPanel captionText='AdSense code'>
-								<g:TextArea characterWidth='65' visibleLines='11' ui:field="adsenseCodeTxtArea"></g:TextArea>
-							</g:CaptionPanel>
-							
-							<g:Label text='AdSense unit linked to:'></g:Label>
-							<g:HorizontalPanel>
-								<g:RadioButton name="adsense" checked='true' ui:field="radioBtnUser"></g:RadioButton>
-								<g:Label text='User: vega113@googlewave.com'></g:Label>
-							</g:HorizontalPanel>
-							<g:HorizontalPanel>
-								<g:RadioButton name="adsense" ui:field="radioBtnForum"></g:RadioButton>
-								<g:SimplePanel ui:field="prjListContainer"></g:SimplePanel>
-							</g:HorizontalPanel>
-							<g:HorizontalPanel horizontalAlignment='ALIGN_CENTER'>
-								<g:HTML width='180px'></g:HTML>
-								<g:Button text='Submit' ui:field="submitAdsenseCodeBtn"></g:Button>
+								<g:HorizontalPanel>
+								<g:Label text='{digestConstants.pleaseSelectMode}'></g:Label> 
+									<g:HTML width="15px"></g:HTML>
+									<g:Label text='{digestConstants.viewModeStr}'></g:Label>
+									<g:RadioButton name="mode" checked='true'
+										ui:field="radioBtnViewMode"></g:RadioButton>
+									<g:HTML width="15px"></g:HTML>
+									<g:Label text='Edit'></g:Label>
+									<g:RadioButton name="mode" ui:field="radioBtnEditMode"></g:RadioButton>
+									<g:HTML width="15px"></g:HTML>
+									<g:Image resource='{res.spinner}'
+											title='{digestConstants.loadingStr}'
+											ui:field="img1" />
+								</g:HorizontalPanel>
+									<g:TextArea characterWidth='65' visibleLines='11'
+										ui:field="adsenseCodeTxtArea"></g:TextArea>
+								<g:HorizontalPanel horizontalAlignment='ALIGN_CENTER'>
+									<g:HTML width='176px'></g:HTML>
+									<g:Image resource='{res.tooltip}' ui:field="img2" />
+									<g:HTML width="4px"></g:HTML>	
+									<g:Button text='Submit' ui:field="submitAdsenseCodeBtn"></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
+					</g:CaptionPanel>
+					<g:CaptionPanel width='{constants.smallerWidthStr}' ui:field="copyAdsenseCptnPanel">
+						<g:HorizontalPanel>
+							<g:Label text='{digestConstants.copyProjAdsense4PersonalQuestionStr}'></g:Label> 
+							<g:HTML width='6px'></g:HTML>
+							<g:Image resource='{res.tooltip}' title='{digestConstants.copyProjAdsense4PersonalQuestionExpl}'
+								ui:field="img3" />
+							<g:HorizontalPanel>
+								<g:HTML width='214px'></g:HTML>
+								<g:Button text='{digestConstants.copyBtnName}' ui:field="copyAdsenseBtn"></g:Button>
+							</g:HorizontalPanel>
+						</g:HorizontalPanel>
+					</g:CaptionPanel>
 				</g:VerticalPanel>
 			</g:VerticalPanel>
 		</g:VerticalPanel>

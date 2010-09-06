@@ -3,9 +3,10 @@ package com.aggfi.digest.server.botty.google.forumbotty.admin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.google.inject.Inject;
+import com.vegalabs.general.server.command.Command;
 
 public class AddDefaultTag extends Command {
   private AdminConfigDao adminConfigDao = null;

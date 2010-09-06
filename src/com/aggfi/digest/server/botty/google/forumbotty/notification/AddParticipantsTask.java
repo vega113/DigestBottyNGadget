@@ -15,7 +15,7 @@ import org.waveprotocol.wave.model.id.WaveId;
 import org.waveprotocol.wave.model.id.WaveletId;
 
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
-import com.aggfi.digest.server.botty.google.forumbotty.Util;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification;
 import com.aggfi.digest.server.botty.google.forumbotty.model.UserNotification.NotificationType;

@@ -10,6 +10,8 @@ import com.vegalabs.general.client.utils.VegaUtils;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -20,13 +22,25 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ProjectSelectWidget extends Composite {
 	@UiField
 	ListBox prjList;
+	@UiField
+	CaptionPanel outerCptnPnl;
+	
+	@UiField
+	HorizontalPanel refresBtnhPnl;
+	
+	private PushButton refreshBtn;
 
 	DigestService digestService;
 	DigestMessages messages;
@@ -52,7 +66,27 @@ public class ProjectSelectWidget extends Composite {
 		this.constants = constants;
 		this.resources = resources;
 		this.utils = utils;
+		
+		refreshBtn = new PushButton(new Image(resources.refresh()));
+		refreshBtn.setTitle(constants.refreshPrjsList());
+		refresBtnhPnl.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		refresBtnhPnl.add(refreshBtn);
+		refreshBtn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				refrshPrjList(messages, digestService, onProjectsRetrCallback, utils);
+			}
+		});
 
+		refrshPrjList(messages, digestService, onProjectsRetrCallback, utils);
+
+	}
+
+
+	private void refrshPrjList(final DigestMessages messages,
+			final DigestService digestService,
+			final Runnable onProjectsRetrCallback, final VegaUtils utils) {
 		final String userId = utils.retrUserId();
 		try {
 			
@@ -64,6 +98,8 @@ public class ProjectSelectWidget extends Composite {
 				@Override
 				public void onFailure(Throwable caught) {
 					Log.error("", caught);
+					utils.dismissAllStaticMessages();
+					utils.alert(caught.getMessage());
 				}
 
 				@Override
@@ -118,10 +154,9 @@ public class ProjectSelectWidget extends Composite {
 				}
 			});
 		} catch (RequestException e) {
-			Log.error("", e);
+			Log.error("Error message: " + e.getMessage() + ".", e);
 			utils.alert(e.getMessage());
 		}
-
 	}
 
 
@@ -138,5 +173,10 @@ public class ProjectSelectWidget extends Composite {
 	public void onPrjIdSelectionChange(ChangeEvent event){
 		String currId = prjList.getValue(prjList.getSelectedIndex());
 		utils.putToPrivateSate("CurrentDigestId", currId);
+	}
+
+
+	public CaptionPanel getOuterCptnPnl() {
+		return outerCptnPnl;
 	}
 }

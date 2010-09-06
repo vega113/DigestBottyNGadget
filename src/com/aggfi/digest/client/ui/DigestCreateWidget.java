@@ -72,10 +72,23 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	
 	@UiField
 	Image imgIsPublicCheckBox;
+	@UiField
+	Image imgIsCopyAdsCheckBox;
+	@UiField
+	HorizontalPanel isCopyAdsPanel;
+	
+	@UiField
+	Image imgIsCopyAdsLoadingImg; 
+	@UiField
+	CheckBox isCopyAdsBox;
+	@UiField
+	Image imgIsAdsEnabledCheckBox;
 	
 	private VegaUtils vegaUtils;
 
 	private Runnable onDigestCreateWidgetLoad;
+	
+	private DigestConstants constants;
 	
 	
 	
@@ -99,6 +112,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		resources.globalCSS().ensureInjected();
 		this.digestService = digestService;
 		this.vegaUtils = vegaUtils;
+		this.constants = constants;
 		
 		initCreateGadgetFlexTbl(createGadgetFlexTbl,constants,resources);
 		submitBtn.setText(constants.submitBtnStr());
@@ -107,14 +121,32 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		isPublicQuestion.setTitle(constants.isPublicQuestionTtl());
 		isPublicBox.setTitle(constants.isPublicQuestionTtl());
 		
-		isEnableAdsPanel.setVisible(false);//XXX remove
+		isCopyAdsPanel.setVisible(false);
+		
+		isAdsEnabledBox.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(isAdsEnabledBox.getValue()){
+					isCopyAdsPanel.setVisible(true);
+					isCopyAdsBox.setVisible(false);
+					imgIsCopyAdsLoadingImg.setVisible(true);
+					getAdSenseCode();
+					//send request to check if there's adsense cone registered for user
+					
+				}else{
+					isCopyAdsPanel.setVisible(false);
+				}
+			}
+		});
+		
 
 		submitBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				try{
 					Log.debug("click on submitBtn");
-					JsDigest digest = initExtDigestFromFields(createGadgetFlexTbl,isPublicBox,isAdsEnabledBox);
+					JsDigest digest = initExtDigestFromFields(createGadgetFlexTbl,isPublicBox,isAdsEnabledBox, isCopyAdsBox);
 					FieldVerifier.areValidDigestFields(digest,messages,constants);
 					encodeDigest(digest);
 					vegaUtils.showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
@@ -125,8 +157,12 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 							public void onSuccess(JSONValue resultJsonValue) {
 								JSONObject resultJson = resultJsonValue.isObject();
 								String outMessage = null;
+								String warning = null;
 								if(resultJson != null && resultJson.isObject() != null && resultJson.isObject().containsKey("message")){
 									outMessage = resultJson.isObject().get("message").isString().stringValue();
+									if(resultJson.isObject().get("warning") != null){
+										warning = resultJson.isObject().get("warning").isString().stringValue();
+									}
 								}else if(resultJsonValue.isString() != null){
 									outMessage = resultJsonValue.isString().stringValue();
 								}else{
@@ -134,8 +170,10 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 									throw new AssertionError ("No message body in create digest - it cannot happen!");
 								}
 								vegaUtils.dismissStaticMessage();
-								outMessage = outMessage.substring(1).substring(0, outMessage.length()-2); //workaround to remove ""
-								vegaUtils.showSuccessMessage(outMessage, 8);
+								vegaUtils.showSuccessMessage(outMessage, 10);
+								if(warning != null && !"".equals(warning)){
+									vegaUtils.alert(warning);
+								}
 								vegaUtils.reportPageview("/createTab/forumCreationSuccess");
 							}
 							
@@ -166,6 +204,42 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		});
 	}
 	
+	String adsense4UserStr = "";
+	private void getAdSenseCode() {
+		final String userId = vegaUtils.retrUserId();
+		
+		try {
+			digestService.getAdSenseCode("none", userId, true, new AsyncCallback<JSONValue>() {
+				
+				@Override
+				public void onSuccess(JSONValue result) {
+					adsense4UserStr = "";
+					try{
+						adsense4UserStr = result.isObject().get("adSenseCode").isString().stringValue();
+						isCopyAdsBox.setVisible(true);
+						imgIsCopyAdsLoadingImg.setVisible(false);
+						if(adsense4UserStr != null && !"".equals(adsense4UserStr)){
+							isCopyAdsBox.setEnabled(true);
+							imgIsCopyAdsCheckBox.setTitle(constants.isCopyAdsQuestionTtl()); 
+						}else{
+							isCopyAdsBox.setEnabled(false);
+							imgIsCopyAdsCheckBox.setTitle(constants.isCopyAdsQuestionTtlNone()); 
+						}
+					}catch(Exception e){}
+					Log.info("getAdSenseCode success");
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					vegaUtils.alert(caught.getMessage());
+					Log.warn("", caught);
+				}
+			});
+		} catch (RequestException e) {
+			vegaUtils.dismissAllStaticMessages();
+			Log.error("", e);
+		}
+	}
 
 	private void encodeDigest(JsDigest digest) {
 		digest.setAuthor(digest.getAuthor().replace("\"", "'"));
@@ -270,9 +344,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		row++;
 
 		Label forumSiteUrlLbl = new Label(constants.forumSiteUrlStr());
-		forumSiteUrlLbl.setVisible(false);
 		TextBox forumSiteUrlVal = new TextBox();
-		forumSiteUrlVal.setVisible(false);
 		forumSiteUrlVal.addClickHandler(clearWarningClickHandler);
 		forumSiteUrlVal.setTitle(constants.forumSiteUrlTitle());
 		tbl.setWidget(row, 0, forumSiteUrlLbl);
@@ -305,6 +377,10 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 					constants.googlegroupsIdExmpl()};
 		MouseDownHandler mouseDownHandler = new DigestMouseDownHandler(vegaUtils);
 		imgIsPublicCheckBox.addMouseDownHandler(mouseDownHandler);
+		imgIsAdsEnabledCheckBox.addMouseDownHandler(mouseDownHandler);
+		imgIsCopyAdsLoadingImg.addMouseDownHandler(mouseDownHandler);
+		imgIsCopyAdsCheckBox.addMouseDownHandler(mouseDownHandler);
+		
 		for(int i = 0; i < row; i++){
 			if(i%2 == 0){
 				tbl.getCellFormatter().setStyleName(row,0, resources.globalCSS().highlight());
@@ -350,7 +426,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		};
 	}
 
-	public static JsDigest initExtDigestFromFields(FlexTable w,CheckBox box, CheckBox isAdsBox) throws IllegalArgumentException{
+	public static JsDigest initExtDigestFromFields(FlexTable w,CheckBox box, CheckBox isAdsBox, CheckBox isCopyAdsBox) throws IllegalArgumentException{
 		
 		int row=0;
 		String ownerId = getStrFromTxtBox(row,w).trim(); row++;
@@ -366,6 +442,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		String googlegroupsId = getStrFromTxtBox(row,w).trim();row++;
 		boolean isPublicOnCreate = box.getValue();
 		boolean isAdsEnabled = isAdsBox.getValue();
+		boolean isCopyAdSenseFromUser = isCopyAdsBox.getValue();
+		
 		
 		String ownerStr = ownerId.substring(0, ownerId.indexOf("@"));
 		String domainStr = ownerId.substring(ownerStr.length()+1, ownerStr.length()+1 + ownerId.substring(ownerStr.length()+1).indexOf("."));
@@ -383,6 +461,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		digest.setGooglegroupsId(googlegroupsId.equals("@googlegroups.com")? "" : googlegroupsId.toLowerCase());
 		digest.setPublicOnCreate(isPublicOnCreate);
 		digest.setAdsEnabled(isAdsEnabled);
+		digest.setCopyAdSenseFromUser(isCopyAdSenseFromUser); 
 		return digest;
 	}
 	
@@ -410,4 +489,5 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	public String getName(){
 		return "create";
 	}
+	
 }
