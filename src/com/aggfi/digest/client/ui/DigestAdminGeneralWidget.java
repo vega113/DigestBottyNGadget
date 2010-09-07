@@ -84,6 +84,9 @@ public class DigestAdminGeneralWidget extends Composite implements RunnableOnTab
 			boolean isFaceEnabled = result.isObject().get("isFaceBtnEnabled").isBoolean().booleanValue();
 			isFaceEnabledCheckBox.setValue(isFaceEnabled);
 			
+			boolean isAtomPublic = result.isObject().get("isAtomFeedPublic").isBoolean().booleanValue();
+			isAtomFeedPublicCheckBox.setValue(isAtomPublic);
+			
 		}
 
 		@Override
@@ -122,7 +125,7 @@ public class DigestAdminGeneralWidget extends Composite implements RunnableOnTab
 	}
 
 	private void initAdminWidget() {
-		clearAll();
+//		clearAll();
 	}
 
 	

@@ -128,7 +128,12 @@ public class BlipSubmitedDaoImpl implements BlipSubmitedDao{
 			query.setFilter(filters);
 			entries = (List<BlipSubmitted>) query.execute(projectId, start.getTime(), end.getTime());      
 		} finally {
-			pm.detachCopyAll(entries);
+			List<BlipSubmitted> entriesCopy = new ArrayList<BlipSubmitted>();
+			for(BlipSubmitted entry : entries){
+				entriesCopy.add(pm.detachCopy(entry));
+			}
+//			pm.detachCopyAll(entries);
+			
 			pm.close();
 		}
 		return entries;

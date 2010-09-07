@@ -2,8 +2,7 @@
 
 var div = document.getElementById('content_div'); 
 
-var DOMAIN = "";
-DOMAIN = "http://aggfiwave.appspot.com";
+
 var JSON_RPC_URL = "/admin/jsonrpc";
 
 function init() {
@@ -17,10 +16,11 @@ function init() {
 function participantCallback(){
 	if (wave && wave.isInWaveContainer() && wave.getState() && wave.getViewer()) {
 		var viewerId = wave.getViewer().getId();
-		var methodName = 'REPORT_POST_VIEW';
+		var methodName = 'REPORT_POST_VIEW'; 
 		
 		
 		var projectId = wave.getState().get('projectId', 'none');
+		var domain = wave.getState().get('domain', 'http://digestbotty.appspot.com');
 		var params = {};
 		params.projectId = projectId;
 		params.userId = viewerId;
@@ -33,7 +33,7 @@ function participantCallback(){
 		postData.params = params;
 		
 		//use gadgets.io to send
-		var url = DOMAIN + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
+		var url = domain + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
 		var params = {};
 		params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
 		params[gadgets.io.RequestParameters.METHOD]=gadgets.io.MethodType.POST;

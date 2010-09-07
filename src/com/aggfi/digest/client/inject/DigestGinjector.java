@@ -15,6 +15,7 @@ public interface DigestGinjector extends Ginjector {
 
 	DigestTabPanel getDigestCreatedTabPanel();
 	DigestAboutWidget getDigestAboutWidget();
+	
 	DigestAdminGeneralWidget getDigestAdminGeneralWidget();
 	DigestAdminParticipantWidget getDigestAdminParticipantWidget();
 	AdsenseWidget getAdsenseWidget();

@@ -3,8 +3,10 @@
 package com.aggfi.digest.server.botty.google.forumbotty.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -212,5 +214,58 @@ public AdminConfig(String id) {
 
 	public void setFaceBtnEnabled(Boolean isFaceBtnEnabled) {
 		this.isFaceBtnEnabled = isFaceBtnEnabled;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		StringBuilder builder = new StringBuilder();
+		builder.append("AdminConfig [id=");
+		builder.append(id);
+		builder.append(", defaultTags=");
+		builder.append(defaultTags != null ? toString(defaultTags, maxLen)
+				: null);
+		builder.append(", defaultParticipants=");
+		builder.append(defaultParticipants != null ? toString(
+				defaultParticipants, maxLen) : null);
+		builder.append(", managers=");
+		builder.append(managers != null ? toString(managers, maxLen) : null);
+		builder.append(", updated=");
+		builder.append(updated);
+		builder.append(", created=");
+		builder.append(created);
+		builder.append(", adsense=");
+		builder.append(adsense);
+		builder.append(", isAtomFeedPublic=");
+		builder.append(isAtomFeedPublic);
+		builder.append(", isDiggBtnEnabled=");
+		builder.append(isDiggBtnEnabled);
+		builder.append(", isBuzzBtnEnabled=");
+		builder.append(isBuzzBtnEnabled);
+		builder.append(", isTweetBtnEnabled=");
+		builder.append(isTweetBtnEnabled);
+		builder.append(", isFaceBtnEnabled=");
+		builder.append(isFaceBtnEnabled);
+		builder.append(", isAdsEnabled=");
+		builder.append(isAdsEnabled);
+		builder.append(", autoTagRegexMap=");
+		builder.append(autoTagRegexMap != null ? toString(
+				autoTagRegexMap.entrySet(), maxLen) : null);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 }

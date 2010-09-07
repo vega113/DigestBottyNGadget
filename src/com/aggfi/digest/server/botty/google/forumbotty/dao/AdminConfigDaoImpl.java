@@ -70,6 +70,7 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 				}
 				
 			} else {
+				LOG.info("Creating new adminConfig with id: " + id);
 				adminConfig = new AdminConfig(id);
 
 				List<String> defaultParticipants = new ArrayList<String>();
@@ -89,7 +90,7 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 		} finally {
 			pm.close();
 		}
-
+		LOG.info("loaded admin config: "  + adminConfig);
 		return adminConfig;
 	}
 

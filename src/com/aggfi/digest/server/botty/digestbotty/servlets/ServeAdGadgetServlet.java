@@ -72,29 +72,13 @@ public class ServeAdGadgetServlet extends HttpServlet{
 			if("".equals(adsenseStr)){
 				throw new IllegalArgumentException("Invalid forumId!");
 			}
-//			if(adsenseStr == null || "".equals(adsenseStr)){
-//				adsenseStr = "		<script type=\"text/javascript\"><!--\n" +
-//									"google_ad_client = \"pub-3589749845269196\";\n"+
-//									"/* 468x60, created 8/23/10 */\n" +
-//									"google_ad_slot = \"7979283764\";\n"+
-//									"google_ad_width = 468;\n"+
-//									"google_ad_height = 60;\n"+
-//									"//-->\n"+
-//									"</script>\n"+
-//									"<script type=\"text/javascript\"\n"+
-//									"src=\"http://pagead2.googlesyndication.com/pagead/show_ads.js\">\n"+
-//									"</script>\n";
-//				LOG.info("Adding Ad by DB");
-//			}else{
-//				LOG.fine("Adding Ad for " + projectId);
-//			}
 		}
 		
 		//let's find the width;
 		String width = "\"" + (Integer.parseInt(extractValue(adsenseStr, "google_ad_width")) + 4) + "\"";
 		String height = "\"" + (Integer.parseInt(extractValue(adsenseStr, "google_ad_height")) +4) + "\"" ;
 		
-		String adtrackStr =  "<script type=\"text/javascript\">document.write(unescape(\"%3Cscript src='\" + \"http://\" + \"aggfiwave.appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E\"));</script>";
+		String adtrackStr =  "<script type=\"text/javascript\">document.write(unescape(\"%3Cscript src='\" + \"http://digestbotty.appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E\"));</script>";
 		
 		Object[] args = {width,height,adsenseStr,adtrackStr};
 		

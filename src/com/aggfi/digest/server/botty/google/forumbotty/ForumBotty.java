@@ -191,15 +191,15 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 		LOG.log(Level.SEVERE,"",e);
 	}
 	  
-//	  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
-//		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
-//		  if( adminConfig.isAdsEnabled()){
-//			  appendAd2Blip(wavelet.getRootBlip(), projectId, false);
-//		  }
-//		  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
-//		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
-//		 
-//	  }
+	  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
+		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+		  if( adminConfig.isAdsEnabled()){
+			  appendAd2Blip(wavelet.getRootBlip(),wavelet.getRootBlip().getBlipId(), projectId, false);
+		  }
+		  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
+		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
+		 
+	  }
   }
 
 	public void appendAd2Blip(Blip blip, String blipId, String projectId, boolean isAdReplyBlip) {
@@ -222,6 +222,7 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 				blip.at(blip.getContent().length()).insert(gadget);
 				Map<String,String> out = new HashMap<String, String>();
 			    out.put("projectId", projectId);
+			    out.put("domain", "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com");
 			    out.put("eventValue", blipId);
 			   blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadget.getUrl())).updateElement(out);
 			}
@@ -237,6 +238,8 @@ protected void actOnBottyAdded(String projectId,
 	if (projectId == null) {
 		  LOG.log(Level.SEVERE, "actOnBottyAdded:Missing proxy-for project id");
 		  return;
+	  }else{
+		  LOG.log(Level.INFO, "actOnBottyAdded: project id: " + projectId);
 	  }
 
 	  // If this is from the "*-digest" proxy, skip processing.
@@ -250,6 +253,7 @@ protected void actOnBottyAdded(String projectId,
 	  }else{
 		  if (isWorthy(wavelet)) {
 			// Add default participants
+			  LOG.log(Level.INFO, "adding default participants: " + projectId);
 			  List<String> participants = this.adminConfigDao.getAdminConfig(projectId).getDefaultParticipants();
 			  if(participants.size() == 0){
 				  LOG.warning("participants.size() == 0");
@@ -293,6 +297,7 @@ protected void submitWavelet(Wavelet wavelet) {
 }
 
 public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip blip, String modifiedBy) {
+	LOG.log(Level.INFO, "adding to digest: project id: " + projectId);
 	ForumPost entry = forumPostDao.getForumPost(wavelet.getDomain(), 
 			wavelet.getWaveId().getId());
 	// Update contributor list if this is not robot or agent
@@ -331,8 +336,6 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		Set<String> keys = blips2Import.keySet();
 		for(String key : keys){
 			Blip blip2Import = blips2Import.get(key);
-			String waveId = blip2Import.getWaveId().getDomain() + "!" + blip2Import.getWaveId().getId();
-			String blipId = blip2Import.getBlipId();
 			//save all blips
 			saveBlipSubmitted(blip2Import.getCreator(), blip2Import, projectId);
 		}
@@ -408,7 +411,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
 		  if( adminConfig.isAdsEnabled() && adminConfig.getAdsense() != null && !"".equals(adminConfig.getAdsense().getValue())){ //if forum not linked to adsense code - do not insert ad
 			  appendAd2Blip(wavelet.getRootBlip(),wavelet.getRootBlip().getBlipId(), projectId, false);
-			  if(entry.getRootBlipsWithoutAdCount() <= 5){ //XXX - should be configurable from admin gadget
+			  if(entry.getRootBlipsWithoutAdCount() >= 5){ //XXX - should be configurable from admin gadget
 				  appendAd2Blip(event.getBlip(),event.getBlip().getBlipId(), projectId, true);
 				  entry.setRootBlipsWithoutAdCount(entry.getRootBlipsWithoutAdCount() - 5);
 			  }
@@ -446,6 +449,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 				  
 				  //now add social buttons
 				  AdminConfig adminConfig = adminConfigDao.getAdminConfig(entry.getProjectId());
+				  LOG.info("Adding social buttons for: "  + adminConfig);
 				  boolean isDiggButtonEnabled = adminConfig.isDiggBtnEnabled();
 				  boolean isBuzzButtonEnabled = adminConfig.isBuzzBtnEnabled();
 				  boolean isTweetButtonEnabled = adminConfig.isTweetBtnEnabled();
@@ -525,7 +529,6 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 			  LOG.log(Level.INFO,"can happen if the robot was removed manually from the wave.",e);
 		  }
 		  String entryTitle = entry.getTitle();
-		  String entryMsg = entry.getFirstBlipContent().getValue();
 		  Blip blip = null;
 		  //check the digest version
 		  if(adminConfig.isAdsEnabled()){
@@ -579,10 +582,9 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
   private void addSocialButtons(Blip blip, String waveId, String domain,String title, String forumName, String message, String imageUrl,boolean isDiggButtonEnabled,
 		  boolean isBuzzButtonEnabled,boolean isTweetButtonEnabled, boolean isFaceEnabled) throws UnsupportedEncodingException {
 	  LOG.info("entering addSocialButtons");
-	  String waveUrl = "https://wave.google.com/wave/#restored:wave:" + domain + "%252F" + URLEncoder.encode(waveId,"UTF-8");
-	  String embeddedUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/showembedded?waveId=" + waveId + "&title=" + URLEncoder.encode(title);
-	  if(!isDiggButtonEnabled && !isDiggButtonEnabled && !isTweetButtonEnabled && !isFaceEnabled){
-		  LOG.info("exiting addSocialButtons by return");
+	  String embeddedUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/showembedded?waveId=" + waveId + "&title=" + URLEncoder.encode(title, "UTF-8");
+	  if(!isDiggButtonEnabled && !isDiggButtonEnabled && !isTweetButtonEnabled && !isBuzzButtonEnabled && !isFaceEnabled){
+		  LOG.info("exiting addSocialButtons by return: forumName: " + forumName);
 		  return;
 	  }else{
 		  blip.append("\n");

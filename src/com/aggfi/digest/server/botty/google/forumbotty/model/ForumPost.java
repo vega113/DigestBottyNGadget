@@ -205,7 +205,7 @@ public void setFirstBlipContent(Text firstBlipContent) {
 }
 
 public int getRootBlipsWithoutAdCount() {
-	return rootBlipsWithoutAdCount;
+	return rootBlipsWithoutAdCount != null ? rootBlipsWithoutAdCount : 0;
 }
 
 public void setRootBlipsWithoutAdCount(int rootBlipsWithoutAdCount) {

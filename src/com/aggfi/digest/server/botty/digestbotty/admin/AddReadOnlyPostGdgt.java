@@ -1,6 +1,7 @@
 package com.aggfi.digest.server.botty.digestbotty.admin;
 
 import java.io.IOException;
+import com.vegalabs.general.server.command.Command;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 
 import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
+import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
@@ -18,18 +20,16 @@ import com.google.inject.Inject;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
-import com.vegalabs.general.server.command.Command;
-import com.vegalabs.general.server.rpc.util.Util;
 
-public class AddReadOnlyPostGadget extends Command {
-	  private static final Logger LOG = Logger.getLogger(AddReadOnlyPostGadget.class.getName());
+public class AddReadOnlyPostGdgt extends Command {
+	  private static final Logger LOG = Logger.getLogger(AddReadOnlyPostGdgt.class.getName());
 	  private Util util = null;
 	private ForumBotty robot = null;
 	private AdminConfigDao adminConfigDao = null;
 	private ExtDigestDao extDigestDao = null;
 
 	  @Inject
-		public AddReadOnlyPostGadget(Util util,ForumBotty robot, AdminConfigDao adminConfigDao, ExtDigestDao extDigestDao) {
+		public AddReadOnlyPostGdgt(Util util,ForumBotty robot, AdminConfigDao adminConfigDao, ExtDigestDao extDigestDao) {
 			this.util = util;
 			this.robot = robot;
 			this.adminConfigDao = adminConfigDao;

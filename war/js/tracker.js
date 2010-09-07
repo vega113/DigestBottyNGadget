@@ -1,6 +1,4 @@
 
-var DOMAIN = "";
-DOMAIN = "http://aggfiwave.appspot.com";
 var JSON_RPC_URL = "/admin/jsonrpc";
 var div = document.getElementById('content_div'); 
 
@@ -55,6 +53,7 @@ function participantCallback(){
 		postData.method = 'REPORT_POST_VIEW';
 		postData.params = params;
 		
+		var DOMAIN = = wave.getState().get('domain', 'http://digestbotty.appspot.com');
 		//use gadgets.io to send
 		var url = DOMAIN + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
 		var params = {};

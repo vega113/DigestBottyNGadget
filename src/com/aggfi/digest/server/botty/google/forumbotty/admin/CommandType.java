@@ -2,7 +2,7 @@ package com.aggfi.digest.server.botty.google.forumbotty.admin;
 
 import com.aggfi.digest.server.botty.digestbotty.admin.AddAdSenseCode;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddDigestManager;
-import com.aggfi.digest.server.botty.digestbotty.admin.AddReadOnlyPostGadget;
+import com.aggfi.digest.server.botty.digestbotty.admin.AddReadOnlyPostGdgt;
 import com.aggfi.digest.server.botty.digestbotty.admin.AddWavesParticipant;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
 import com.aggfi.digest.server.botty.digestbotty.admin.CreateNewPost;
@@ -59,7 +59,7 @@ public enum CommandType {
   GET_NEXT_PUB_PER_PROJECT(GetNextPubPerProject.class),
   UPDATE_ATOM_FEED_PUBLIC(UpdateAtomFeedPublic.class),
   CREATE_NEW_POST(CreateNewPost.class),
-  ADD_SECURE_POST_GADGET(AddReadOnlyPostGadget.class),
+  ADD_SECURE_POST_GADGET(AddReadOnlyPostGdgt.class),
   UPDATE_SOCIAL_BTNS_SETTINGS(UpdateSocialBtnsSettings.class), 
   ADD_ADSENSE_CODE(AddAdSenseCode.class),
   GET_ADSENSE_CODE(GetAdSenseCode.class),
