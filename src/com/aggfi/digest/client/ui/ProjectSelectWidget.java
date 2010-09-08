@@ -22,6 +22,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -39,14 +40,20 @@ public class ProjectSelectWidget extends Composite {
 	
 	@UiField
 	HorizontalPanel refresBtnhPnl;
-	
 	private PushButton refreshBtn;
+	
+	@UiField
+	HorizontalPanel goBtnhPnl;
+	private Button goBtn;
+	
 
 	DigestService digestService;
 	DigestMessages messages;
 	DigestConstants constants;
 	GlobalResources resources;
 	VegaUtils utils;
+	
+	String digestWaveId = null;
 
 	private static ProjectSelectWidgetUiBinder uiBinder = GWT
 	.create(ProjectSelectWidgetUiBinder.class);
@@ -67,7 +74,10 @@ public class ProjectSelectWidget extends Composite {
 		this.resources = resources;
 		this.utils = utils;
 		
+		prjList.setWidth("380px");
+		
 		refreshBtn = new PushButton(new Image(resources.refresh()));
+		//refreshBtn.setHeight("21px");
 		refreshBtn.setTitle(constants.refreshPrjsList());
 		refresBtnhPnl.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		refresBtnhPnl.add(refreshBtn);
@@ -76,6 +86,23 @@ public class ProjectSelectWidget extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 				refrshPrjList(messages, digestService, onProjectsRetrCallback, utils);
+			}
+		});
+		
+		
+		goBtn = new Button("<span style='color: #105eb2; font-weight: bold;'>" + constants.goStr() + "</span>");
+		//goBtn.setHeight("21px");
+		goBtn.setTitle(constants.goToWaveStr());
+		goBtnhPnl.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		goBtnhPnl.add(goBtn);
+		goBtn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				String digestId = utils.retrFromPrivateSate("CurrentDigestId");
+				String digestWaveId = utils.retrFromPrivateSate("digestWaveId#" +digestId);
+				String navigateTo = "#restored:wave:" + digestWaveId;
+				utils.requestNavigateTo(navigateTo, null);
 			}
 		});
 
@@ -118,14 +145,19 @@ public class ProjectSelectWidget extends Composite {
 							prjList.clear();
 							Set<String> keys = resultJson.keySet();
 							for(String key : keys){
-								String item = resultJson.get(key).isString().stringValue();
-								if(item.length() > 57){
-									item = item.substring(60) + "...";
+								
+								String prjName = resultJson.get(key).isObject().get("prjName").isString().stringValue();
+								String digestWaveId = resultJson.get(key).isObject().get("digestWaveId").isString().stringValue();
+								
+								utils.putToPrivateSate("digestWaveId#" + key , digestWaveId);
+								
+								if(prjName.length() > 57){
+									prjName = prjName.substring(60) + "...";
 								}
-								if(item == null || "".equals(item)){
-									item = key;
+								if(prjName == null || "".equals(prjName)){
+									prjName = key;
 								}
-								prjList.addItem(item,key);
+								prjList.addItem(prjName,key);
 							}
 							// Create a callback to be called when the visualization API
 							// has been loaded.

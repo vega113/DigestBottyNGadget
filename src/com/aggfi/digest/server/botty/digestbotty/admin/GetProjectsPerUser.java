@@ -36,9 +36,14 @@ public class GetProjectsPerUser extends Command {
 		List<ExtDigest> digests = extDigestDao.retrDigestsByOwnerOrManagerId(userId);
 		if (digests.size() > 0) {
 			for (ExtDigest digest : digests) {
+				JSONObject outjson = new JSONObject();
 				String prjId = digest.getProjectId();
 				String prjName = digest.getName();
-				digestMapJson.put(prjId, prjName);
+				outjson.put("prjName", prjName);
+				outjson.put("prjId", prjId);
+				outjson.put("digestWaveId", digest.getId());
+				
+				digestMapJson.put(prjId, outjson);
 			}
 		}else{
 			digestMapJson.put("none", "none");

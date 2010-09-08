@@ -1,26 +1,105 @@
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-</head>
-<body>
-<iframe src="javascript:'" id="__gwt_historyFrame" tabIndex=-1
-	style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-<table align="center">
-	<tr>
-		<td id="adsensePanel">
-		<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body><iframe src="javascript:'" id="__gwt_historyFrame" tabIndex=-1 style="position:absolute;width:0;height:0;border:0"></iframe><table align="center"><tr><td id="adsensePanel">		<script type="text/javascript"><!--
-google_ad_client = "pub-3589749845269196";
-/* 468x60, created 8/23/10 */
-google_ad_slot = "7979283764";
-google_ad_width = 468;
-google_ad_height = 60;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-</td> </tr> <tr> <td id="mainPanel"></td> </tr><tr><td id="logPanel"></td></tr></table></body></html>
-		</td>
-</table>
-</body>
-</html>
+ <div style="">
+		<table
+			style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
+			valign="middle">
+			<tr
+				style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
+				valign="middle">
+				<td
+					style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
+					valign="middle"><img alt="views" title="total views"
+					src="http://lh5.ggpht.com/_tsWs83xehHE/TIOGSemIT9I/AAAAAAAAFc0/cNz281SMJfU/eye_icon.png"
+					width="24px" height="22px;" style="padding-top: 0px;"></td>
+				<td
+					style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt">
+				<fieldset
+					style="padding: 0px; padding-top: 0px; margin: 1px; height: 18px; width: 36px; background-color: #5999de; color: white; border-color: black; border-style: solid; border-width: 2pt"
+					title="total views"><legend
+					style="font-size: 11pt; font-weight: bold; padding: 1px; margin: 1px; color: darkgreen; border-color: white"></legend>
+				<div id="content_div"
+					style="height: 10px; width: 32px; color: white; text-align: center; font-size: 11pt; vertical-align: top;"></div>
+				</fieldset>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<script>
+	
+
+	var JSON_RPC_URL = "/admin/jsonrpc";
+	var div = document.getElementById('content_div'); 
+
+
+	function stateUpdated() {
+		if(!wave.getState().get('totalViewersCounter')) {
+			div.innerHTML = "0"
+		}
+		else {
+			div.innerHTML = wave.getState().get('totalViewersCounter');
+		} 
+	}
+
+	function init() {
+		if (wave && wave.isInWaveContainer()) {
+			wave.setStateCallback(stateUpdated);
+			setTimeout("participantCallback()",2000);
+		}else{
+			alert("wave is null in init!")
+		}
+	}
+
+	function participantCallback(){
+		if (wave && wave.isInWaveContainer() && wave.getState() && wave.getViewer()) {
+			
+			
+			var delta = {};
+			var viewerId = wave.getViewer().getId();
+			var viewerCounter = parseInt(wave.getState().get(viewerId, '0'));
+			var uniqueViewersCounter = parseInt(wave.getState().get('uniqueViewersCounter', '0'));
+			var totalViewersCounter = parseInt(wave.getState().get('totalViewersCounter', '0'));
+			
+			if(viewerCounter == 0){
+				// increase unique counter
+				uniqueViewersCounter++; 
+			}
+			
+			delta[viewerId] = viewerCounter+1; 
+			delta['uniqueViewersCounter'] = uniqueViewersCounter;
+			totalViewersCounter++;
+			delta['totalViewersCounter'] = totalViewersCounter;
+			
+			var projectId = wave.getState().get('projectId', 'none');
+			var params = {};
+			params.projectId = projectId;
+			params.userId = viewerId;
+			params.waveId = wave.getWaveId();
+			params.type = "VIEW_POST";
+			params.value = uniqueViewersCounter;
+			
+			var postData = {};
+			postData.method = 'REPORT_POST_VIEW';
+			postData.params = params;
+			
+			var DOMAIN = = wave.getState().get('domain', 'http://digestbotty.appspot.com');
+			//use gadgets.io to send
+			var url = DOMAIN + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
+			var params = {};
+			params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+			params[gadgets.io.RequestParameters.METHOD]=gadgets.io.MethodType.POST;
+			params[gadgets.io.RequestParameters.POST_DATA]= JSON.stringify(postData);
+			 
+			gadgets.io.makeRequest(url, null, params);
+			
+			wave.getState().submitDelta(delta);
+			
+		}
+	}
+	gadgets.util.registerOnLoadHandler(init);
+
+	// Reset value of "count" to 0
+	function resetCounter(){
+		wave.getState().submitDelta({'viewersCounter': '0'});
+	}
+
+
+	</script>

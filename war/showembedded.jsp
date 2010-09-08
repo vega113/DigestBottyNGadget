@@ -26,7 +26,7 @@ s1.parentNode.insertBefore(s, s1);
 <script type="text/javascript">
 	var waveIdToLoad = null;
 	var wavePanel = null;
-	var globalUrl = "http://" + "<%= request.getServerName() %>";
+	var globalUrl = "http://" + "<%= request.getServerName()  + ":" + request.getServerPort()%>";
     google.load("wave", "1");
     
     function createDiggLink(href){
@@ -98,6 +98,7 @@ s1.parentNode.insertBefore(s, s1);
 			  if(description != null){
 				  url = url +  "&description=" + escape(description);
 			  }
+			 
 				try{
 					window.location.href = url;
 				//_trackEvent("/embed", "clickAd");

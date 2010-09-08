@@ -14,6 +14,9 @@
 						<g:HorizontalPanel ui:field="refresBtnhPnl">
 								<g:HTML width='15px'></g:HTML>
 						</g:HorizontalPanel>
+						<g:HorizontalPanel ui:field="goBtnhPnl">
+								<g:HTML width='5px'></g:HTML>
+						</g:HorizontalPanel>
 					</g:HorizontalPanel>
 		</g:CaptionPanel>
 		</g:HorizontalPanel>

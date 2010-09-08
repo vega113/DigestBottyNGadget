@@ -70,7 +70,8 @@ import com.aggfi.digest.server.botty.google.forumbotty.admin.CommandType;
 
 @Singleton
 public class ForumBotty extends AbstractRobot {
-  private static final String TO_BOTTOM = "Link to Bottom";
+  private static final String USE_HOME_END_KEYBOARD_KEYS = "(You can use HOME/END keyboard keys to navigate to top/bottom)";
+private static final String TO_BOTTOM = "Link to Bottom";
 private static final String TO_TOP = "Link to Top";
 private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
   private static final boolean DEBUG_MODE = false;
@@ -445,6 +446,9 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 				  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
 				  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",backtodigestAnnotationName,"done");
 				  rootBlipRef.insert(baList, back2digestWaveStr);
+				  List<BundledAnnotation> ba2 = BundledAnnotation.listOf( "style/fontSize", "8pt");
+				  String useKeysStr = " " + USE_HOME_END_KEYBOARD_KEYS;
+				  rootBlip.at(rootBlip.getContent().length()).insert(ba2,useKeysStr);
 				  LOG.fine("updated addBack2Digest2RootBlip " + rootBlip.getContent());
 				  
 				  //now add social buttons
@@ -455,7 +459,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 				  boolean isTweetButtonEnabled = adminConfig.isTweetBtnEnabled();
 				  boolean isFaceButtonEnabled = adminConfig.isFaceBtnEnabled();
 				  try {
-					addSocialButtons(rootBlip,digestsList.get(0).getWaveId(),digestsList.get(0).getDomain(),entry.getTitle(),digestsList.get(0).getName(),
+					addSocialButtons(rootBlip,entry.getId(),entry.getTitle(),digestsList.get(0).getName(),
 							  rootBlip.getContent(),digestsList.get(0).getInstallerThumbnailUrl(),  isDiggButtonEnabled,isBuzzButtonEnabled,isTweetButtonEnabled,isFaceButtonEnabled);
 				} catch (UnsupportedEncodingException e) {
 					LOG.severe(e.getMessage());
@@ -579,10 +583,10 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	  }
   }
   
-  private void addSocialButtons(Blip blip, String waveId, String domain,String title, String forumName, String message, String imageUrl,boolean isDiggButtonEnabled,
+  private void addSocialButtons(Blip blip, String waveId,String title, String forumName, String message, String imageUrl,boolean isDiggButtonEnabled,
 		  boolean isBuzzButtonEnabled,boolean isTweetButtonEnabled, boolean isFaceEnabled) throws UnsupportedEncodingException {
 	  LOG.info("entering addSocialButtons");
-	  String embeddedUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/showembedded?waveId=" + waveId + "&title=" + URLEncoder.encode(title, "UTF-8");
+	  String embeddedUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/showembedded?waveId=" + URLEncoder.encode(waveId, "UTF-8")  + "&title=" + URLEncoder.encode(title, "UTF-8");
 	  if(!isDiggButtonEnabled && !isDiggButtonEnabled && !isTweetButtonEnabled && !isBuzzButtonEnabled && !isFaceEnabled){
 		  LOG.info("exiting addSocialButtons by return: forumName: " + forumName);
 		  return;
@@ -591,6 +595,9 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	  }
 	  String back2digestWaveStr = makeBackStr(forumName);
 	  message = message.replaceAll(back2digestWaveStr, "");
+	  message = message.replaceAll(USE_HOME_END_KEYBOARD_KEYS, "");
+	  message = message.replaceFirst ("\\(", "");
+	  message = message.replaceFirst ("\\)", "");
 	  if(isDiggButtonEnabled){
 		  String imgUrl = "http://widgets.digg.com/img/button/diggThisDigger.png";
 		  MessageFormat fmt = new MessageFormat("http://digg.com/submit?url={0}&amp;title={1}");
@@ -956,7 +963,7 @@ protected String[] createGadgetUrlsArr() {
 			  blipToUpdate.at(blipToUpdate.getContent().length()).insert(baList, toLocationStr);
 			  blipToUpdate.append("\n");
 				List<BundledAnnotation> ba = BundledAnnotation.listOf("style/fontStyle","italic","style/fontSize", "8pt");
-				blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba," (Or use HOME/END keyboard keys to navigate to top/bottom)");
+				blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba,USE_HOME_END_KEYBOARD_KEYS);
 		}
 		submit(blipToUpdate.getWavelet(), PREVIEW_RPC_URL);
 	}
@@ -965,13 +972,13 @@ protected String[] createGadgetUrlsArr() {
 		//append powered by
 			String fontSize = "8pt";
 			int startPos = blipToUpdate.getContent().length();
-			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(91,155,226)", "style/color", "rgb(255,255,255)");
+			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(1,66,177)", "style/color", "rgb(255,255,255)");
 			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba1," [Forum powered by ");
 			
-			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(91,155,226)", "style/color", "rgb(255,255,255)", "link/manual","waveid://googlewave.com/w+KNw8wPWXA/~/conv+root/b+KNw8wPWXB");
+			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(1,66,177)", "style/color", "rgb(255,255,255)", "link/manual","waveid://googlewave.com/w+KNw8wPWXA/~/conv+root/b+KNw8wPWXB");
 			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba2,"DigestBotty");
 			
-			List<BundledAnnotation> ba3 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(91,155,226)", "style/color", "rgb(255,255,255)");
+			List<BundledAnnotation> ba3 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(1,66,177)", "style/color", "rgb(255,255,255)");
 			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba3,"]");
 			
 			int endPos = blipToUpdate.getContent().length();

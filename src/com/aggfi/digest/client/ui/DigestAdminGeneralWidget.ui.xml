@@ -49,7 +49,7 @@
 							<g:Image resource='{res.tooltip}' title='{constants.addSocialBtnstExpl}'
 								ui:field="img11" />
 							<g:HorizontalPanel>
-								<g:HTML width='140px'></g:HTML>
+								<g:HTML width='105px'></g:HTML>
 								<g:Button text='{constants.updateStr}' ui:field="isSocialBtnsUpdateBtn"></g:Button>
 							</g:HorizontalPanel>
 						</g:HorizontalPanel>

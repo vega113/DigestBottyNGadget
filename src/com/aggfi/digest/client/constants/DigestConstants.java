@@ -154,6 +154,8 @@ public interface DigestConstants extends Constants {
 	
 	String userStr();
 	String forumStr();
+	
+	String goToWaveStr();
 
 	/**
 	 * Google Apps domain Id of the DigestBotty
@@ -224,6 +226,8 @@ public interface DigestConstants extends Constants {
 	String loadingStr();
 	String isCopyAdsQuestionTtl();
 	String isCopyAdsQuestionTtlNone();
+	
+	String goStr();
 	
 	String loadingVisualizationsApiStr();
 	

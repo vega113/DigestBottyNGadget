@@ -23,5 +23,9 @@ public interface GlobalResources extends ClientBundle {
 	
 	@Source("images/spinner.1.gif")
 	ImageResource spinner();
+	
+	@Source("images/GoButton.gif")
+	ImageResource go();
+	
 
 }

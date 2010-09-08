@@ -52,7 +52,7 @@ public class GetAllForumIds extends Command {
 					String waveId = digest.getId();
 					String title = digest.getName();
 					digestMapJson.put(prjId, waveId);
-					digestMapDescriptionJson.put(waveId, digest.getDescription() + "; By " + digest.getAuthor());
+					digestMapDescriptionJson.put(waveId, digest.getDescription() + " [By " + digest.getAuthor() + "]");
 					digestMapTitleJson.put(waveId, title);
 				}
 			}else{
