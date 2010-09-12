@@ -167,6 +167,7 @@ public class DigestAdminGeneralWidget extends Composite implements RunnableOnTab
 					}
 				});
 			} catch (RequestException e) {
+				vegaUtils.dismissStaticMessage();
 				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
@@ -255,6 +256,8 @@ public class DigestAdminGeneralWidget extends Composite implements RunnableOnTab
 				}
 			});
 		} catch (RequestException e) {
+			vegaUtils.dismissStaticMessage();
+			Log.error("", e);
 		}
 	}
 	

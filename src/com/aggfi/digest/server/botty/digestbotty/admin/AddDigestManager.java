@@ -1,5 +1,7 @@
 package com.aggfi.digest.server.botty.digestbotty.admin;
 
+import java.util.logging.Logger;
+
 import org.json.JSONException;
 import com.vegalabs.general.server.command.Command;
 import org.json.JSONObject;
@@ -8,6 +10,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.google.inject.Inject;
 
 public class AddDigestManager extends Command {
+	Logger LOG  = Logger.getLogger(AddDigestManager.class.getName());
   private AdminConfigDao adminConfigDao = null;
   private Util util = null;
 
@@ -19,6 +22,7 @@ public class AddDigestManager extends Command {
 
   @Override
   public JSONObject execute() throws JSONException {
+	  LOG.entering(this.getClass().getName(), "execute", toString());
     String projectId = this.getParam("projectId");
     if (util.isNullOrEmpty(projectId)) {
       throw new IllegalArgumentException("Missing required param: id");

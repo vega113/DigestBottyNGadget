@@ -108,9 +108,14 @@ public class AtomGenerator extends HttpServlet {
       boolean isAtomFeedPublic = adminConfigDao.getAdminConfig(projectId).isAtomFeedPublic();
 
       for (ForumPost entry : entries) {
+    	  if(!entry.isDispayAtom())
+    		  continue;
         String author = entry.getCreator();
         if(author == null || "".equals(author)){
         	author = System.getProperty("APP_DOMAIN") + "@appspot.com";
+        }
+        if(entry == null || entry.getId() == null){
+        	continue;
         }
         String title = entry.getTitle();
         Date updated = entry.getLastUpdated();

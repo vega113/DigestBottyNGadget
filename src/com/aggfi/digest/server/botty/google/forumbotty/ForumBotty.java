@@ -199,7 +199,6 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
 		  }
 		  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
 		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
-		 
 	  }
   }
 
@@ -274,7 +273,23 @@ protected void actOnBottyAdded(String projectId,
 
 			  // Apply default and auto tags to the wave
 			  applyAutoTags(blip, projectId);
-			  submit(wavelet, PREVIEW_RPC_URL);
+			  
+			  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+			  if(adminConfig.isViewsTrackingEnabled()){
+				  appendViewsTrackingGadget(wavelet.getRootBlip(), projectId);
+			  }
+			  try{
+				  submit(wavelet, PREVIEW_RPC_URL);
+			  }catch(java.io.IOException timeoutException){
+				  LOG.log(Level.WARNING, "first time", timeoutException);
+//				  try{
+//					  submit(wavelet, PREVIEW_RPC_URL);
+//				  }catch(java.io.IOException timeoutException2){
+//					  LOG.log(Level.WARNING, "second time", timeoutException);
+//					  LOG.log(Level.WARNING, "removing ForumPost entry: " + entry.toString());
+//					  forumPostDao.remove(entry);
+//				  }
+			  }
 		  }
 		 
 	  }
@@ -299,11 +314,10 @@ protected void submitWavelet(Wavelet wavelet) {
 
 public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip blip, String modifiedBy) {
 	LOG.log(Level.INFO, "adding to digest: project id: " + projectId);
-	ForumPost entry = forumPostDao.getForumPost(wavelet.getDomain(), 
-			wavelet.getWaveId().getId());
+	ForumPost entry = forumPostDao.getForumPost (wavelet.getDomain(), wavelet.getWaveId().getId());
 	// Update contributor list if this is not robot or agent
 
-	if (entry != null) {
+	if (entry != null && entry.getProjectId().equals(projectId)) {
 		if (isNormalUser(modifiedBy)) {
 			entry.addContributor(modifiedBy);
 		}
@@ -320,9 +334,10 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 //		updateEntryInDigestWave(entry); //TODO - maybe I need to create a different "hot and noisy" wave
 		forumPostDao.save(entry);
 	} else {
+		LOG.info( " event.proxy: " + projectId);
 		entry = new ForumPost(wavelet.getDomain(), wavelet);
 		entry.setProjectId(projectId);
-		entry = forumPostDao.syncTags(projectId, entry, wavelet);
+//		entry = forumPostDao.syncTags(projectId, entry, wavelet);
 		entry.setBlipCount(wavelet.getBlips().size());
 		applyAutoTags(blip, projectId);
 		entry = forumPostDao.syncTags(projectId, entry, wavelet);
@@ -400,6 +415,10 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 				  wavelet.getParticipants().add(participant);
 			  }
 		  }
+		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+		  if(adminConfig.isViewsTrackingEnabled()){
+			  appendViewsTrackingGadget(wavelet.getRootBlip(), projectId);
+		  }
     }
     
     ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
@@ -434,11 +453,14 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
   public void addBack2Digest2RootBlip(String projectId,
 			Blip rootBlip, ForumPost entry) {
 		Annotations annotations = rootBlip.getAnnotations();
-		  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
+		  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest#" + projectId;
+		  String backtodigestAnnotationNameOld = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
 		  List<Annotation> annotationsList =  annotations.get(backtodigestAnnotationName);
-		  if(annotationsList == null || annotationsList.size() == 0){
+		  List<Annotation> annotationsListOld =  annotations.get(backtodigestAnnotationNameOld);
+		  if((annotationsList == null || annotationsList.size() == 0) && (annotationsListOld == null || annotationsListOld.size() == 0)){
 			  List<ExtDigest> digestsList = extDigestDao.retrDigestsByProjectId(projectId);
 			  if(digestsList != null && digestsList.size() > 0 ){
+				  rootBlip.append("  ");
 				  String forumName = digestsList.size() > 0 ? digestsList.get(0).getName() : "";
 				  String back2digestWaveStr = makeBackStr(forumName);
 				  LOG.fine("content: " + rootBlip.getContent());
@@ -565,7 +587,7 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 					  entry.setDigestBlipId(blipId);
 					  digest.setLastDigestBlipId(blipId);
 					  if(!adminConfig.isAdsEnabled()){
-						  addOrUpdateLinkToBottomOrTopForDigestWave(digestWavelet.getRootBlip(), blipId, true); 
+						  addOrUpdateLinkToBottomOrTopForDigestWave(digestWavelet.getRootBlip(), blipId, true, true); 
 					  }
 					  break;
 				  }
@@ -579,7 +601,11 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 		  }else{
 			  LOG.log(Level.SEVERE, "Not Found new blip id: " + entry.toString() );
 		  }
-		  
+		  //now update digestWave forumPost
+		  ForumPost digestForumPost = forumPostDao.getForumPost(digest.getId());
+		  if(digestForumPost != null){
+			  digestForumPost.setBlipCount(digestForumPost.getBlipCount() + 1);
+		  }
 	  }
   }
   
@@ -598,58 +624,83 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 	  message = message.replaceAll(USE_HOME_END_KEYBOARD_KEYS, "");
 	  message = message.replaceFirst ("\\(", "");
 	  message = message.replaceFirst ("\\)", "");
+	  if(message.length() > 150){
+		  message = message.substring(0, 147) + "...";
+	  }
 	  if(isDiggButtonEnabled){
 		  String imgUrl = "http://widgets.digg.com/img/button/diggThisDigger.png";
-		  MessageFormat fmt = new MessageFormat("http://digg.com/submit?url={0}&amp;title={1}");
-		  Object[] args = {URLEncoder.encode(embeddedUrl,  "UTF-8"),URLEncoder.encode(message, "UTF-8")};
-		  Image diggImage = new Image(imgUrl, 16, 16, "digg it");
-		  blip.append(diggImage);
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
-		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
-		  LOG.fine("inserting digg button");
-		  blifRef.insert(baList, "digg");
-		  blip.append(" ");
+		  if(!isButtonExists(imgUrl,blip)){
+			  MessageFormat fmt = new MessageFormat("http://digg.com/submit?url={0}&amp;title={1}");
+			  Object[] args = {URLEncoder.encode(embeddedUrl,  "UTF-8"),URLEncoder.encode(message, "UTF-8")};
+			  Image diggImage = new Image(imgUrl, 16, 16, "digg it");
+			  blip.append(diggImage);
+			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+			  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+			  LOG.fine("inserting digg button");
+			  blifRef.insert(baList, "digg");
+			  blip.append(" ");
+		  }
+		 
 	  }
 	  if(isBuzzButtonEnabled){
-		  MessageFormat fmt = new MessageFormat("http://www.google.com/buzz/post?message={0}&url={1}&imageurl={2}");
-		  Object[] args = {URLEncoder.encode(message, "UTF-8"),URLEncoder.encode(embeddedUrl, "UTF-8"), imageUrl};
-		  
 		  String imgUrl = "http://code.google.com/apis/buzz/images/google-buzz-16x16.png";
-		  Image buzzImage = new Image(imgUrl, 16, 16, "buzz it");
-		  blip.append(buzzImage);
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
-		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
-		  LOG.fine("inserting buzz button");
-		  blifRef.insert(baList, "buzz");
-		  blip.append(" ");
+		  if(!isButtonExists(imgUrl,blip)){
+			  MessageFormat fmt = new MessageFormat("http://www.google.com/buzz/post?message={0}&url={1}&imageurl={2}");
+			  Object[] args = {URLEncoder.encode(message, "UTF-8"),URLEncoder.encode(embeddedUrl, "UTF-8"), imageUrl};
+			  Image buzzImage = new Image(imgUrl, 16, 16, "buzz it");
+			  blip.append(buzzImage);
+			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+			  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+			  LOG.fine("inserting buzz button");
+			  blifRef.insert(baList, "buzz");
+			  blip.append(" ");
+		  }
+		 
 	  }
 	  if(isTweetButtonEnabled){
-		  MessageFormat fmt = new MessageFormat("http://twitter.com/share?text={0}&url={1}");
-		  Object[] args = {URLEncoder.encode(message, "UTF-8"),URLEncoder.encode(embeddedUrl, "UTF-8")};
-		  
 		  String imgUrl = "http://twitter-badges.s3.amazonaws.com/t_mini-b.png";
-		  Image tweetImage = new Image(imgUrl, 16, 16, "tweet it");
-		  blip.append(tweetImage);
-		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
-		  LOG.fine("inserting tweet button");
-		  blifRef.insert(baList, "tweet");
-		  blip.append(" ");
+		  if(!isButtonExists(imgUrl,blip)){
+			  MessageFormat fmt = new MessageFormat("http://twitter.com/share?text={0}&url={1}");
+			  String tweetMsg  = message.length() > 150 ? message.substring(0,147) + "..." : message;
+			  Object[] args = {URLEncoder.encode(tweetMsg, "UTF-8"),URLEncoder.encode(embeddedUrl, "UTF-8")};
+			  
+			  Image tweetImage = new Image(imgUrl, 16, 16, "tweet it");
+			  blip.append(tweetImage);
+			  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+			  LOG.fine("inserting tweet button");
+			  blifRef.insert(baList, "tweet");
+			  blip.append(" ");
+		  }
+		 
 	  }
 	  if(isFaceEnabled){
-		  MessageFormat fmt = new MessageFormat("http://www.facebook.com/sharer.php?u={0}&t={1}");
-		  Object[] args = {URLEncoder.encode(embeddedUrl, "UTF-8"), URLEncoder.encode(title, "UTF-8")};
-		  
 		  String imgUrl = "http://lh3.ggpht.com/_tsWs83xehHE/TH432yol8-I/AAAAAAAAFcg/MK-GOldQN4M/facebook_share.png";
-		  Image tweetImage = new Image(imgUrl, 16, 16, "tweet it");
-		  blip.append(tweetImage);
-		  BlipContentRefs blifRef = blip.at(blip.getContent().length());
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
-		  LOG.fine("inserting facebook button");
-		  blifRef.insert(baList, "share");
-		  blip.append(" ");
+		  if(!isButtonExists(imgUrl,blip)){
+			  MessageFormat fmt = new MessageFormat("http://www.facebook.com/sharer.php?u={0}&t={1}");
+			  Object[] args = {URLEncoder.encode(embeddedUrl, "UTF-8"), URLEncoder.encode(title, "UTF-8")};
+			  
+			  Image tweetImage = new Image(imgUrl, 16, 16, "tweet it");
+			  blip.append(tweetImage);
+			  BlipContentRefs blifRef = blip.at(blip.getContent().length());
+			  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",fmt.format(args));
+			  LOG.fine("inserting facebook button");
+			  blifRef.insert(baList, "share");
+			  blip.append(" ");
+		  }
+		 
 	  }
 	  LOG.info("exiting addSocialButtons");
+}
+
+private boolean isButtonExists(String imgUrl, Blip blip) {
+	LOG.info("isButtonExists: " + imgUrl + ", blipId: " + blip.getBlipId());
+	//check if blip already contains the add gadget. 
+	BlipContentRefs imageRef = blip.first(ElementType.IMAGE ,Gadget.restrictByUrl(imgUrl));
+	if(imageRef == null || Image.class.cast(imageRef.value()) == null){
+		return true;
+	}
+	return false;
 }
 
 private void updateEntryInDigestWave(ForumPost entry) {
@@ -790,9 +841,10 @@ private void updateEntryInDigestWave(ForumPost entry) {
 		LOG.severe("In getCustomProfile,  extDigestDao: " + extDigestDao + ", name: " + name );
 	}
       if (digests != null && digests.size() > 0) {
+    	  String digestWaveUrl = "https://wave.google.com/wave/waveref/googlewave.com/" + digests.get(0).getWaveId();
     	  profile = new ParticipantProfile(digests.get(0).getName(),
 	    		  digests.get(0).getRobotThumbnailUrl() != null ? digests.get(0).getRobotThumbnailUrl() : getRobotAvatarUrl(),
-	    		  digests.get(0).getForumSiteUrl() != null ? digests.get(0).getForumSiteUrl() : getRobotProfilePageUrl());
+	    				  digestWaveUrl);
     	  
     	  // Put the value into the cache.
 	      cache.put(name, new SeriallizableParticipantProfile(profile.getImageUrl(),profile.getName(), profile.getProfileUrl()));
@@ -833,37 +885,37 @@ private void updateEntryInDigestWave(ForumPost entry) {
 	  LOG.severe(event.getMessage());
   }
 
-//  @Override
-//  @Capability(contexts = {Context.SELF})
-//  public void onGadgetStateChanged(GadgetStateChangedEvent e) {
-//	  LOG.log(Level.INFO, "entering OnGadgetStateChanged: ");
-//	// If this is from the "*-digest" proxy, skip processing.
-//	  boolean isDigestAdmin = isDigestAdmin(e.getBundle().getProxyingFor());
-//	  String[] gadgetUrls = createGadgetUrlsArr();
-//	  JSONObject json = new JSONObject();
-//	  Blip blip = e.getBlip();
-//	  Gadget gadget = null;
-//	  
-//	  
-////	  if (!isDigestAdmin) {
-////	      LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " return!");
-////	      return; //only gadget proxy allowed to react
-////	    }else{
-////	    	LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
-////	    }
-//	  LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
-//	  int i = 0;
-//	  String gadgetUrl = null;
-//	  while(gadget == null && i < gadgetUrls.length){
-//		  gadgetUrl = gadgetUrls[i];
-//		  gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
-//		  if(gadget!=null){
-//			  handleGadgetRequest(e, json, blip, gadget);
-//		  }
-//		  i++;
-//	  }
-//	  
-//  }
+  @Override
+  @Capability(contexts = {Context.SELF})
+  public void onGadgetStateChanged(GadgetStateChangedEvent e) {
+	  LOG.log(Level.INFO, "entering OnGadgetStateChanged: ");
+	// If this is from the "*-digest" proxy, skip processing.
+	  boolean isDigestAdmin = isDigestAdmin(e.getBundle().getProxyingFor());
+	  String[] gadgetUrls = createGadgetUrlsArr();
+	  JSONObject json = new JSONObject();
+	  Blip blip = e.getBlip();
+	  Gadget gadget = null;
+	  
+	  
+//	  if (!isDigestAdmin) {
+//	      LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " return!");
+//	      return; //only gadget proxy allowed to react
+//	    }else{
+//	    	LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
+//	    }
+	  LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
+	  int i = 0;
+	  String gadgetUrl = null;
+	  while(gadget == null && i < gadgetUrls.length){
+		  gadgetUrl = gadgetUrls[i];
+		  gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
+		  if(gadget!=null){
+			  handleGadgetRequest(e, json, blip, gadget);
+		  }
+		  i++;
+	  }
+	  
+  }
 
 public void handleGadgetRequest(GadgetStateChangedEvent e, JSONObject json,
 		Blip blip, Gadget gadget) {
@@ -941,7 +993,7 @@ protected String[] createGadgetUrlsArr() {
   	 * @param isBottom
   	 * @throws IOException
   	 */
-	public void addOrUpdateLinkToBottomOrTopForDigestWave(Blip blipToUpdate,String blipId, boolean isBottom) throws IOException {
+	public void addOrUpdateLinkToBottomOrTopForDigestWave(Blip blipToUpdate,String blipId, boolean isBottom, boolean isSubmit) throws IOException {
 		String toLocationStr = isBottom ? TO_BOTTOM : TO_TOP;
 		String linkToAnnonationName = System.getProperty("APP_DOMAIN") + (isBottom ?  ".appspot.com/backtobottom" :  ".appspot.com/backtotop");
 		if(blipToUpdate.getAnnotations().get(linkToAnnonationName) != null){
@@ -972,14 +1024,14 @@ protected String[] createGadgetUrlsArr() {
 		//append powered by
 			String fontSize = "8pt";
 			int startPos = blipToUpdate.getContent().length();
-			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(1,66,177)", "style/color", "rgb(255,255,255)");
+			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(91,155,226)", "style/color", "rgb(255,255,255)");
 			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba1," [Forum powered by ");
 			
-			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(1,66,177)", "style/color", "rgb(255,255,255)", "link/manual","waveid://googlewave.com/w+KNw8wPWXA/~/conv+root/b+KNw8wPWXB");
+			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(91,155,226)", "style/color", "rgb(255,255,255)", "link/manual","waveid://googlewave.com/w+KNw8wPWXA/~/conv+root/b+KNw8wPWXB");
 			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba2,"DigestBotty");
 			
-			List<BundledAnnotation> ba3 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(1,66,177)", "style/color", "rgb(255,255,255)");
-			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba3,"]");
+			List<BundledAnnotation> ba3 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/backgroundColor", "rgb(91,155,226)", "style/color", "rgb(255,255,255)");
+			blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba3,"] ");
 			
 			int endPos = blipToUpdate.getContent().length();
 			blipToUpdate.range(startPos, endPos).annotate(System.getProperty("APP_DOMAIN") + ".appspot.com/poweredby", "done");
@@ -990,6 +1042,67 @@ protected String[] createGadgetUrlsArr() {
 		String blipRef = "waveid://" + blipToUpdate.getWaveId().getDomain() + "/" + blipToUpdate.getWaveId().getId() + "/~/conv+root/" + blipId;
 		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",linkToAnnonationName,"done");
 		return baList;
+	}
+
+	public void appendViewsTrackingGadget(Blip blip, String projectId) {
+		String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/tracker.xml";
+		LOG.info("appendViewsTrackingGadget: " + projectId + ", blipId: " + blip.getBlipId());
+		//check if blip already contains the add gadget. 
+		BlipContentRefs gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
+		if(gadgetRef == null || Gadget.class.cast(gadgetRef.value()) == null){
+			Gadget gadget = null;
+			gadget = new Gadget(gadgetUrl);
+			blip.at(blip.getContent().length()).insert(gadget);
+			Map<String,String> out = new HashMap<String, String>();
+		    out.put("projectId", projectId);
+		    out.put("domain", "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com");
+		    out.put("eventValue", blip.getBlipId());
+		    blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadget.getUrl())).updateElement(out);
+		}
+		
+	}
+
+	public void removeViewsTrackingGadget(Blip blip, String projectId) {
+		LOG.info("removeViewsTrackingGadget: " + projectId + ", blipId: " + blip.getBlipId());
+		String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/tracker.xml";
+		//check if blip already contains the add gadget. 
+		Gadget gadget = null;
+		BlipContentRefs gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
+		if(gadgetRef != null){
+			gadget = Gadget.class.cast(gadgetRef.value());
+			if(gadget != null){
+			   blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadget.getUrl())).delete();
+			   gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
+			   if(gadgetRef != null){
+				   gadget = Gadget.class.cast(gadgetRef.value());
+				   if(gadget != null){
+					   LOG.warning("Failed to remove gadget!!! blipId: " + blip + ", projectId: " + projectId );
+				   }else{
+					   LOG.info("Removed gadget!!! blipId: " + blip + ", projectId: " + projectId );
+				   }
+			   }else{
+				   LOG.info("Removed gadget!!! blipId: " + blip + ", projectId: " + projectId );
+			   }
+			   
+			 
+			}
+		}
+		
+	}
+
+	public void appendViewsCounterGadget(Blip blip) {
+		String gadgetUrl = "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/viewhits.xml";
+		//check if blip already contains the add gadget. 
+		Gadget gadget = null;
+		BlipContentRefs gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
+		if(gadgetRef != null){
+			gadget = Gadget.class.cast(gadgetRef.value());
+			if(gadget == null){
+				gadget = new Gadget(gadgetUrl);
+				blip.at(blip.getContent().length()).insert(gadget);
+			}
+		}
+		
 	}
 
   /*

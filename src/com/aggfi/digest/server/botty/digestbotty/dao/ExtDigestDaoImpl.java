@@ -13,6 +13,7 @@ import com.aggfi.digest.server.botty.digestbotty.admin.CreateDigest;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.DigestDaoImpl;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
+import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.inject.Inject;
 
 public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
@@ -115,6 +116,29 @@ public class ExtDigestDaoImpl  extends DigestDaoImpl implements ExtDigestDao{
 		return extDigests;
 
 	}
+	
+	@Override
+	  public ExtDigest retrDigestById(String id) {
+	    PersistenceManager pm = pmf.getPersistenceManager();
+	    ExtDigest entry = null;
+
+	    try {
+	      Query query = pm.newQuery(ExtDigest.class);
+	      query.declareParameters("String id_");
+	      String filters = "id == id_";
+	      query.setFilter(filters);
+	      List<ExtDigest> entries = (List<ExtDigest>) query.execute( id);
+	      entries = (List<ExtDigest>) pm.detachCopyAll(entries);
+	      if (entries.size() > 0) {
+	    	  entry = pm.detachCopy(entries.get(0));
+	        return entry;
+	      }
+	    } finally {
+	      pm.close();
+	    }
+
+	    return entry;
+	  }
 	
 	@SuppressWarnings("unchecked")
 	@Override

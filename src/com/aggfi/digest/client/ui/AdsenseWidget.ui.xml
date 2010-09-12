@@ -33,9 +33,9 @@
 										ui:field="adsenseCodeTxtArea"></g:TextArea>
 								<g:HorizontalPanel horizontalAlignment='ALIGN_CENTER'>
 									<g:HTML width='176px'></g:HTML>
-									<g:Image resource='{res.tooltip}' ui:field="img2" />
+									<g:Image resource='{res.tooltip}' ui:field="img2" title='{digestConstants.submitAdSenseBtnExpl}'/>
 									<g:HTML width="4px"></g:HTML>	
-									<g:Button text='Submit' ui:field="submitAdsenseCodeBtn"></g:Button>
+									<g:Button text='{digestConstants.submitStr}' ui:field="submitAdsenseCodeBtn"></g:Button>
 							</g:HorizontalPanel>
 						</g:VerticalPanel>
 					</g:CaptionPanel>

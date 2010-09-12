@@ -1,4 +1,4 @@
- <div style="">
+ <div>
 		<table
 			style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
 			valign="middle">
@@ -17,89 +17,69 @@
 					title="total views"><legend
 					style="font-size: 11pt; font-weight: bold; padding: 1px; margin: 1px; color: darkgreen; border-color: white"></legend>
 				<div id="content_div"
-					style="height: 10px; width: 32px; color: white; text-align: center; font-size: 11pt; vertical-align: top;"></div>
+					style="height: 10px; width: 32px; color: white; text-align: center; font-size: 11pt; vertical-align: top;">1</div>
 				</fieldset>
 				</td>
 			</tr>
 		</table>
 	</div>
-	<script>
 	
-
+<!--	<script src='/js/jsonrpc.js'></script>-->
+<!--	<script src='/js/jquery-1.3.2.min.js'></script>-->
+<!--	<script src='/js/json2.js'></script>-->
+	
+	
+	<script>
 	var JSON_RPC_URL = "/admin/jsonrpc";
-	var div = document.getElementById('content_div'); 
-
-
-	function stateUpdated() {
-		if(!wave.getState().get('totalViewersCounter')) {
-			div.innerHTML = "0"
+	function stateUpdated(obj) {
+		if(obj.data != null) {
+			//alert("stateUpdated: " + data);
+			alert("obj: " + JSON.stringify(obj) + ", obj.data: " + JSON.stringify(obj.data));
+			var json = obj.data;
+			document.getElementById("content_div").innerHTML = json.result.count;
 		}
-		else {
-			div.innerHTML = wave.getState().get('totalViewersCounter');
-		} 
 	}
 
 	function init() {
 		if (wave && wave.isInWaveContainer()) {
-			wave.setStateCallback(stateUpdated);
-			setTimeout("participantCallback()",2000);
+			setTimeout("afterInit()",2000);
 		}else{
 			alert("wave is null in init!")
 		}
 	}
-
-	function participantCallback(){
-		if (wave && wave.isInWaveContainer() && wave.getState() && wave.getViewer()) {
-			
-			
-			var delta = {};
-			var viewerId = wave.getViewer().getId();
-			var viewerCounter = parseInt(wave.getState().get(viewerId, '0'));
-			var uniqueViewersCounter = parseInt(wave.getState().get('uniqueViewersCounter', '0'));
-			var totalViewersCounter = parseInt(wave.getState().get('totalViewersCounter', '0'));
-			
-			if(viewerCounter == 0){
-				// increase unique counter
-				uniqueViewersCounter++; 
-			}
-			
-			delta[viewerId] = viewerCounter+1; 
-			delta['uniqueViewersCounter'] = uniqueViewersCounter;
-			totalViewersCounter++;
-			delta['totalViewersCounter'] = totalViewersCounter;
-			
-			var projectId = wave.getState().get('projectId', 'none');
-			var params = {};
-			params.projectId = projectId;
-			params.userId = viewerId;
-			params.waveId = wave.getWaveId();
-			params.type = "VIEW_POST";
-			params.value = uniqueViewersCounter;
+		
+	function afterInit(){
+		//make call to app engine = recieve result
+		
+		if (wave && wave.isInWaveContainer() && wave.getState() != null) {
+			var domain = wave.getState().get('domain', 'http://aggfiwave.appspot.com');
+			var url = domain + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
+			var p = {};
+			p.waveId = wave.getWaveId();
 			
 			var postData = {};
-			postData.method = 'REPORT_POST_VIEW';
-			postData.params = params;
+			postData.method = 'GET_VIEWS_COUNT_PER_WAVE';
+			postData.params = p;
 			
-			var DOMAIN = = wave.getState().get('domain', 'http://digestbotty.appspot.com');
-			//use gadgets.io to send
-			var url = DOMAIN + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
 			var params = {};
 			params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
 			params[gadgets.io.RequestParameters.METHOD]=gadgets.io.MethodType.POST;
 			params[gadgets.io.RequestParameters.POST_DATA]= JSON.stringify(postData);
-			 
-			gadgets.io.makeRequest(url, null, params);
-			
-			wave.getState().submitDelta(delta);
-			
+			alert("sending request! waveId: " + p.waveId );
+			gadgets.io.makeRequest(url, stateUpdated, params);
+		}else{
+			alert("wave.state is null in afterInit!")
 		}
+			
+			//jsonrpc.makeRequest('GET_VIEWS_COUNT_PER_WAVE',params,stateUpdated);
+		
 	}
-	gadgets.util.registerOnLoadHandler(init);
+	//var wave = {};
+	//wave.isInWaveContainer = function(){ return true;}
+	//wave.getWaveId = function(){return "";}
+	//init();
+	
+	//gadgets.util.registerOnLoadHandler(init);
 
-	// Reset value of "count" to 0
-	function resetCounter(){
-		wave.getState().submitDelta({'viewersCounter': '0'});
-	}
-
-
+	document.getElementById("content_div").innerHTML = "<img src='http://lh3.ggpht.com/_tsWs83xehHE/TI0DEIKdbXI/AAAAAAAAFe0/_qvd_O06Qt4/spinner.1.gif'></img";
 	</script>

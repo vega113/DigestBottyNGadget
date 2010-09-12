@@ -16,7 +16,7 @@ function init() {
 function participantCallback(){
 	if (wave && wave.isInWaveContainer() && wave.getState() && wave.getViewer()) {
 		var viewerId = wave.getViewer().getId();
-		var methodName = 'REPORT_POST_VIEW'; 
+		var methodName = 'REPORT_AD_VIEW'; 
 		
 		
 		var projectId = wave.getState().get('projectId', 'none');
@@ -29,7 +29,7 @@ function participantCallback(){
 		params.value = wave.getState().get('eventValue', 'adtracker'); //Ad id here
 		
 		var postData = {};
-		postData.method = 'REPORT_POST_VIEW';
+		postData.method = methodName;
 		postData.params = params;
 		
 		//use gadgets.io to send

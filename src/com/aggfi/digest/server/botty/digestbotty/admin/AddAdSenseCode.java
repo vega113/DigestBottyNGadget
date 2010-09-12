@@ -30,6 +30,7 @@ public class AddAdSenseCode extends Command {
 
 	  @Override
 	  public JSONObject execute() throws JSONException {
+		  LOG.entering(this.getClass().getName(), "execute", toString());
 	  String isAdSenseUpdate4UserStr = this.getParam("isAdSenseUpdate4User");
 	    if (util.isNullOrEmpty(isAdSenseUpdate4UserStr)) {
 	      throw new IllegalArgumentException("Missing required param: isAdSenseUpdate4User");

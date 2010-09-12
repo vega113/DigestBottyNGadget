@@ -185,7 +185,6 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 						});
 					} catch (RequestException e) {
 						vegaUtils.dismissStaticMessage();
-						vegaUtils.alert(e.getMessage());
 						Log.error("",e);
 					}
 				}catch(IllegalArgumentException e){

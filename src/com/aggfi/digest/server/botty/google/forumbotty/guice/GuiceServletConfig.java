@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
+import com.aggfi.digest.server.botty.digestbotty.dao.AdEventDao;
+import com.aggfi.digest.server.botty.digestbotty.dao.AdEventDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.BlipSubmitedDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.dao.ComplReplyProbDao;
@@ -18,6 +20,7 @@ import com.aggfi.digest.server.botty.digestbotty.dao.InfluenceDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.dao.TrackerEventDao;
 import com.aggfi.digest.server.botty.digestbotty.dao.TrackerEventDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.servlets.ServeAdGadgetServlet;
+import com.aggfi.digest.server.botty.digestbotty.servlets.ServeAdInstallerServlet;
 import com.aggfi.digest.server.botty.digestbotty.servlets.ServeEmbedServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallGadgetServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallServlet;
@@ -65,6 +68,8 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         serve("/serveAd").with(ServeAdGadgetServlet.class); 
         serve("/gadgetRPC").with(GadgetRPCServlet.class); 
         serve("/embed").with(ServeEmbedServlet.class); 
+        serve("/serveAdInstaller").with(ServeAdInstallerServlet.class);
+        
         
         
         
@@ -93,8 +98,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         bind(ContributorDao.class).to(ContributorDaoImpl.class);
         bind(CommandFetcher.class).to(CommandFetcherImpl.class);
         bind(TrackerEventDao.class).to(TrackerEventDaoImpl.class);
-        
-
+        bind(AdEventDao.class).to(AdEventDaoImpl.class);
       }
 
       @Provides

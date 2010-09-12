@@ -31,6 +31,7 @@ public class GetPostByActivity extends Command {
 
   @Override
   public JSONObject execute() throws JSONException {    
+	  LOG.info("GetPostByActivity:" + toString());
     String projectId = this.getParam("projectId");
     if (util.isNullOrEmpty(projectId)) {
       throw new IllegalArgumentException("Missing required param: id");
@@ -61,6 +62,13 @@ public class GetPostByActivity extends Command {
     List<ForumPost> entries = null;
     
       entries = forumPostDao.getForumPostsFromDate(projectId, startDate);
+      
+      StringBuilder sb = new StringBuilder();
+      sb.append("In GetPostByActivity - entries returned by getForumPostsFromDate: \n");
+      for(ForumPost p : entries){
+    	  sb.append(p.toString() + ", ");
+      }
+      LOG.info(sb.toString());
       
       Collections.sort(entries, new ForumPostComparator());
       int count = 0;

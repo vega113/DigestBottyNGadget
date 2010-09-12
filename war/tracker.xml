@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
-	<ModulePrefs title="Tracker" width="70" height="27"> 
+	<ModulePrefs title="Tracker" width="1" height="1"> 
 		<Require feature="wave" /> 
 		
 	</ModulePrefs>

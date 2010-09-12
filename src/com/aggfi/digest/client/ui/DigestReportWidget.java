@@ -16,12 +16,9 @@ import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ListBox;
@@ -57,6 +54,8 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 	private static final String CONTRIBUTORS_PER_INFLUENCE = "CONTRIBUTORS_PER_INFLUENCE";
 	private static final String TAGS_BREAKDOWN = "TAGS_BREAKDOWN";
 	private static final String POSTS_BY_ACTIVITY = "POSTS_BY_ACTIVITY";
+	private static final String POSTS_BY_VIEWS = "POSTS_BY_VIEWS";
+	private static final String VIEWS_COUNT = "VIEWS_COUNT";
 	
 	private static DigestReportWidgetUiBinder uiBinder = GWT
 			.create(DigestReportWidgetUiBinder.class);
@@ -117,10 +116,12 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		
 		reportTypesList.addItem(constantsReport.newWavesLast14Days(),NEW_WAVES);
 		reportTypesList.addItem(constantsReport.newBlipsLast14Days(),NEW_BLIPS);
+		reportTypesList.addItem(constantsReport.viewsCountLast14Days(),VIEWS_COUNT);
 		reportTypesList.addItem(constantsReport.breakDown4AllTags(),TAGS_BREAKDOWN);
 		reportTypesList.addItem(constantsReport.activeContributors14Days(),BLIPS_CONTRIBUTORS);
 		reportTypesList.addItem(constantsReport.influenceContributors14Days(),CONTRIBUTORS_PER_INFLUENCE);
 		reportTypesList.addItem(constantsReport.postsByActivity14Days(),POSTS_BY_ACTIVITY);
+		reportTypesList.addItem(constantsReport.postsByViews14Days(),POSTS_BY_VIEWS);
 		
 		reportTypesList.setItemSelected(0, true);
 		
@@ -200,7 +201,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		} catch (RequestException e) {
 			Log.error("", e);
 			utils.dismissStaticMessage();
-			utils.alert(e.getMessage());
 		}
 		
 		utils.reportEvent("/report/select/","createTagsBreakdownPieChart", getProjectId(), 1);
@@ -328,7 +328,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				Log.error("", e);
 			} catch (RequestException e) {
 				utils.dismissStaticMessage();
-				utils.alert(e.getMessage());
 				Log.error("", e);
 			}
 			
@@ -415,10 +414,8 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				utils.showStaticMessage(msg);
 				digestService2.retrBlipsPerContributor(getProjectId() , new AsyncCallback<JSONValue>() {
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public void onSuccess(JSONValue result) {
-						Map<String,Integer> blipsDistMap = new HashMap<String, Integer>();
 						JSONArray blipsJsonArray =  result.isArray();
 						
 						AbstractDataTable dataTable = createBlipsPerContributorTable(blipsJsonArray);
@@ -443,7 +440,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				Log.error("", e);
 			} catch (RequestException e) {
 				utils.dismissStaticMessage();
-				utils.alert(e.getMessage());
 				Log.error("", e);
 			}
 			
@@ -535,10 +531,8 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				utils.showStaticMessage(msg);
 				digestService2.retrPostsByActivity(getProjectId() , new AsyncCallback<JSONValue>() {
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public void onSuccess(JSONValue result) {
-						Map<String,Integer> blipsDistMap = new HashMap<String, Integer>();
 						JSONArray blipsJsonArray =  result.isArray();
 						
 						AbstractDataTable dataTable = createPostsByActivityTable(blipsJsonArray);
@@ -563,7 +557,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				Log.error("", e);
 			} catch (RequestException e) {
 				utils.dismissStaticMessage();
-				utils.alert(e.getMessage());
 				Log.error("", e);
 			}
 			
@@ -647,6 +640,125 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		  }
 		//end PostsByActivity
 		
+		//start PostsByViews
+		protected void drawPostsByViewsHorizontalBar(MessagesImpl messages,
+				final ConstantsImpl constants, GlobalResources resources,
+				DigestService digestService2, VerticalPanel reportPanel2 ) {
+			try {
+				String msg = messages.loadingForumsMsg(constants.reportTabStr(), getProjectName());
+				Log.debug(msg);
+				utils.showStaticMessage(msg);
+				digestService2.retrPostsByViews(getProjectId() , new AsyncCallback<JSONValue>() {
+					
+					@Override
+					public void onSuccess(JSONValue result) {
+						JSONArray viewsJsonArray =  result.isArray();
+						
+						AbstractDataTable dataTable = createPostsByViewsTable(viewsJsonArray);
+						com.google.gwt.visualization.client.visualizations.BarChart.Options options = createPostsByViewsOptions(constants);
+						BarChart barChart = new BarChart(dataTable,options);
+						barChart.addSelectHandler(createPostsByViewsSelectHandler(barChart));
+						reportPanel.clear();
+						reportPanel.setVisible(true);
+						reportPanel.add(barChart);
+						utils.dismissStaticMessage();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						utils.dismissStaticMessage();
+						utils.alert(caught.getMessage());
+					}
+				});
+			} catch (IllegalArgumentException e) {
+				utils.dismissStaticMessage();
+//				digestUtils.alert(e.getMessage());
+				Log.error("", e);
+			} catch (RequestException e) {
+				utils.dismissStaticMessage();
+				Log.error("", e);
+			}
+			
+			utils.reportEvent("/report/select/","drawPostsByViewsBarChart", getProjectId(), 1);
+		}
+	  private SelectHandler createPostsByViewsSelectHandler(
+				final BarChart barChart) {
+			//
+		    return new SelectHandler() {
+			      @Override
+			      public void onSelect(SelectEvent event) {
+			        String message = "";
+			        
+			        // May be multiple selections.
+			        JsArray<Selection> selections = barChart.getSelections();
+
+			        for (int i = 0; i < selections.length(); i++) {
+			          // add a new line for each selection
+			          message += i == 0 ? "" : "\n";
+			          
+			          Selection selection = selections.get(i);
+
+			          if (selection.isCell()) {
+			            // isCell() returns true if a cell has been selected.
+			            
+			            // getRow() returns the row number of the selected cell.
+			            int row = selection.getRow();
+			            // getColumn() returns the column number of the selected cell.
+			            int column = selection.getColumn();
+			            message += "cell " + row + ":" + column + " selected";
+			          } else if (selection.isRow()) {
+			            // isRow() returns true if an entire row has been selected.
+			            
+			            // getRow() returns the row number of the selected row.
+			            int row = selection.getRow();
+			            message += "row " + row + " selected";
+			          } else {
+			            // unreachable
+			            message += "Pie chart selections should be either row selections or cell selections.";
+			            message += "  Other visualizations support column selections as well.";
+			          }
+			        }
+			        
+//			        Window.alert(message);
+			      }
+			    };
+			  
+		}
+
+
+		private AbstractDataTable createPostsByViewsTable(JSONArray viewsJsonArray) {
+			DataTable data = DataTable.create();
+			data.addColumn(ColumnType.STRING, "Post");
+		    data.addColumn(ColumnType.NUMBER, "Views");
+		    
+		    int size = viewsJsonArray.size();
+		    data.addRows(size);
+		    for(int i = 0; i < size; i++){
+				JSONValue participantJson = viewsJsonArray.get(i);
+				String title = participantJson.isObject().get("title").isString().stringValue();
+				if(title.length() > 35){
+					title = title.substring(0, 32) + "...";
+				}
+				int postCount = (int)participantJson.isObject().get("count").isNumber().doubleValue();
+				data.setValue(i, 0, title);
+			    data.setValue(i, 1, postCount);
+				
+			}
+		    
+		    return data;
+		  }
+
+		private com.google.gwt.visualization.client.visualizations.BarChart.Options createPostsByViewsOptions(ConstantsImpl constants) {
+			com.google.gwt.visualization.client.visualizations.BarChart.Options options = com.google.gwt.visualization.client.visualizations.BarChart.Options.create();
+		    options.setWidth(constants.basicWidthInt());
+		    options.setHeight(constants.basicReportHeightInt());
+		    options.setTitle(constants.postsByViews14Days());
+		    options.setLegend(LegendPosition.NONE);
+		    options.set3D(true);
+		    return options;
+		  }
+		//end PostsByViews
+		
 		
 		
 		//start ContributorsPerInfluence
@@ -659,10 +771,8 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				utils.showStaticMessage(msg);
 				digestService2.retrContributorsPerInfluence(getProjectId() , new AsyncCallback<JSONValue>() {
 					
-					@SuppressWarnings("deprecation")
 					@Override
 					public void onSuccess(JSONValue result) {
-						Map<String,Integer> blipsDistMap = new HashMap<String, Integer>();
 						JSONArray blipsJsonArray =  result.isArray();
 						
 						AbstractDataTable dataTable = createContributorsPerInfluenceTable(blipsJsonArray);
@@ -687,7 +797,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				Log.error("", e);
 			} catch (RequestException e) {
 				utils.dismissStaticMessage();
-				utils.alert(e.getMessage());
 				Log.error("", e);
 			}
 			
@@ -817,7 +926,6 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 				Log.error("", e);
 			} catch (RequestException e) {
 				utils.dismissStaticMessage();
-				utils.alert(e.getMessage());
 				Log.error("", e);
 			}
 			
@@ -894,6 +1002,134 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 		  }
 		
 		//end BlipsCounts
+		
+		//start ViewsCounts
+		protected void drawViewsCountsLineChart(MessagesImpl messages,
+				final ConstantsImpl constants, GlobalResources resources,
+				DigestService digestService2, VerticalPanel reportPanel2 ) {
+			try {
+				String msg = messages.loadingForumsMsg(constants.reportTabStr(), getProjectName());
+				Log.debug(msg);
+				utils.showStaticMessage(msg);
+				digestService2.retrViewsCounts(getProjectId() , new AsyncCallback<JSONValue>() {
+					
+					@SuppressWarnings("deprecation")
+					@Override
+					public void onSuccess(JSONValue result) {
+						Map<Date,Integer> blipsDistMap = new TreeMap<Date, Integer>();
+						Map<Date, Integer> uniqueViewsMap =  new TreeMap<Date, Integer>();
+						JSONArray blipsJsonArray =  result.isArray();
+						int size = blipsJsonArray.size();
+						for(int i = 0; i < size; i++){
+							JSONValue tagJson = blipsJsonArray.get(i);
+							String dateStr = tagJson.isObject().get("date").isString().stringValue();
+							 Date date = new Date(dateStr);
+							Integer viewsCount = (int)tagJson.isObject().get("count").isNumber().doubleValue();
+							Integer uniqueCount = (int)tagJson.isObject().get("uniqueCount").isNumber().doubleValue();
+							Log.info(date.toString() + " : " + viewsCount + " : " + uniqueCount);
+							blipsDistMap.put(date,viewsCount);
+							uniqueViewsMap.put(date,uniqueCount);
+						}
+						AbstractDataTable dataTable = createViewsCountsTable(blipsDistMap,uniqueViewsMap);
+						com.google.gwt.visualization.client.visualizations.LineChart.Options options = createViewsCountsOptions(constants);
+						LineChart lineChart = new LineChart(dataTable,options);
+						lineChart.addSelectHandler(createViewsCountsSelectHandler(lineChart));
+						reportPanel.clear();
+						reportPanel.setVisible(true);
+						reportPanel.add(lineChart);
+						utils.dismissStaticMessage();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						utils.dismissStaticMessage();
+						utils.alert(caught.getMessage());
+					}
+				});
+			} catch (IllegalArgumentException e) {
+				utils.dismissStaticMessage();
+//				digestUtils.alert(e.getMessage());
+				Log.error("", e);
+			} catch (RequestException e) {
+				utils.dismissStaticMessage();
+				Log.error("", e);
+			}
+			
+			utils.reportEvent("/report/select/","drawNewBlipsLineChart", getProjectId(), 1);
+		}
+	  private SelectHandler createViewsCountsSelectHandler(
+				final LineChart lineChart) {
+			//
+		    return new SelectHandler() {
+			      @Override
+			      public void onSelect(SelectEvent event) {
+			        String message = "";
+			        
+			        // May be multiple selections.
+			        JsArray<Selection> selections = lineChart.getSelections();
+
+			        for (int i = 0; i < selections.length(); i++) {
+			          // add a new line for each selection
+			          message += i == 0 ? "" : "\n";
+			          
+			          Selection selection = selections.get(i);
+
+			          if (selection.isCell()) {
+			            // isCell() returns true if a cell has been selected.
+			            
+			            // getRow() returns the row number of the selected cell.
+			            int row = selection.getRow();
+			            // getColumn() returns the column number of the selected cell.
+			            int column = selection.getColumn();
+			            message += "cell " + row + ":" + column + " selected";
+			          } else if (selection.isRow()) {
+			            // isRow() returns true if an entire row has been selected.
+			            
+			            // getRow() returns the row number of the selected row.
+			            int row = selection.getRow();
+			            message += "row " + row + " selected";
+			          } else {
+			            // unreachable
+			            message += "Pie chart selections should be either row selections or cell selections.";
+			            message += "  Other visualizations support column selections as well.";
+			          }
+			        }
+			        
+//			        Window.alert(message);
+			      }
+			    };
+			  
+		}
+
+
+		private AbstractDataTable createViewsCountsTable(Map<Date, Integer> viewsMap, Map<Date, Integer> uniqueViewsMap) {
+			DataTable data = DataTable.create();
+			data.addColumn(ColumnType.DATE, "Date");
+		    data.addColumn(ColumnType.NUMBER, "Views total");
+		    data.addColumn(ColumnType.NUMBER, "Views unique");
+		    
+			Set<Date> keys = viewsMap.keySet();
+			data.addRows(keys.size());
+			int row = 0;
+			for(Date key : keys){
+				data.setValue(row, 0, key);
+			    data.setValue(row, 1, viewsMap.get(key));
+			    data.setValue(row, 2, uniqueViewsMap.get(key));
+			    row++;
+			}
+		    return data;
+		  }
+
+		private com.google.gwt.visualization.client.visualizations.LineChart.Options createViewsCountsOptions(ConstantsImpl constants) {
+			com.google.gwt.visualization.client.visualizations.LineChart.Options options = com.google.gwt.visualization.client.visualizations.LineChart.Options.create();
+		    options.setWidth(constants.basicWidthInt());
+		    options.setHeight(constants.basicReportHeightInt());
+		    options.setTitle(constants.viewsCountLast14Days());
+		    options.setLegend(LegendPosition.NONE);
+		    return options;
+		  }
+		
+		//end ViewsCounts
 	  
 		void handleOnSelectPrjList(){
 			hideAll();
@@ -906,12 +1142,18 @@ public class DigestReportWidget extends Composite implements RunnableOnTabSelect
 					drawNewWavesLineChart(messagesReport,constantsReport,resources,digestService,reportPanel);
 				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(NEW_BLIPS) ){
 					drawBlipsCountsLineChart(messagesReport,constantsReport,resources,digestService,reportPanel);
+				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(VIEWS_COUNT) ){
+					drawViewsCountsLineChart(messagesReport,constantsReport,resources,digestService,reportPanel);
 				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(BLIPS_CONTRIBUTORS) ){
 					drawBlipsPerContributorHorizontalBar(messagesReport,constantsReport,resources,digestService,reportPanel);
 				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(CONTRIBUTORS_PER_INFLUENCE) ){
 					drawContributorsPerInfluenceHorizontalBar (messagesReport,constantsReport,resources,digestService,reportPanel);
 				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(POSTS_BY_ACTIVITY) ){
 					drawPostsByActivityHorizontalBar (messagesReport,constantsReport,resources,digestService,reportPanel);
+				}else if(reportTypesList.getValue(reportTypesList.getSelectedIndex()).equals(POSTS_BY_VIEWS) ){
+					drawPostsByViewsHorizontalBar (messagesReport,constantsReport,resources,digestService,reportPanel);
+				}else{
+					utils.alert("You forgot to add an option (in method handleOnSelectPrjList) to the reports menu! : " + reportTypesList.getValue(reportTypesList.getSelectedIndex()));
 				}
 				
 				

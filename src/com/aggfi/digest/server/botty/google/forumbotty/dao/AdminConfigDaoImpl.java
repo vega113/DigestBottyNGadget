@@ -43,7 +43,10 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 					adminConfig.setAtomFeedPublic(isForumPublic);
 					isUpdate = true;
 				}
-				
+				if(adminConfig.isAdsEnabled() == null){
+					adminConfig.setAdsEnabled(false);
+					isUpdate = true;
+				}
 				if(adminConfig.isDiggBtnEnabled() == null){
 					adminConfig.setDiggBtnEnabled(isForumPublic);
 					isUpdate = true;
@@ -62,6 +65,10 @@ public class AdminConfigDaoImpl implements AdminConfigDao {
 				}
 				if(adminConfig.isFaceBtnEnabled() == null){
 					adminConfig.setFaceBtnEnabled(isForumPublic);
+					isUpdate = true;
+				}
+				if(adminConfig.isViewsTrackingEnabled() == null){
+					adminConfig.setViewsTrackingEnabled(false);
 					isUpdate = true;
 				}
 				if(isUpdate == true){

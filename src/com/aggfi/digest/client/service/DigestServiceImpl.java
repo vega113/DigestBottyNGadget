@@ -373,6 +373,22 @@ public class DigestServiceImpl implements DigestService {
 		requestService.makeRequest(url,asyncCallback,params);
 	}
 	
+	@Override
+	public void updateViewsTracking(String projectId, boolean isEnableViewsTracking, boolean isSync,  AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("isEnableViewsTracking", new JSONString(String.valueOf(isEnableViewsTracking)));
+		paramsJson.put("isSync", new JSONString(String.valueOf(isSync)));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("UPDATE_VIEWS_TRACKING"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
 
 	@Override
 	public void getAdSenseCode(String projectId, String userId, boolean isAdSenseUpdate4User,  AsyncCallback<JSONValue> asyncCallback)
@@ -389,4 +405,63 @@ public class DigestServiceImpl implements DigestService {
 		JavaScriptObject params = postDataJson.getJavaScriptObject();
 		requestService.makeRequest(url,asyncCallback,params);
 	}
+	
+	@Override
+	public void retrViewsCounts(String projectId,AsyncCallback<JSONValue> asyncCallback) throws RequestException{
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_VIEWS_COUNT"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
+	
+
+	@Override
+	public void retrPostsByViews(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_POSTS_BY_VIEWS"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
+	@Override
+	public void addAdSenseInstaller(String projectId, String userId,  AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("userId", new JSONString(userId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_ADSENSE_INSTALLER"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
+	@Override
+	public void addAdSenseInstaller(String userId,  AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("userId", new JSONString(userId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("ADD_VIEWS_COUNTER_INSTALLER"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();
+		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
 }

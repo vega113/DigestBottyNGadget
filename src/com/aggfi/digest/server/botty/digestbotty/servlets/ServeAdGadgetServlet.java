@@ -78,7 +78,7 @@ public class ServeAdGadgetServlet extends HttpServlet{
 		String width = "\"" + (Integer.parseInt(extractValue(adsenseStr, "google_ad_width")) + 4) + "\"";
 		String height = "\"" + (Integer.parseInt(extractValue(adsenseStr, "google_ad_height")) +4) + "\"" ;
 		
-		String adtrackStr =  "<script type=\"text/javascript\">document.write(unescape(\"%3Cscript src='\" + \"http://digestbotty.appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E\"));</script>";
+		String adtrackStr =  "<script type=\"text/javascript\">document.write(unescape(\"%3Cscript src='\" + \"http://" + System.getProperty("APP_DOMAIN") + ".appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E\"));</script>";
 		
 		Object[] args = {width,height,adsenseStr,adtrackStr};
 		

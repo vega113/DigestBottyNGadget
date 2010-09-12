@@ -211,9 +211,14 @@ public class ExtDigest  extends Digest{
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
+	@Deprecated
+	/**
+	 * store/get the adsense in adminConfig
+	 */
 	public Text getGoogleAdsenseCode() {
 		return googleAdsenseCode;
 	}
+	@Deprecated
 	public void setGoogleAdsenseCode(Text code) {
 		this.googleAdsenseCode = code;
 	}

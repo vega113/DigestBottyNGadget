@@ -72,4 +72,19 @@ public interface DigestService {
 			boolean isAdSenseUpdate4User, AsyncCallback<JSONValue> asyncCallback)
 			throws RequestException;
 
+	void updateViewsTracking(String projectId, boolean isUpdateViewsTracking, boolean isSync,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void retrViewsCounts(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void retrPostsByViews(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void addAdSenseInstaller(String projectId, String userId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
+	void addAdSenseInstaller(String userId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
 }

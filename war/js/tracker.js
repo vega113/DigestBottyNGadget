@@ -1,7 +1,5 @@
 
 
-var div = document.getElementById('content_div'); 
-
 
 var JSON_RPC_URL = "/admin/jsonrpc";
 
@@ -21,16 +19,16 @@ function participantCallback(){
 		
 		var projectId = wave.getState().get('projectId', 'none');
 		var domain = wave.getState().get('domain', 'http://digestbotty.appspot.com');
-		var params = {};
-		params.projectId = projectId;
-		params.userId = viewerId;
-		params.waveId = wave.getWaveId();
-		params.type = wave.getState().get('eventType', 'VIEW_POST');
-		params.value = wave.getState().get('eventValue', 'posttracker'); //Ad id here
+		var p = {};
+		p.projectId = projectId;
+		p.userId = viewerId;
+		p.waveId = wave.getWaveId();
+		p.type = wave.getState().get('eventType', 'VIEW_POST');
+		p.value = wave.getState().get('eventValue', 'posttracker'); //viewer
 		
 		var postData = {};
 		postData.method = 'REPORT_POST_VIEW';
-		postData.params = params;
+		postData.params = p;
 		
 		//use gadgets.io to send
 		var url = domain + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();

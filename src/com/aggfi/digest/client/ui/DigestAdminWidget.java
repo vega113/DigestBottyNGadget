@@ -60,6 +60,8 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 	DigestAdminGeneralWidget digestAdminGeneralWidget = null;;
 	DigestAdminParticipantWidget digestAdminParticipantWidget = null;
 	AdsenseWidget adSenseWidget = null;
+	DigestTrackerWidget trackerWidget = null;
+	
 	
 	@Inject
 	public DigestAdminWidget(final DigestMessages messages, final DigestConstants constants, final GlobalResources resources, final DigestService digestService, final VegaUtils vegaUtils, DigestGinjector ginjector) {
@@ -104,6 +106,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 								public void onSuccess(JSONValue result) {
 									digestAdminParticipantWidget.getDigestAdminParticipantCallback().onSuccess(result);
 									digestAdminGeneralWidget.getDigestAdminGeneralCallback().onSuccess(result);
+									trackerWidget.getDigestTrackerCallback().onSuccess(result);
 									adminSettingsTabPnl.selectTab(0);
 									boolean isAdsEnabled = result.isObject().get("isAdsEnabled").isBoolean().booleanValue();
 									if(isAdsEnabled && adminSettingsTabPnl.getWidgetIndex(adSenseWidget) < 0){
@@ -125,13 +128,13 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 									vegaUtils.dismissAllStaticMessages();
 									digestAdminGeneralWidget.getDigestAdminGeneralCallback().onFailure(caught);
 									digestAdminParticipantWidget.getDigestAdminParticipantCallback().onFailure(caught);
+									trackerWidget.getDigestTrackerCallback().onFailure(caught);
 									vegaUtils.adjustHeight();
 									vegaUtils.alert(caught.getMessage());
 								}
 							});
 						} catch (RequestException e) {
 							vegaUtils.dismissStaticMessage();
-							vegaUtils.alert(e.getMessage());
 							Log.error("", e);
 						}
 					
@@ -193,7 +196,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 				vegaUtils.adjustHeight();
 			}
 		});
-		
+		if(adminSettingsTabPnl.getWidgetCount() > 0 ){
+			adminSettingsTabPnl.selectTab(0);
+		}
 		
 	}
 
@@ -205,10 +210,14 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 			digestAdminGeneralWidget = ginjector.getDigestAdminGeneralWidget();
 			digestAdminParticipantWidget = ginjector.getDigestAdminParticipantWidget();
 			adSenseWidget = ginjector.getAdsenseWidget();
+			trackerWidget = ginjector.getDigestTrackerWidget();
+			
 			adminSettingsTabPnl.setAnimationEnabled(true);
 			initAdminTabsOnPrjChange();
 			adminSettingsTabPnl.add(digestAdminParticipantWidget, constants.participantSettingsStr());
 			adminSettingsTabPnl.add(digestAdminGeneralWidget, constants.generalSettingsStr());
+			
+			adminSettingsTabPnl.add(trackerWidget, constants.trackerSettingsStr());
 			
 			adSenseWidget.setImgExplTitle(constants.forumAdSenseExpl());
 			adminSettingsTabPnl.selectTab(0);
@@ -224,6 +233,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 		digestAdminGeneralWidget.setProjectSelectWidget(projectSelectWidget);
 		digestAdminParticipantWidget.setOnProjectsLoadCallback(onProjectsLoadCallback);
 		digestAdminParticipantWidget.setProjectSelectWidget(projectSelectWidget);
+		trackerWidget.setProjectSelectWidget(projectSelectWidget);
 		vegaUtils.adjustHeight();
 	}
 

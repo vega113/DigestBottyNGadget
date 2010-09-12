@@ -82,6 +82,8 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 	String projectId = null;
 	String projectName = null;
 	String userId = null;
+	
+	boolean isSubmitOrCreate = false;
 
 	@Inject
 	public AdsenseWidget(final DigestMessages messages, final DigestConstants constants,final MessagesImpl messagesAdSense, final ConstantsImpl constantsAdSense,
@@ -98,7 +100,6 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 		this.utils = utils;
 		defaultAdSenseAreaStyleName = adsenseCodeTxtArea.getStyleName();
 		
-		submitAdsenseCodeBtn.setEnabled(false);
 		img1.setVisible(false);
 		
 		disableAdSenseCodeArea();
@@ -139,6 +140,7 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 			public void onClick(ClickEvent event) {
 				adsenseTxt = adsenseCodeTxtArea.getText();
 				enableAdSenseCodeArea();
+				switch2SubmitCode();
 				submitAdsenseCodeBtn.setEnabled(true);
 			}
 		});
@@ -155,38 +157,61 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				adsenseTxt = adsenseCodeTxtArea.getText();
-				FieldVerifier.verifyAdSenseCode(adsenseTxt);
-				String userName = utils.retrUserName();
-				userId = utils.retrUserId();
-				String userThumbnailUrl = utils.retrUserThumbnailUrl();
-				try {
-					String userOrForumStr = isAdSenseUpdate4User ? constants.userStr() : constants.forumStr();
-					String nameStr = isAdSenseUpdate4User ? userName : projectName;
-					utils.showStaticMessage(messages.savingAdSense4Msg(userOrForumStr,nameStr ));
-					digestService.addAdSenseCode(projectId, userId, adsenseTxt, userName, userThumbnailUrl, isAdSenseUpdate4User, new AsyncCallback<JSONValue>() {
-						
-						@Override
-						public void onSuccess(JSONValue result) {
-							utils.dismissStaticMessage();
-//							utils.showSuccessMessage(constants.successStr(), 3); //XXX it shows the msg several times for some reason?
-							btnViewOnClick();
-							utils.reportEvent("/adsenseTab/", "submit", userId, 1);
-							Log.info(result.toString());
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							utils.dismissStaticMessage();
-							utils.alert(caught.getMessage());
-							Log.error("caught", caught);
-						}
-					});
-				} catch (RequestException e) {
-					utils.dismissAllStaticMessages();
-					Log.error("", e);
-					utils.alert(e.getMessage());
+				if(isSubmitOrCreate){
+					adsenseTxt = adsenseCodeTxtArea.getText();
+					FieldVerifier.verifyAdSenseCode(adsenseTxt);
+					String userName = utils.retrUserName();
+					userId = utils.retrUserId();
+					String userThumbnailUrl = utils.retrUserThumbnailUrl();
+					try {
+						String userOrForumStr = isAdSenseUpdate4User ? constants.userStr() : constants.forumStr();
+						String nameStr = isAdSenseUpdate4User ? userName : projectName;
+						utils.showStaticMessage(messages.savingAdSense4Msg(userOrForumStr,nameStr ));
+						digestService.addAdSenseCode(projectId, userId, adsenseTxt, userName, userThumbnailUrl, isAdSenseUpdate4User, new AsyncCallback<JSONValue>() {
+							
+							@Override
+							public void onSuccess(JSONValue result) {
+								utils.dismissStaticMessage();
+								btnViewOnClick();
+								utils.reportEvent("/adsenseTab/", "submit", userId, 1);
+								Log.info(result.toString());
+							}
+							
+							@Override
+							public void onFailure(Throwable caught) {
+								utils.dismissStaticMessage();
+								utils.alert(caught.getMessage());
+								Log.error("caught", caught);
+							}
+						});
+					} catch (RequestException e) {
+						utils.dismissAllStaticMessages();
+						Log.error("", e);
+					}
+				}else{
+					//add installer to the viewer
+					try {
+						AsyncCallback<JSONValue> callback = new AsyncCallback<JSONValue>() {
+							
+							@Override
+							public void onSuccess(JSONValue result) {
+								img1.setVisible(false);
+							}
+							
+							@Override
+							public void onFailure(Throwable caught) {
+								img1.setVisible(false);
+								utils.alert(caught.getMessage());
+								Log.error("caught", caught);
+							}
+						};
+						img1.setVisible(true);
+						digestService.addAdSenseInstaller(projectId, utils.retrUserId(), callback  );
+					} catch (RequestException e) {
+						Log.error("", e);
+					}
 				}
+				
 			}
 		});
 		
@@ -215,6 +240,7 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 							utils.showSuccessMessage(constants.successStr(), 3);
 							btnViewOnClick();
 							utils.reportEvent("/adsenseTab/", "submit", userId, 1);
+							copyAdsenseCptnPanel.setVisible(false);
 							Log.info(result.toString());
 						}
 						
@@ -228,7 +254,6 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 				} catch (RequestException e) {
 					utils.dismissAllStaticMessages();
 					Log.error("", e);
-					utils.alert(e.getMessage());
 				}
 			}
 		});
@@ -267,6 +292,7 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 						if(!"".equals(adsSenseCode4UserInCaseOfProjStr) && "".equals(adsenseTxt)){
 							copyAdsenseCptnPanel.setVisible(true);
 						}
+						determineSwitchMode();
 					}
 					Log.info("success");
 				}
@@ -283,8 +309,6 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 			Log.error("", e);
 		}
 	}
-
-
 
 	private boolean isPrjModeNull() {
 		return !isAdSenseUpdate4User && (projectId == null || "none".equals(projectId));
@@ -306,6 +330,7 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 			}
 		});
 		adsenseCodeTxtArea.setReadOnly(true);
+		determineSwitchMode();
 	}
 	
 	public void enableAdSenseCodeArea() {
@@ -323,6 +348,7 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 			}
 		});
 		adsenseCodeTxtArea.setReadOnly(false);
+		determineSwitchMode();
 	}
 
 
@@ -355,14 +381,26 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 
 
 	private void btnViewOnClick() {
+		try{
+			FieldVerifier.verifyAdSenseCode(adsenseTxt);
+		}catch(IllegalArgumentException e){
+			utils.alert(e.getMessage());
+			return;
+		}
 		radioBtnViewMode.setValue(true);
 		adsenseCodeTxtArea.setText(adsenseTxt);
 		submitAdsenseCodeBtn.setEnabled(false);
 		disableAdSenseCodeArea();
 	}
 	
+	String captionTitleStr = "";
 	private void setAdSenseCaption(String name){
-		adsenseTitle4Cptn.setTitle(messages.adSenseCaptionMsg(name));
+		if(name != null){
+			captionTitleStr = messages.adSenseCaptionMsg(name);
+		}
+		adsenseTitle4Cptn.setTitle(captionTitleStr);
+		adsenseTitle4Cptn.setCaptionText(captionTitleStr);
+		
 	}
 	
 	public void setIsUserOrForumMode(boolean isUser, String name, String id){
@@ -393,6 +431,32 @@ public class AdsenseWidget extends Composite implements RunnableOnTabSelect{
 		Image[] images = {img1,img2,img3};
 		for(Image image : images){
 			image.addMouseDownHandler(mouseDownHandler);
+		}
+	}
+
+	protected void switch2SubmitCode() {
+		submitAdsenseCodeBtn.setText(constants.submitStr());
+		submitAdsenseCodeBtn.setTitle(constants.submitStr());
+		submitAdsenseCodeBtn.setEnabled(false);
+		img2.setTitle(constants.submitAdSenseBtnExpl());
+		isSubmitOrCreate = true;
+	}
+
+	private void switch2CreateInstaller() {
+		submitAdsenseCodeBtn.setText(constants.createAdInstallerStr());
+		submitAdsenseCodeBtn.setTitle(constants.createAdInstallerStr());
+		submitAdsenseCodeBtn.setEnabled(true);
+		img2.setTitle(constants.createAdInstallerExpl());
+		isSubmitOrCreate = false;
+	}
+
+
+
+	private void determineSwitchMode() {
+		if(adsenseCodeTxtArea.getText().length() > 2 && !isAdSenseUpdate4User){
+			switch2CreateInstaller();
+		}else{
+			switch2SubmitCode();
 		}
 	}
 

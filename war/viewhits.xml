@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="View Hits" width="72" height="25"> 
+		<Require feature="wave" /> 
+		
+	</ModulePrefs>
+	<Content type="html">
+    <![CDATA[
+    
+      <div>
+		<table
+			style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
+			valign="middle">
+			<tr
+				style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
+				valign="middle">
+				<td
+					style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt"
+					valign="middle"><img alt="views" title="total views"
+					src="http://lh5.ggpht.com/_tsWs83xehHE/TIOGSemIT9I/AAAAAAAAFc0/cNz281SMJfU/eye_icon.png"
+					width="24px" height="22px;" style="padding-top: 0px;"></td>
+				<td
+					style="padding: 0px; padding-top: 0px; margin: 0px; border-width: 0pt">
+				<fieldset
+					style="padding: 0px; padding-top: 0px; margin: 1px; height: 18px; width: 36px; background-color: #5999de; color: white; border-color: black; border-style: solid; border-width: 2pt"
+					title="total views"><legend
+					style="font-size: 11pt; font-weight: bold; padding: 1px; margin: 1px; color: darkgreen; border-color: white"></legend>
+				<div id="content_div"
+					style="height: 10px; width: 32px; color: white; text-align: center; font-size: 11pt; vertical-align: top;">0</div>
+				</fieldset>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<script>
+	var JSON_RPC_URL = "/admin/jsonrpc";
+	function stateUpdated(obj) {
+		if(obj.data != null) {
+			var json = obj.data;
+			if(json != null && json.result != null && json.result.count != null){
+				document.getElementById("content_div").innerHTML = (1 + parseInt(json.result.count) ) ;
+				try{
+				var delta = {};
+				delta['savedCount'] = json.result.count;
+				wave.getPrivateState().submitDetla(delta);
+				}catch(e){}
+			}
+			
+		}
+	}
+
+	function init() {
+		if (wave && wave.isInWaveContainer()) {
+			setTimeout("afterInit()",1500);
+			setInterval("afterInit()",20000);
+			try{
+				document.getElementById("content_div").innerHTML = "<img src='http://lh3.ggpht.com/_tsWs83xehHE/TI0DEIKdbXI/AAAAAAAAFe0/_qvd_O06Qt4/spinner.1.gif'></img>" ;
+			}catch(e){}
+		}
+	}
+		
+	function afterInit(){
+		//make call to app engine = recieve result
+		
+		if (wave && wave.isInWaveContainer() && wave.getState() != null) {
+			
+			var domain = wave.getState().get('domain', 'http://digestbotty.appspot.com');
+			var url = domain + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
+			var p = {};
+			p.waveId = wave.getWaveId();
+			
+			var postData = {};
+			postData.method = 'GET_VIEWS_COUNT_PER_WAVE';
+			postData.params = p;
+			
+			var params = {};
+			params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+			params[gadgets.io.RequestParameters.METHOD]=gadgets.io.MethodType.POST;
+			params[gadgets.io.RequestParameters.POST_DATA]= JSON.stringify(postData);
+			try{
+				document.getElementById("content_div").innerHTML = "<img src='http://lh3.ggpht.com/_tsWs83xehHE/TI0DEIKdbXI/AAAAAAAAFe0/_qvd_O06Qt4/spinner.1.gif'></img>";
+			}catch(e){}
+			gadgets.io.makeRequest(url, stateUpdated, params);
+		}
+	}
+	gadgets.util.registerOnLoadHandler(init);
+
+	</script>
+    
+    
+     ]]>
+	</Content>
+</Module>

@@ -163,6 +163,7 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 				try {
 					digestService.removeDefaultParticipant(projectId, participantId, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
+					vegaUtils.dismissStaticMessage();
 					Log.error("", e);
 				}
 				try{
@@ -187,6 +188,7 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 				try {
 					digestService.removeDefaultTag(projectId, tag, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
+					vegaUtils.dismissStaticMessage();
 					Log.error("", e);
 				}
 				try{
@@ -211,6 +213,7 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 				try {
 					digestService.removeDigestManager(projectId, managerId, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
+					vegaUtils.dismissStaticMessage();
 					Log.error("", e);
 				}
 				try{
@@ -238,6 +241,7 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 					vegaUtils.showStaticMessage(msg);
 					digestService.removeAutoTag(projectId, tag,sync, getAfterRemovalAsyncCallback());
 				} catch (RequestException e) {
+					vegaUtils.dismissStaticMessage();
 					Log.error("", e);
 				}
 				try{
@@ -328,7 +332,8 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 					}
 				});
 			} catch (RequestException e) {
-				e.printStackTrace();
+				vegaUtils.dismissStaticMessage();
+				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
@@ -367,7 +372,8 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 					}
 				});
 			} catch (RequestException e) {
-				e.printStackTrace();
+				vegaUtils.dismissStaticMessage();
+				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
@@ -406,7 +412,8 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 					}
 				});
 			} catch (RequestException e) {
-				vegaUtils.alert(e.getMessage());
+				vegaUtils.dismissStaticMessage();
+				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
 			vegaUtils.alert(e.getMessage());
@@ -457,7 +464,8 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 					}
 				});
 			} catch (RequestException e) {
-				e.printStackTrace();
+				vegaUtils.dismissStaticMessage();
+				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);
@@ -518,7 +526,8 @@ public class DigestAdminParticipantWidget extends Composite implements RunnableO
 					}
 				});
 			} catch (RequestException e) {
-				e.printStackTrace();
+				vegaUtils.dismissStaticMessage();
+				Log.error("", e);
 			}
 		}catch(IllegalArgumentException e){
 			digestAlert(e);

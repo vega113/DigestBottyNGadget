@@ -28,4 +28,6 @@ public interface ForumPostDao {
 
   public abstract List<ForumPost> getForumPostsFromDate(String projectId, Date fromDate);
 
+  public abstract ForumPost remove(ForumPost entry);
+
 }

@@ -68,6 +68,10 @@ public class AdminConfig {
   @Persistent
   private Boolean  isFaceBtnEnabled = Boolean.FALSE;
   
+  @Expose
+  @Persistent
+  private Boolean  isViewsTrackingEnabled = Boolean.FALSE;
+  
   public Date getCreated() {
 	return created;
 }
@@ -75,8 +79,8 @@ public class AdminConfig {
 @Persistent
   @Expose
   private Boolean isAdsEnabled = Boolean.FALSE;
-  public boolean isAdsEnabled() {
-	return isAdsEnabled != null ?  isAdsEnabled.booleanValue() : false;
+  public Boolean isAdsEnabled() {
+	return isAdsEnabled;
   }
 
   @Expose
@@ -84,13 +88,18 @@ public class AdminConfig {
   private Map<String, Pattern> autoTagRegexMap = null;
 
   public AdminConfig() {
-    this.updated = new Date();
+    init();
+  }
+
+private void init() {
+	this.updated = new Date();
     this.created = new Date();
     this.autoTagRegexMap = new HashMap<String, Pattern>();
     this.defaultTags = new ArrayList<String>();
     this.defaultParticipants = new ArrayList<String>();
     this.managers = new ArrayList<String>();
-  }
+    this.isViewsTrackingEnabled  = true; //default is enabled
+}
 
   public void setCreated(Date created) {
 	this.created = created;
@@ -102,10 +111,7 @@ public void setAdsEnabled(boolean isAdsEnabled) {
 
 public AdminConfig(String id) {
     this.id = id;
-    this.updated = new Date();
-    this.autoTagRegexMap = new HashMap<String, Pattern>();
-    this.defaultTags = new ArrayList<String>();
-    this.managers = new ArrayList<String>();
+    init();
   }
 
   public Date getUpdated() {
@@ -215,6 +221,16 @@ public AdminConfig(String id) {
 	public void setFaceBtnEnabled(Boolean isFaceBtnEnabled) {
 		this.isFaceBtnEnabled = isFaceBtnEnabled;
 	}
+	
+	public Boolean isViewsTrackingEnabled() {
+		return isViewsTrackingEnabled;
+	}
+
+	public void setViewsTrackingEnabled(Boolean isViewsTrackingEnabled) {
+		this.isViewsTrackingEnabled = isViewsTrackingEnabled;
+	}
+	
+	
 
 	@Override
 	public String toString() {
@@ -248,6 +264,8 @@ public AdminConfig(String id) {
 		builder.append(isFaceBtnEnabled);
 		builder.append(", isAdsEnabled=");
 		builder.append(isAdsEnabled);
+		builder.append(", isViewsTrackingEnabled=");
+		builder.append(isViewsTrackingEnabled);
 		builder.append(", autoTagRegexMap=");
 		builder.append(autoTagRegexMap != null ? toString(
 				autoTagRegexMap.entrySet(), maxLen) : null);

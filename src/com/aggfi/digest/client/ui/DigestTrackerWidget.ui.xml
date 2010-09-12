@@ -1,0 +1,90 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field='res'
+		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.DigestConstants' />
+	<g:HTMLPanel>
+		<g:VerticalPanel>
+			<g:CaptionPanel width='{constants.smallerWidthStr}'>
+				<g:HorizontalPanel>
+					<g:VerticalPanel>
+						<g:HTML height="21px"></g:HTML>
+						<g:HorizontalPanel>
+							<g:Label text='{constants.trackViewsQuestionStr}' width="135px"></g:Label>
+							<g:HTML width='6px'></g:HTML>
+							<g:CheckBox ui:field="enableViewsTrackingCheckBox"></g:CheckBox>
+							<g:Image resource='{res.tooltip}' title='{constants.trackViewsExpl}'
+								ui:field="img0" />
+						</g:HorizontalPanel>
+					</g:VerticalPanel>
+
+
+					<g:HorizontalPanel width="35px">
+						<g:HTML width="10px"></g:HTML>
+					<g:CaptionPanel ui:field="syncCptnPnl">
+						<g:VerticalPanel>
+							<g:HorizontalPanel>
+								<g:Label text='{constants.syncStr}'></g:Label>
+							</g:HorizontalPanel>
+							<g:HorizontalPanel>
+								<g:CheckBox ui:field="syncViewsCheckBox"></g:CheckBox>
+								<g:Image resource='{res.tooltip}' title='{constants.autoTagSyncExpl}'
+									ui:field="img1" />
+							</g:HorizontalPanel>
+						</g:VerticalPanel>
+					</g:CaptionPanel>
+					</g:HorizontalPanel>
+
+					<g:VerticalPanel>
+						<g:HTML height="21px"></g:HTML>
+						<g:HorizontalPanel>
+							<g:HTML width="15px"></g:HTML>
+							<g:Image resource='{res.spinner}' title='{constants.loadingStr}'
+								ui:field="img2" />
+						</g:HorizontalPanel>
+					</g:VerticalPanel>
+
+					<g:VerticalPanel>
+						<g:HTML height="21px"></g:HTML>
+						<g:HorizontalPanel>
+							<g:HTML width='160px'></g:HTML>
+							<g:Button text='{constants.updateStr}' ui:field="updateTrackViewsBtn"></g:Button>
+						</g:HorizontalPanel>
+					</g:VerticalPanel>
+				</g:HorizontalPanel>
+			</g:CaptionPanel>
+			
+			
+			<g:CaptionPanel width='{constants.smallerWidthStr}'>
+				<g:HorizontalPanel>
+					<g:VerticalPanel>
+						<g:HTML height="21px"></g:HTML>
+						<g:HorizontalPanel>
+							<g:Label text='{constants.createViewsCounterInstallerQuestionStr}' width="245px"></g:Label>
+							<g:HTML width='1px'></g:HTML>
+							<g:Image resource='{res.tooltip}' title='{constants.viewsCounterInstallerExpl}'
+								ui:field="img3" />
+							<g:HorizontalPanel width="20px">
+							<g:HTML width="4px"></g:HTML>
+							<g:Image resource='{res.spinner}' title='{constants.loadingStr}'
+								ui:field="img4" />
+							</g:HorizontalPanel>
+						</g:HorizontalPanel>
+					</g:VerticalPanel>
+
+
+					<g:HTML width="144px"></g:HTML>
+					<g:VerticalPanel>
+						<g:HTML height="21px"></g:HTML>
+						<g:HorizontalPanel>
+							<g:Button text='{constants.createBtnStr}' ui:field="createViewsCounterInstallerBtn"></g:Button>
+						</g:HorizontalPanel>
+					</g:VerticalPanel>
+				</g:HorizontalPanel>
+			</g:CaptionPanel>
+			
+		</g:VerticalPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

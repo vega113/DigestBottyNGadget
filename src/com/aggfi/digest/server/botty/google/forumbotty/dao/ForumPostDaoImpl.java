@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
@@ -31,8 +32,39 @@ public class ForumPostDaoImpl implements ForumPostDao {
   public ForumPost save(ForumPost entry) {
     PersistenceManager pm = pmf.getPersistenceManager();
     try {
-      entry = pm.makePersistent(entry);
-      entry = pm.detachCopy(entry);
+    	LOG.info("Saving forumPost before: " + entry.toString());
+    	Long primaryKey = null;
+    	if(entry.getPrimaryKey() == 0){
+    		primaryKey = new Long ((long)((Math.random() +1  * 10000) * (Math.random() + 1)));
+    		entry.setPrimaryKey(primaryKey);
+    	}
+    	String uuid = null;
+    	if(entry.getId() == null){
+    		uuid = UUID.randomUUID().toString();
+    		entry.setId(uuid);
+    	}
+    	LOG.info("Saving forumPost after: " + entry.toString() + ", ### prinaryKey = " + primaryKey + ", uuid: " + uuid);
+      try{
+    	  pm.makePersistent(entry);
+    	  entry = pm.detachCopy(entry);
+      }catch(Exception e){
+    	  LOG.warning("Exception: " + e.getMessage() + ", entry: " + entry.toString()  );
+      }
+    } finally {
+      pm.close();
+    }
+
+    return entry;
+  }
+  
+  @Override
+  public ForumPost remove(ForumPost entry) {
+    PersistenceManager pm = pmf.getPersistenceManager();
+    try {
+     pm.deletePersistent(entry);
+      try{
+    	  entry = pm.detachCopy(entry);
+      }catch(Exception e){}
     } finally {
       pm.close();
     }
@@ -72,25 +104,25 @@ public class ForumPostDaoImpl implements ForumPostDao {
   
   @Override
   public ForumPost getForumPost(String id) {
-    PersistenceManager pm = pmf.getPersistenceManager();
-    ForumPost entry = null;
+    String[] split = id.split("!");
+    return getForumPost(split[0], split[1]);
+  }
 
-    try {
-      Query query = pm.newQuery(ForumPost.class);
-      query.declareParameters("String id_");
-      String filters = "id == id_";
-      query.setFilter(filters);
-      List<ForumPost> entries = (List<ForumPost>) query.execute(id);
-      entries = (List<ForumPost>) pm.detachCopyAll(entries);
-      if (entries.size() > 0) {
-        return entries.get(0);
-      }
-    } finally {
-      pm.close();
-    }
-
-    return entry;
-  }  
+private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, int i) {
+	ForumPost entry;
+	entry = entries.get(i);
+	  try{
+		  if(entry.isDispayAtom() == null){
+			  entry.setDispayAtom(true);
+			  pm.makePersistent(entry);
+		  }
+	  }catch(Exception e){}
+	 
+	 try{
+		 entry = pm.detachCopy(entry);
+	 }catch(Exception e){}
+	return entry;
+}  
   
   @Override
   public ForumPost getForumPost(String domain, String waveId) {
@@ -99,13 +131,14 @@ public class ForumPostDaoImpl implements ForumPostDao {
 
     try {
       Query query = pm.newQuery(ForumPost.class);
-      query.declareParameters("String id_");
-      String filters = "id == id_";
+      query.declareParameters("String domain_, String waveId_");
+      String filters = "domain == domain_ && waveId == waveId_";
       query.setFilter(filters);
-      List<ForumPost> entries = (List<ForumPost>) query.execute(domain + "!" + waveId);
+      List<ForumPost> entries = (List<ForumPost>) query.execute(domain, waveId);
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
       if (entries.size() > 0) {
-        return entries.get(0);
+    	  entry = prepare4Ret(pm, entries, 0);
+        return entry;
       }
     } finally {
       pm.close();
@@ -156,7 +189,8 @@ public class ForumPostDaoImpl implements ForumPostDao {
   public List<ForumPost> getForumPostsByTag(String projectId, String tag, int limit) {
     PersistenceManager pm = pmf.getPersistenceManager();
     List<ForumPost> entries = new ArrayList<ForumPost>();
-
+    List<ForumPost> entries4Ret = new ArrayList<ForumPost>();
+    
     try {
       Query query = pm.newQuery(ForumPost.class);
       if(tag != null && !"".equals(tag)){
@@ -175,10 +209,17 @@ public class ForumPostDaoImpl implements ForumPostDao {
         }
       }
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
+      
+      int i = 0;
+      for(ForumPost entry2Ret : entries){
+    	  entry2Ret = prepare4Ret(pm, entries, i);
+    	  entries4Ret.add(entry2Ret);
+    	  i++;
+      }
     } finally {
       pm.close();
     }
-    return entries;
+    return entries4Ret;
   }
 
   @Override
@@ -201,7 +242,7 @@ public class ForumPostDaoImpl implements ForumPostDao {
   public List<ForumPost> getForumPosts(String projectId, int limit) {
     PersistenceManager pm = pmf.getPersistenceManager();
     List<ForumPost> entries = new ArrayList<ForumPost>();
-
+    List<ForumPost> entries4Ret = new ArrayList<ForumPost>();
     try {
       Query query = pm.newQuery(ForumPost.class);
       query.declareParameters("String projectId_");
@@ -214,18 +255,24 @@ public class ForumPostDaoImpl implements ForumPostDao {
         }
       }
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
+      
+      int i = 0;
+      for(ForumPost entry2Ret : entries){
+    	  entry2Ret = prepare4Ret(pm, entries, i);
+    	  i++;
+    	  entries4Ret.add(entry2Ret);
+      }
     } finally {
       pm.close();
     }
-    return entries;
+    return entries4Ret;
   }
   
-  @SuppressWarnings("unchecked")
 @Override
   public List<ForumPost> getForumPostsFromDate(String projectId, Date fromDate) {
 	    PersistenceManager pm = pmf.getPersistenceManager();
 	    List<ForumPost> entries = new ArrayList<ForumPost>();
-
+	    List<ForumPost> entries4Ret = new ArrayList<ForumPost>();
 	    try {
 	      Query query = pm.newQuery(ForumPost.class);
 	      query.declareImports("import java.util.Date");
@@ -233,19 +280,29 @@ public class ForumPostDaoImpl implements ForumPostDao {
 	      query.setFilter("projectId == projectId_ && lastUpdated >= fromDate_");
 
 	      entries = (List<ForumPost>) query.execute(projectId,fromDate);
-	     
-	      entries = (List<ForumPost>) pm.detachCopyAll(entries);
+	      
+	      for(ForumPost p : entries){
+	    	  entries4Ret.add(pm.detachCopy(p));
+	      }
+	      
+	      StringBuilder sb = new StringBuilder();
+	      sb.append("In getForumPostsFromDate: \n");
+	      for(ForumPost p : entries){
+	    	  sb.append(p.toString() + ", ");
+	      }
+	      LOG.info(sb.toString());
+	      
 	    } finally {
 	      pm.close();
 	    }
-	    return entries;
+	    return entries4Ret;
 	  }
 
   @Override
   public List<ForumPost> getRecentlyUpdated(String projectId, int limit) {
     PersistenceManager pm = pmf.getPersistenceManager();
     List<ForumPost> entries = new ArrayList<ForumPost>();
-
+    List<ForumPost> entries4Ret = new ArrayList<ForumPost>();
     try {
       Query query = pm.newQuery(ForumPost.class);
       query.declareImports("import java.util.Date");
@@ -260,9 +317,20 @@ public class ForumPostDaoImpl implements ForumPostDao {
         }
       }
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
+      for(ForumPost entry2Ret : entries){
+    	  if(entry2Ret.isDispayAtom() == null){
+    		  entry2Ret.setDispayAtom(true);
+			 try{
+				 pm.makePersistent(entry2Ret);
+				 entry2Ret = pm.detachCopy(entry2Ret);
+			 }catch(Exception e){}
+		  }
+    	  entries4Ret.add(entry2Ret);
+      }
+      
     } finally {
       pm.close();
     }
-    return entries;
+    return entries4Ret;
   }
 }

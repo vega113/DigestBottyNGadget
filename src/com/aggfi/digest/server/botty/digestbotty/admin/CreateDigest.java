@@ -2,6 +2,8 @@ package com.aggfi.digest.server.botty.digestbotty.admin;
 
 import java.io.IOException;
 import com.vegalabs.general.server.command.Command;
+import com.vegalabs.general.server.command.CommandFetcher;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -20,10 +22,14 @@ import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.digestbotty.utils.StringBuilderAnnotater;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
 import com.vegalabs.general.server.rpc.util.Util;
+import com.aggfi.digest.server.botty.google.forumbotty.admin.CommandType;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
+import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
+import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.gson.annotations.Expose;
 import com.google.inject.Inject;
+import com.google.inject.internal.ImmutableMap;
 import com.google.wave.api.Blip;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.Image;
@@ -42,14 +48,18 @@ public class CreateDigest extends Command {
 	private ForumBotty robot;
 	private AdminConfigDao adminConfigDao;
 	private ContributorDao contributorDao;
+	private ForumPostDao forumPostDao;
+	private CommandFetcher commandFetcher;
 
 	@Inject
-	public CreateDigest(Util util, ExtDigestDao extDigestDao, AdminConfigDao adminConfigDao, ContributorDao contributorDao, ForumBotty robot) {
+	public CreateDigest(Util util, ExtDigestDao extDigestDao, AdminConfigDao adminConfigDao, ContributorDao contributorDao, ForumBotty robot, ForumPostDao forumPostDao, CommandFetcher commandFetcher) {
 		this.extDigestDao = extDigestDao;
 		this.util = util;
 		this.robot = robot;
 		this.adminConfigDao = adminConfigDao;
 		this.contributorDao = contributorDao;
+		this.forumPostDao = forumPostDao;
+		this.commandFetcher = commandFetcher;
 	}
 
 	@Override
@@ -77,6 +87,7 @@ public class CreateDigest extends Command {
 	    	boolean isCopyAdSenseFromUser = Boolean.parseBoolean(getParam("isCopyAdSenseFromUser"));
 			AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
 			adminConfig.setAdsEnabled(isAdsEnabled);
+			adminConfig.setViewsTrackingEnabled(true);
 			boolean isPublicOnCreate = Boolean.parseBoolean(this.getParam("publicOnCreate"));
 			adminConfig.setAtomFeedPublic(isPublicOnCreate);
 			adminConfig.setDiggBtnEnabled(isPublicOnCreate);
@@ -125,6 +136,7 @@ public class CreateDigest extends Command {
 					}
 				}
 			}
+			adminConfig.setAdsEnabled(isAdsEnabled);
 			adminConfigDao.save(adminConfig);
 	    	//-------------------------
 	    	
@@ -134,11 +146,11 @@ public class CreateDigest extends Command {
 	    	
 	    	Wavelet digestWavelet = null;
 	    	try{
-	    		digestWavelet = createDigestWave(digestWaveDomain,ownerId,projectId,projectName,googlegroups, isPublicOnCreate,isAdsEnabled,extDigest.getDescription(), extDigest.getInstallerThumbnailUrl(), extDigest.getForumSiteUrl());
+	    		digestWavelet = createDigestWave(digestWaveDomain,ownerId,adminConfig,projectId,projectName,googlegroups, isPublicOnCreate,extDigest.getDescription(), extDigest.getInstallerThumbnailUrl(), extDigest.getForumSiteUrl());
 	    	}catch(IOException ioe){
 	    		if(ioe.getMessage().indexOf("Timeout") > -1){
 	    			//------------------------
-	    			digestWavelet = createDigestWave(digestWaveDomain,ownerId,projectId,projectName,googlegroups, isPublicOnCreate,isAdsEnabled, extDigest.getDescription(), extDigest.getInstallerThumbnailUrl(), extDigest.getForumSiteUrl());
+	    			digestWavelet = createDigestWave(digestWaveDomain,ownerId,adminConfig,projectId,projectName,googlegroups, isPublicOnCreate, extDigest.getDescription(), extDigest.getInstallerThumbnailUrl(), extDigest.getForumSiteUrl());
 	    			//----------------------------
 	    		}else{
 	    			throw ioe;
@@ -189,7 +201,14 @@ public class CreateDigest extends Command {
 		LOG.info("create_digest output: " + output.toString());
 		json.put("result", new JSONObject(util.toJson(output)));
 		
-		LOG.exiting(this.getClass().getName(), "execute()");
+		//add new post gadget
+		  Command command = commandFetcher.fetchCommand("ADD_SECURE_POST_GADGET");
+		  String userId = System.getProperty("APP_DOMAIN") + "@" + System.getProperty("APP_DOMAIN") + "." + "appspot.com";
+		  Map<String,String> params = ImmutableMap.of("projectId", extDigest.getProjectId(), "userId", userId);
+		  command.setParams(params);
+		  String outJson = command.execute().toString();
+		  LOG.fine("Added new post gadget: " + outJson);
+		
 		return json;
 	}
 	
@@ -240,6 +259,12 @@ public class CreateDigest extends Command {
 		robot.submit(newWavelet, rpcUrl);
 		//add this post to the digest
 		robot.addOrUpdateDigestWave(projectId, newWavelet, null, null);
+		
+		 ForumPost forumPost = new ForumPost(domain, newWavelet);
+		  forumPost.setProjectId(projectId);
+		  forumPost.setBlipCount(0);
+		  forumPost.setDispayAtom(false);
+		  forumPostDao.save(forumPost);
 	}
 
 	protected void appendFaq2blip(String projectName, String projectId,String digestWaveId,String ownerId,Wavelet newWavelet) {
@@ -332,6 +357,11 @@ public class CreateDigest extends Command {
 		sba.append(a3_6, styleFontStyle, "italic");
 		
 		sba.flush2Blip();
+		
+		AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+		 if(adminConfig.isViewsTrackingEnabled()){
+			  robot.appendViewsTrackingGadget(newWavelet.getRootBlip(), projectId);
+		  }
 	}
 	
 	
@@ -414,14 +444,15 @@ public class CreateDigest extends Command {
 		return digest;
 	}
 	
-	private Wavelet createDigestWave(String domain, String ownerId, String projectId, String projectName, String googlegroups, boolean isPublicOnCreate,
-			boolean isAdsEnabled, String forumDescription, String iconUrl, String siteUrl) throws IOException {
+	private Wavelet createDigestWave(String domain, String ownerId,AdminConfig adminConf, String projectId, String projectName, String googlegroups, boolean isPublicOnCreate,
+			String forumDescription, String iconUrl, String siteUrl) throws IOException {
 		Set<String> participants = new HashSet<String>(); 
 		participants.add(ownerId);
 		try{
-			adminConfigDao.addDefaultParticipant(projectId, ownerId);
+			if(!adminConf.getDefaultParticipants().contains(ownerId)){
+				adminConfigDao.addDefaultParticipant(projectId, ownerId);
+			}
 		}catch (Exception e) {
-			//FIXME why this happens? it (sometime) says default participant already exists
 			LOG.log(Level.SEVERE,"",e);
 		}
 		if(!util.isNullOrEmpty(googlegroups)){
@@ -469,7 +500,7 @@ public class CreateDigest extends Command {
 			topBlip.at(topBlip.getContent().length()).insert(ba1,  "Forum description: ");
 			
 			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/fontStyle", "italic");
-			topBlip.at(topBlip.getContent().length()).insert(ba2,  "\"" + description + "\"");
+			topBlip.at(topBlip.getContent().length()).insert(ba2, description );
 			
 			int e1 = topBlip.getContent().length();
 			topBlip.range(s1, e1).annotate(System.getProperty("APP_DOMAIN") + ".appspot.com/forumDescription", "done");
@@ -480,41 +511,60 @@ public class CreateDigest extends Command {
 			String fontSize = "12pt";
 			int s1 = topBlip.getContent().length();
 			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize, "link/manual", siteUrl, "style/fontStyle", "italic");
-			topBlip.at(topBlip.getContent().length()).insert(ba1,  "Link");
+			topBlip.at(topBlip.getContent().length()).insert(ba1,  "Link to forum site");
 			
-			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize);
-			topBlip.at(topBlip.getContent().length()).insert(ba2,  " to forum site.");
+//			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize);
+//			topBlip.at(topBlip.getContent().length()).insert(ba2,  " to forum site.");
 			
 			int e1 = topBlip.getContent().length();
 			topBlip.range(s1, e1).annotate(System.getProperty("APP_DOMAIN") + ".appspot.com/forumSite", "done");
 		}
 		
-		if(isAdsEnabled){
+		if(adminConf.isAdsEnabled()){
 			topBlip.append("\n");
 			if(adminConfig.getAdsense() != null && !adminConfig.getAdsense().getValue().equals("")){
 				robot.appendAd2Blip(topBlip,topBlip.getBlipId(),projectId,false);
-				topBlip.append("\n");
 			}
 			bottomBlip = newWavelet.reply("\n");
 		}
+		boolean isSubmit = false;
+		
 		 String blipId = null;
 		List<JsonRpcResponse> submitResponseList = robot.submit(newWavelet, rpcUrl);
 		 for(JsonRpcResponse res : submitResponseList){
 			  Map<ParamsProperty, Object> dataMap = res.getData();
 			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
 				  blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));//blip id of the bottom blip
-				  robot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true);
+				  robot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true,false);
+				  isSubmit = true;
 				
 			  }
 		  }
 		 if(blipId == null){
-			 LOG.warning("No blip id got bottom blip!");
+			 LOG.warning("No blip id - link to bottom blip!");
 		 }
-		  if(isAdsEnabled){
+		  if(adminConf.isAdsEnabled()){
 			  robot.appendAd2Blip(bottomBlip,blipId,System.getProperty("BOTTY_OWNER_WAVE_ID"),false );
-			  robot.addOrUpdateLinkToBottomOrTopForDigestWave(bottomBlip, newWavelet.getRootBlipId(), false);
+			  robot.addOrUpdateLinkToBottomOrTopForDigestWave(bottomBlip, newWavelet.getRootBlipId(), false,false);
+			  isSubmit = true;
+		  }
+		  if(adminConf.isViewsTrackingEnabled()){
+			  topBlip.append("\n");
+			  robot.appendViewsCounterGadget(topBlip);
+			  robot.appendViewsTrackingGadget(topBlip, projectId);
+			  isSubmit = true;
+		  }else{
+			  LOG.warning("views tracking not enabled for: " + projectId);
 		  }
 		  
+		  ForumPost forumPost = new ForumPost(domain, newWavelet);
+		  forumPost.setProjectId(projectId);
+		  forumPost.setBlipCount(0);
+		  forumPost.setDispayAtom(false);
+		  forumPostDao.save(forumPost);
+		 if(isSubmit){
+			 robot.submit(newWavelet, rpcUrl);
+		 }
 		return newWavelet;
 	}
 

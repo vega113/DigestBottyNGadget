@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension name="Views hit counter"
+	thumbnailUrl="http://lh3.ggpht.com/_tsWs83xehHE/TIvz10GA80I/AAAAAAAAFeM/gZpQWCuSe-I/views_counter_icon.png"
+	description="Displays views hit count - for waves that are tracked with the views tracker gadget.">
+	<author name="Yuri Zelikov" />
+	<menuHook location="toolbar" text="Add Views counter"
+		iconUrl="http://lh3.ggpht.com/_tsWs83xehHE/TIvz10GA80I/AAAAAAAAFeM/gZpQWCuSe-I/views_counter_icon.png">
+		<insertGadget url="http://digestbotty.appspot.com/viewhits.xml" />
+	</menuHook>
+</extension> 

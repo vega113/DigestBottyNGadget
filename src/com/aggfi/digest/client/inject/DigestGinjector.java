@@ -7,6 +7,7 @@ import com.aggfi.digest.client.ui.DigestAboutWidget;
 import com.aggfi.digest.client.ui.DigestAdminGeneralWidget;
 import com.aggfi.digest.client.ui.DigestAdminParticipantWidget;
 import com.aggfi.digest.client.ui.DigestTabPanel;
+import com.aggfi.digest.client.ui.DigestTrackerWidget;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
@@ -19,4 +20,5 @@ public interface DigestGinjector extends Ginjector {
 	DigestAdminGeneralWidget getDigestAdminGeneralWidget();
 	DigestAdminParticipantWidget getDigestAdminParticipantWidget();
 	AdsenseWidget getAdsenseWidget();
+	DigestTrackerWidget getDigestTrackerWidget();
 }

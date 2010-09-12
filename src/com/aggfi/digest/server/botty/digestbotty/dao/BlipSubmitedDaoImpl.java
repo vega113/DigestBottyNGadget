@@ -120,23 +120,23 @@ public class BlipSubmitedDaoImpl implements BlipSubmitedDao{
 		end.setMinutes(59);
 		end.setSeconds(59);
 		List<BlipSubmitted> entries = new ArrayList<BlipSubmitted>();
+		List<BlipSubmitted> entriesCopy = new ArrayList<BlipSubmitted>();
 		try {
 			Query query = pm.newQuery(BlipSubmitted.class);
 			//	      query.declareImports("import java.util.Date");
 			query.declareParameters("String projectId_, long start, long end");
 			String filters = "projectId == projectId_ && createdTime >= start && createdTime <= end";      
 			query.setFilter(filters);
-			entries = (List<BlipSubmitted>) query.execute(projectId, start.getTime(), end.getTime());      
-		} finally {
-			List<BlipSubmitted> entriesCopy = new ArrayList<BlipSubmitted>();
+			entries = (List<BlipSubmitted>) query.execute(projectId, start.getTime(), end.getTime());     
 			for(BlipSubmitted entry : entries){
 				entriesCopy.add(pm.detachCopy(entry));
 			}
-//			pm.detachCopyAll(entries);
+			pm.detachCopyAll(entries);
+		} finally {
 			
 			pm.close();
 		}
-		return entries;
+		return entriesCopy;
 	}
 }
 

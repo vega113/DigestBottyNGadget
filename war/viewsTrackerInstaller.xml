@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension name="Views tracker gadget"
+	thumbnailUrl="http://lh3.ggpht.com/_tsWs83xehHE/TIykFKku2JI/AAAAAAAAFeg/UctciqGXPQo/views_tracker_icon.png"
+	description="Add this gadget in order to track views. The views hits are displayed by Views counter gadget.">
+	<author name="Yuri Zelikov" />
+	<menuHook location="toolbar" text="Add Views tracker"
+		iconUrl="http://lh3.ggpht.com/_tsWs83xehHE/TIykFKku2JI/AAAAAAAAFeg/UctciqGXPQo/views_tracker_icon.png">
+		<insertGadget url="http://digestbotty.appspot.com/tracker.xml" />
+	</menuHook>
+</extension> 

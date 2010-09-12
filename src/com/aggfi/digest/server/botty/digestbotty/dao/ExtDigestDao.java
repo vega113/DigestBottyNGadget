@@ -12,4 +12,5 @@ public interface ExtDigestDao extends DigestDao {
 	List<ExtDigest> retrDigestsByOwnerId(String ownerId);
 	List<ExtDigest> retrDigestsByOwnerOrManagerId(String userId);
 	List<ExtDigest> retrAllDigests();
+	ExtDigest retrDigestById(String id);
 }

@@ -10,6 +10,12 @@
         <property name="created" direction="desc"/>
   </datastore-index>  
   
+  <datastore-index kind="ForumPost" ancestor="false">
+        <property name="id" direction="asc"/>
+        <property name="projectId" direction="asc"/>
+  </datastore-index>  
+  
+  
   <datastore-index kind="ForumPost" ancestor="false" source="auto">
         <property name="projectId" direction="asc"/>
         <property name="created" direction="asc"/>
@@ -40,6 +46,15 @@
         <property name="waveId" direction="asc"/>
         <property name="blipId" direction="asc"/>
          <property name="version" direction="desc"/>
+  </datastore-index> 
+  <datastore-index kind="TrackerEvent" ancestor="false" source="auto">
+   		 <property name="projectId" direction="asc"/>
+        <property name="created" direction="desc"/>
+  </datastore-index> 
+  <datastore-index kind="TrackerEvent" ancestor="false" source="auto">
+   		 <property name="projectId" direction="asc"/>
+        <property name="created" direction="desc"/>
+         <property name="sourceId" direction="desc"/>
   </datastore-index> 
   
   <datastore-index kind="Tag" ancestor="false" source="auto">

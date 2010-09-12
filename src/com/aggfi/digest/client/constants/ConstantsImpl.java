@@ -15,12 +15,23 @@ import com.google.gwt.i18n.client.Constants.DefaultStringValue;
 public interface ConstantsImpl extends Constants {
 
 
+	String postsByViews14Days();
+	String viewsCountLast14Days();
+	
+	//-------------------------------------
+	String newWavesLast14Days();
+	String breakDown4AllTags();
+	String reportTabStr();
+	String noForumSelectedWarning();
+	String selectReportTypeStr();
+	String selectDigestStr();
+	String newBlipsLast14Days();
+	String activeContributors14Days();
+	String influenceContributors14Days();
+	String postsByActivity14Days();
 	
 	
-	
-	
-	
-	@DefaultStringValue(value="aggfiwave")
+	@DefaultStringValue(value="digestbotty")
 	String appDomain();
 	//urls
 	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252BVIL2ZrZkBSb")
@@ -62,17 +73,7 @@ public interface ConstantsImpl extends Constants {
 	@DefaultStringValue(value="UA-13269470-4")
 	String ANALYTICS_ID();
 	
-	//-------------------------------------
-	String newWavesLast14Days();
-	String breakDown4AllTags();
-	String reportTabStr();
-	String noForumSelectedWarning();
-	String selectReportTypeStr();
-	String selectDigestStr();
-	String newBlipsLast14Days();
-	String activeContributors14Days();
-	String influenceContributors14Days();
-	String postsByActivity14Days();
+	
 	
 	
 	

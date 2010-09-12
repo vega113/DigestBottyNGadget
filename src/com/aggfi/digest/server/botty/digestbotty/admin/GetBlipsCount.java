@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +16,7 @@ import com.vegalabs.general.server.command.Command;
 import com.google.inject.Inject;
 
 public class GetBlipsCount extends Command {
+	Logger LOG  = Logger.getLogger(GetBlipsCount.class.getName());
   private static final int ONE_DAY = 60 * 60 * 24 * 1000;
   
   private BlipSubmitedDao blipSubmitedDao = null;
@@ -27,6 +30,7 @@ public class GetBlipsCount extends Command {
 
   @Override
   public JSONObject execute() throws JSONException {    
+	  LOG.entering(this.getClass().getName(), "execute", toString());
     String projectId = this.getParam("projectId");
     if (util.isNullOrEmpty(projectId)) {
       throw new IllegalArgumentException("Missing required param: id");

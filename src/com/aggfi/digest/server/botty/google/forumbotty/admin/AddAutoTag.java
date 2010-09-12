@@ -72,10 +72,13 @@ public class AddAutoTag extends Command {
 				  boolean isTagApplied = false;
 				  try{
 					  wavelet = robot.fetchWavelet( new WaveId(entry.getDomain(), entry.getWaveId()), new WaveletId(entry.getDomain(), "conv+root"), entry.getProjectId(),  robot.getRpcServerUrl());
+					  if(wavelet == null){
+						  LOG.log(Level.WARNING,"wavelet is null.");
+					  }
 		    		}catch (IOException e) {
-		    			LOG.log(Level.FINER,"can happen if the robot was removed manually from the wave.",e);
+		    			LOG.log(Level.WARNING,"can happen if the robot was removed manually from the wave.",e);
 		    		}
-				  if(!wavelet.getTags().contains(tag)){
+				  if(wavelet.getTags().size() == 0 || !wavelet.getTags().contains(tag)){
 					  Map<String,Blip> blips = wavelet.getBlips();
 					  for(String blipKey : blips.keySet()){
 						  isTagApplied = robot.applyAutoTag(blips.get(blipKey), projectId, tag);

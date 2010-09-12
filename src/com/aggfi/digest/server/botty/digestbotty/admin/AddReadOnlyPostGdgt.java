@@ -17,6 +17,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.inject.Inject;
+import com.google.wave.api.Blip;
 import com.google.wave.api.Gadget;
 import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
@@ -38,6 +39,7 @@ public class AddReadOnlyPostGdgt extends Command {
 
 	  @Override
 	  public JSONObject execute() throws JSONException {
+		  LOG.entering(this.getClass().getName(), "execute", toString());
 	    String projectId = this.getParam("projectId");
 	    if (util.isNullOrEmpty(projectId)) {
 	      throw new IllegalArgumentException("Missing required param: projectId");
@@ -69,17 +71,18 @@ public class AddReadOnlyPostGdgt extends Command {
 		
 		ForumPost entry = robot.addOrUpdateDigestWave(projectId, newWavelet, newWavelet.getRootBlip(), userId);
 		String projectName = extDigestDao.retrDigestsByProjectId(projectId).get(0).getName();
-		String gadgetUrl = System.getProperty("READONLYPOST_GADGET_URL");
-		Gadget gadget = null;
-		gadget = new Gadget(gadgetUrl);
-		gadget.setProperty("projectId", projectId);
-		gadget.setProperty("projectName", projectName);
-		newWavelet.getRootBlip().append(gadget);
+		appendNewPostGadget(projectId, newWavelet.getRootBlip(), projectName);
 		 if( adminConfig.isAdsEnabled()){
 			  robot.appendAd2Blip(newWavelet.getRootBlip(),newWavelet.getRootBlip().getBlipId(), projectId, false);
 		  }
 		  robot.addBack2Digest2RootBlip(projectId, newWavelet.getRootBlip(), entry);
 		
+		  if(adminConfig.isViewsTrackingEnabled()){
+			  robot.appendViewsTrackingGadget(newWavelet.getRootBlip(), projectId);
+		  }else{
+			  LOG.warning("views tracking not enabled for: " + projectId);
+		  }
+		  
 		try {
 			robot.submit(newWavelet, robot.getRpcServerUrl());
 		} catch (IOException e) {
@@ -89,4 +92,15 @@ public class AddReadOnlyPostGdgt extends Command {
 	    json.put("success", "true");
 	    return json;
 	  }
+
+	public static void appendNewPostGadget(String projectId, Blip blip, String projectName) {
+		LOG.info("Appneding new post gadget: " + projectId);
+		String gadgetUrl = System.getProperty("READONLYPOST_GADGET_URL");
+		Gadget gadget = null;
+		gadget = new Gadget(gadgetUrl);
+		gadget.setProperty("projectId", projectId);
+		gadget.setProperty("projectName", projectName);
+		blip.append("\n");
+		blip.append(gadget);
+	}
 }

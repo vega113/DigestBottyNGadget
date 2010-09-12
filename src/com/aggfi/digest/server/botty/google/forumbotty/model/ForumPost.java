@@ -1,10 +1,14 @@
 package com.aggfi.digest.server.botty.google.forumbotty.model;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -18,7 +22,12 @@ import com.google.wave.api.Wavelet;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class ForumPost {
+	
+  @SuppressWarnings("unused")
   @PrimaryKey
+  @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+  private Long primaryKey;
+	
   @Persistent
   @Expose
   private String id = null;
@@ -64,12 +73,16 @@ public class ForumPost {
   @Persistent
   @Expose
   private Text firstBlipContent = null;
+  @Persistent
+  @Expose
+  private Boolean isDispayAtom;
   
 
   public ForumPost(String domain, Wavelet wavelet) {
     this.domain = wavelet.getWaveId().getDomain();
     this.waveId = wavelet.getWaveId().getId();
-    this.id = domain + "!" + wavelet.getWaveId().getId();
+    this.id =  UUID.randomUUID().toString();
+    this.primaryKey = new Long ((long)((Math.random() +1  * 10000) * (Math.random() + 1)));
     List<String> contributors = wavelet.getRootBlip().getContributors();
     String creator = null;
     for(String contributor : contributors){
@@ -84,8 +97,12 @@ public class ForumPost {
     this.created = new Date();
     this.title = wavelet.getTitle();
     this.blipCount = wavelet.getBlips().size();
-    String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
+    String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest#" + projectId;
+	String backtodigestAnnotationNameOld = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest";
     List<Annotation> annonList = wavelet.getRootBlip().getAnnotations().get(backtodigestAnnotationName);
+    if(annonList == null || annonList.size() == 0){
+    	annonList =  wavelet.getRootBlip().getAnnotations().get(backtodigestAnnotationNameOld);
+    }
     Range range = null;
     if(annonList != null && annonList.size() > 0){
     	range = annonList.get(0).getRange();
@@ -93,10 +110,11 @@ public class ForumPost {
     }else{
     	this.firstBlipContent = new Text(wavelet.getRootBlip().getContent()); 
     }
+    this.isDispayAtom = true;
   }
 
   public String getId() {
-    return id;
+    return domain + "!" + waveId;
   }
 
   public String getWaveId() {
@@ -170,15 +188,6 @@ public class ForumPost {
   }
 
 
-@Override
-public String toString() {
-	return "ForumPost [blipCount=" + blipCount + ", contributors="
-			+ contributors + ", created=" + created + ", creator=" + creator
-			+ ", digestBlipId=" + digestBlipId + ", domain=" + domain + ", id="
-			+ id + ", lastUpdated=" + lastUpdated + ", projectId=" + projectId
-			+ ", tags=" + tags + ", title=" + title + ", updater=" + updater
-			+ ", waveId=" + waveId + "]";
-}
 
 public String getUpdater() {
 	return updater;
@@ -215,4 +224,82 @@ public void setRootBlipsWithoutAdCount(int rootBlipsWithoutAdCount) {
 public void setCreator(String creator) {
 	this.creator = creator;
 }
+
+public Boolean isDispayAtom() {
+	return isDispayAtom != null ? isDispayAtom : true;
+}
+
+public void setDispayAtom(Boolean isDispayAtom) {
+	this.isDispayAtom = isDispayAtom;
+}
+
+public Long getPrimaryKey() {
+	return primaryKey;
+}
+
+public void setPrimaryKey(Long primaryKey) {
+	this.primaryKey = primaryKey;
+}
+
+public void setId(String id) {
+	this.id = id;
+}
+
+@Override
+public String toString() {
+	final int maxLen = 10;
+	StringBuilder builder = new StringBuilder();
+	builder.append("ForumPost [primaryKey=");
+	builder.append(primaryKey);
+	builder.append(", id=");
+	builder.append(id);
+	builder.append(", domain=");
+	builder.append(domain);
+	builder.append(", waveId=");
+	builder.append(waveId);
+	builder.append(", projectId=");
+	builder.append(projectId);
+	builder.append(", digestBlipId=");
+	builder.append(digestBlipId);
+	builder.append(", creator=");
+	builder.append(creator);
+	builder.append(", updater=");
+	builder.append(updater);
+	builder.append(", lastUpdated=");
+	builder.append(lastUpdated);
+	builder.append(", created=");
+	builder.append(created);
+	builder.append(", rootBlipsWithoutAdCount=");
+	builder.append(rootBlipsWithoutAdCount);
+	builder.append(", tags=");
+	builder.append(tags != null ? toString(tags, maxLen) : null);
+	builder.append(", contributors=");
+	builder.append(contributors != null ? toString(contributors, maxLen) : null);
+	builder.append(", title=");
+	builder.append(title);
+	builder.append(", blipCount=");
+	builder.append(blipCount);
+	builder.append(", firstBlipContent=");
+	builder.append(firstBlipContent);
+	builder.append(", isDispayAtom=");
+	builder.append(isDispayAtom);
+	builder.append("]");
+	return builder.toString();
+}
+
+private String toString(Collection<?> collection, int maxLen) {
+	StringBuilder builder = new StringBuilder();
+	builder.append("[");
+	int i = 0;
+	for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+			&& i < maxLen; i++) {
+		if (i > 0)
+			builder.append(", ");
+		builder.append(iterator.next());
+	}
+	builder.append("]");
+	return builder.toString();
+}
+
+
 }

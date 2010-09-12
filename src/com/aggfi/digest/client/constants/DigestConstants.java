@@ -12,6 +12,18 @@ import com.google.gwt.i18n.client.Constants.DefaultIntValue;
  * explicit binding: Gin will internallt call GWT.create on the requested type.
  */
 public interface DigestConstants extends Constants {
+	
+	String createBtnStr();
+	String viewsCounterInstallerExpl();
+	String createViewsCounterInstallerQuestionStr();
+	String submitStr();
+	String submitAdSenseBtnExpl();
+	String createAdInstallerExpl();
+	String createAdInstallerStr();
+	String enableBtnName();
+	String trackViewsExpl();
+	String trackViewsQuestionStr();
+	String trackerSettingsStr();
 
 	String createTabStr();
 	String adminTabStr();
@@ -231,7 +243,7 @@ public interface DigestConstants extends Constants {
 	
 	String loadingVisualizationsApiStr();
 	
-	@DefaultStringValue(value="aggfiwave") //Change it when switching domains
+	@DefaultStringValue(value="digestbotty") //Change it when switching domains
 	String appDomain();
 	//urls
 	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252B0R06HrZkBhE%252F")
