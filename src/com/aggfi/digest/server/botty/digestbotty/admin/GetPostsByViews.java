@@ -39,6 +39,7 @@ public class GetPostsByViews extends Command {
 
   @Override
   public JSONObject execute() throws JSONException {    
+	 LOG.info("GetPostsByViews: " + toString());
     String projectId = this.getParam("projectId");
     if (util.isNullOrEmpty(projectId)) {
       throw new IllegalArgumentException("Missing required param: id");
@@ -93,6 +94,11 @@ public class GetPostsByViews extends Command {
     		post = forumPostDao.getForumPost(trackerEvent.getWaveId());
     	}catch(Exception e){
     		LOG.log(Level.SEVERE,"there's views for wave without ForumPost : " + trackerEvent.toString() ,e);
+    	}
+    	if(post == null){
+    		LOG.log(Level.SEVERE,"no post for waveId: " + trackerEvent.getWaveId() + " from: " + trackerEvent.toString());
+    		//if post created with new post gadget - but wasnt updated by - o forumPost exist for it (yet)
+    		continue;
     	}
     	  JSONObject entry = new JSONObject();
     	    try {

@@ -11,7 +11,9 @@ import org.json.JSONObject;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
 import com.vegalabs.general.server.rpc.util.Util;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
+import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
+import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
 import com.google.inject.Inject;
 import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
@@ -65,6 +67,8 @@ public class CreateNewPost extends Command {
 			}
 		}
 		newWavelet.getRootBlip().append("\n" + userId + " - Please enter the post content.");
+		newWavelet.getDataDocuments().set(System.getProperty("APP_DOMAIN") + ".appspot.com/creator", userId);
+		
 		
 		try {
 			robot.submit(newWavelet, robot.getRpcServerUrl());

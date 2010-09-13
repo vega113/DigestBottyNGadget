@@ -56,6 +56,9 @@ public class ForumPost {
   @Persistent
   @Expose
   private Integer rootBlipsWithoutAdCount = 0;
+  @Persistent
+  @Expose
+  private Boolean isCreatedByRobot;
   
 
 @Persistent
@@ -82,17 +85,32 @@ public class ForumPost {
     this.domain = wavelet.getWaveId().getDomain();
     this.waveId = wavelet.getWaveId().getId();
     this.id =  UUID.randomUUID().toString();
-    this.primaryKey = new Long ((long)((Math.random() +1  * 10000) * (Math.random() + 1)));
-    List<String> contributors = wavelet.getRootBlip().getContributors();
-    String creator = null;
-    for(String contributor : contributors){
-    	//the first modifier besides rusty@a.gwave.com is probably the creator
-    	if(contributor.indexOf("gwave.com") < 0 && contributor.indexOf("appspot.com") < 0){
-    		creator = contributor;
-    		break;
-    	}
+    this.primaryKey = System.currentTimeMillis();
+    
+  //handle the case when created with new post gadget
+    
+    
+    if(wavelet.getRootBlip().getCreator() == null || wavelet.getRootBlip().getCreator().indexOf("gwave.com") > 0 || wavelet.getRootBlip().getCreator().indexOf("appspot.com") > 0){
+    	this.isCreatedByRobot = true;
+    }else{
+    	this.isCreatedByRobot = false;
+    	this.creator = wavelet.getRootBlip().getCreator();
     }
-    this.creator = creator;
+    
+   if(isCreatedByRobot){
+	   if(wavelet.getDataDocuments().contains("creator")){
+			this.setCreator(wavelet.getDataDocuments().get(System.getProperty("APP_DOMAIN") + ".appspot.com/creator")); 
+		}else{
+			List<String> contributors = wavelet.getRootBlip().getContributors();
+			for(String contributor : contributors){
+				if(contributor.indexOf("gwave.com") < 0 && contributor.indexOf("appspot.com") < 0){
+					this.setCreator(contributor);
+					break;
+				}
+			}
+		}
+   }
+    
     this.lastUpdated = new Date();
     this.created = new Date();
     this.title = wavelet.getTitle();
@@ -279,8 +297,8 @@ public String toString() {
 	builder.append(title);
 	builder.append(", blipCount=");
 	builder.append(blipCount);
-	builder.append(", firstBlipContent=");
-	builder.append(firstBlipContent);
+//	builder.append(", firstBlipContent=");
+//	builder.append(firstBlipContent);
 	builder.append(", isDispayAtom=");
 	builder.append(isDispayAtom);
 	builder.append("]");
@@ -299,6 +317,14 @@ private String toString(Collection<?> collection, int maxLen) {
 	}
 	builder.append("]");
 	return builder.toString();
+}
+
+public Boolean isCreatedByRobot() {
+	return isCreatedByRobot;
+}
+
+public void setCreatedByRobot(Boolean isCreatedByRobot) {
+	this.isCreatedByRobot = isCreatedByRobot;
 }
 
 

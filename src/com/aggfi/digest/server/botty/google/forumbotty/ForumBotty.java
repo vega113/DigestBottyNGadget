@@ -37,6 +37,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
 import com.aggfi.digest.server.botty.google.forumbotty.model.AdminConfig;
 import com.aggfi.digest.server.botty.google.forumbotty.model.ForumPost;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -312,6 +313,14 @@ protected void submitWavelet(Wavelet wavelet) {
 	  }
 }
 
+/**
+ * Returns forum entry for the wavelet that contains the submitted blip - new or existing
+ * @param projectId
+ * @param wavelet
+ * @param blip
+ * @param modifiedBy
+ * @return
+ */
 public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip blip, String modifiedBy) {
 	LOG.log(Level.INFO, "adding to digest: project id: " + projectId);
 	ForumPost entry = forumPostDao.getForumPost (wavelet.getDomain(), wavelet.getWaveId().getId());
@@ -324,6 +333,9 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		if(modifiedBy != null){
 			entry.setUpdater(modifiedBy);
 			entry.setBlipCount(entry.getBlipCount()+1);
+			if(entry.getCreator() == null){
+				entry.setCreator(modifiedBy);
+			}
 		}
 		
 		// Existing wavelet in datastore
@@ -332,6 +344,8 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		applyAutoTags(blip, projectId);
 		entry = forumPostDao.syncTags(projectId, entry, wavelet);
 //		updateEntryInDigestWave(entry); //TODO - maybe I need to create a different "hot and noisy" wave
+		
+		
 		forumPostDao.save(entry);
 	} else {
 		LOG.info( " event.proxy: " + projectId);
@@ -353,7 +367,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		for(String key : keys){
 			Blip blip2Import = blips2Import.get(key);
 			//save all blips
-			saveBlipSubmitted(blip2Import.getCreator(), blip2Import, projectId);
+			saveBlipSubmitted(blip2Import.getCreator(), blip2Import, projectId, entry.isDispayAtom());
 		}
 	}
 	
@@ -424,7 +438,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
     ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
 
   //here is the place to save blipSubmitted
-    saveBlipSubmitted(event.getModifiedBy(), event.getBlip(), projectId);
+    saveBlipSubmitted(event.getModifiedBy(), event.getBlip(), projectId, entry.isDispayAtom());
     
     //check if there's link to Digest Wave in the Root Blip, if one missing add it with annotation.
 	  if(wavelet.getRootBlip() != null){
@@ -498,7 +512,7 @@ public String makeBackStr(String forumName) {
 	return back2digestWaveStr;
 }
 
-private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
+private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boolean isPublic) {
 	try{
 			
 		    String creator = blip.getCreator();
@@ -515,6 +529,9 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId) {
 			BlipSubmitedDao blipSubmitedDao = injector.getInstance(BlipSubmitedDao.class);
 			BlipSubmitted blipSubmitted = null;
 			blipSubmitted = new BlipSubmitted(creator, replytoCreator, modifier, contributors, replytoContributors, version, blipId, parentBlipId, waveletId, waveId, projectId, blipLength, createdTime, null, null);
+			if(isPublic){
+				blipSubmitted.setBlipContent(new Text(blip.getContent()));
+			}
 			blipSubmitedDao.save(blipSubmitted);
 	   }catch(Exception e){
 		   LOG.warning(e.getMessage());
@@ -697,10 +714,10 @@ private boolean isButtonExists(String imgUrl, Blip blip) {
 	LOG.info("isButtonExists: " + imgUrl + ", blipId: " + blip.getBlipId());
 	//check if blip already contains the add gadget. 
 	BlipContentRefs imageRef = blip.first(ElementType.IMAGE ,Gadget.restrictByUrl(imgUrl));
-	if(imageRef == null || Image.class.cast(imageRef.value()) == null){
-		return true;
+	if(imageRef.value() == null){
+		return false;
 	}
-	return false;
+	return true;
 }
 
 private void updateEntryInDigestWave(ForumPost entry) {

@@ -53,7 +53,7 @@
 	function init() {
 		if (wave && wave.isInWaveContainer()) {
 			setTimeout("afterInit()",1500);
-			setInterval("afterInit()",20000);
+			setInterval("afterInit()",30000);
 			try{
 				document.getElementById("content_div").innerHTML = "<img src='http://lh3.ggpht.com/_tsWs83xehHE/TI0DEIKdbXI/AAAAAAAAFe0/_qvd_O06Qt4/spinner.1.gif'></img>" ;
 			}catch(e){}

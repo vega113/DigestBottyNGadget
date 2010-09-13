@@ -9,6 +9,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import com.google.appengine.api.datastore.Text;
 import com.google.gson.annotations.Expose;
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class BlipSubmitted{
@@ -72,6 +73,9 @@ public class BlipSubmitted{
 	@Persistent
 	@Expose
 	private Date lastUpdated;
+	@Persistent
+	@Expose
+	Text blipContent;
 
 	@Persistent
 	@Expose
@@ -246,6 +250,12 @@ public class BlipSubmitted{
 				Math.min(properties2.size(), maxLen)) : null);
 		builder.append("]");
 		return builder.toString();
+	}
+	public Text getBlipContent() {
+		return blipContent;
+	}
+	public void setBlipContent(Text blipContent) {
+		this.blipContent = blipContent;
 	}
 	
 }

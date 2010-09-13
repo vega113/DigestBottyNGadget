@@ -285,13 +285,6 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
 	    	  entries4Ret.add(pm.detachCopy(p));
 	      }
 	      
-	      StringBuilder sb = new StringBuilder();
-	      sb.append("In getForumPostsFromDate: \n");
-	      for(ForumPost p : entries){
-	    	  sb.append(p.toString() + ", ");
-	      }
-	      LOG.info(sb.toString());
-	      
 	    } finally {
 	      pm.close();
 	    }
