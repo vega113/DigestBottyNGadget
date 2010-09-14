@@ -39,7 +39,7 @@ public class ForumPostDaoImpl implements ForumPostDao {
     		entry.setPrimaryKey(primaryKey);
     	}
     	String uuid = null;
-    	if(entry.getId() == null){
+    	if(entry.getRealId() == null){
     		uuid = UUID.randomUUID().toString();
     		entry.setId(uuid);
     	}

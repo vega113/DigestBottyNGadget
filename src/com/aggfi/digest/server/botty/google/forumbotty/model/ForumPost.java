@@ -327,5 +327,9 @@ public void setCreatedByRobot(Boolean isCreatedByRobot) {
 	this.isCreatedByRobot = isCreatedByRobot;
 }
 
+public Object getRealId() {
+	return id;
+}
+
 
 }

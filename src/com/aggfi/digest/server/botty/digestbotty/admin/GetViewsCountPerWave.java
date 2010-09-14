@@ -64,13 +64,13 @@ public class GetViewsCountPerWave extends Command {
 		  result.put("count", count);
 		  result.put("waveId", waveId);
 
-		  LOG.info("GetViewsCountPerWave output: " + ", " + result.toString());
+		  LOG.info("GetViewsCountPerWave output cache: " + ", " + result.toString());
 	  }else{
 		  List<TrackerEvent> trackerEventsList = trackerEventDao.getTrackerEventsByWaveId(waveId);
 		  result.put("count", trackerEventsList.size());
 		  result.put("waveId", waveId);
-		  LOG.info("GetViewsCountPerWave output: " + ", " + result.toString());
-		  cache.put(GetViewsCountPerWave.class.getName() + waveId,trackerEventsList.size());
+		  LOG.info("GetViewsCountPerWave output DB: " + ", " + result.toString());
+		  cache.put(ReportPostView.class.getName() + waveId,trackerEventsList.size());
 	  }
 	  json.put("result", result);
 	  return json;   

@@ -73,24 +73,36 @@ public class ReportPostView extends Command {
 	    }
 	    
 	    if("none".equals(projectId) ||  util.isNullOrEmpty(projectId)){
-	    	ForumPost forumPost = null;
-	    	try{
-	    		forumPost = forumPostDao.getForumPost(waveId);
-	    	}catch(Exception e){
-	    		LOG.warning("Cannot find wave with id: " + waveId + ", " + e.getMessage());
-	    	}
-	    	if(forumPost != null){
-	    		projectId = forumPost.getProjectId();
+	    	Object prjObj = cache.get(ReportPostView.class.getName() + "/projectId/" + waveId);
+	    	if(prjObj != null){
+	    		projectId = (String)prjObj;
+	    		cache.put(ReportPostView.class.getName() + "/projectId/" + waveId, projectId);
+	    		LOG.info("taking projectId from cache: " + projectId + " for waveId: " + waveId);
 	    	}else{
-	    		ExtDigest extDigest = null;
-	    		try{
-	    			extDigest = extDigestDao.retrDigestById(waveId);
-	    		}catch(Exception e){
-	    			if(extDigest != null){
-	    				projectId = extDigest.getProjectId();
-	    			}
-	    		}
+	    		ForumPost forumPost = null;
+		    	try{
+		    		forumPost = forumPostDao.getForumPost(waveId);
+		    	}catch(Exception e){
+		    		LOG.warning("Cannot find wave with id: " + waveId + ", " + e.getMessage());
+		    	}
+		    	if(forumPost != null){
+		    		projectId = forumPost.getProjectId();
+		    	}else{
+		    		ExtDigest extDigest = null;
+		    		try{
+		    			extDigest = extDigestDao.retrDigestById(waveId);
+		    		}catch(Exception e){
+		    			if(extDigest != null){
+		    				projectId = extDigest.getProjectId();
+		    			}
+		    		}
+		    	}
+		    	if(projectId != null){
+		    		cache.put(ReportPostView.class.getName() + "/projectId/" + waveId, projectId);
+		    		LOG.info("taking projectId from DB: " + projectId + " for waveId: " + waveId);
+		    	}
 	    	}
+	    	
 	    	
 	    }
 	    

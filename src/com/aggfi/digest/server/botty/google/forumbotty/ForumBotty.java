@@ -902,37 +902,37 @@ private void updateEntryInDigestWave(ForumPost entry) {
 	  LOG.severe(event.getMessage());
   }
 
-  @Override
-  @Capability(contexts = {Context.SELF})
-  public void onGadgetStateChanged(GadgetStateChangedEvent e) {
-	  LOG.log(Level.INFO, "entering OnGadgetStateChanged: ");
-	// If this is from the "*-digest" proxy, skip processing.
-	  boolean isDigestAdmin = isDigestAdmin(e.getBundle().getProxyingFor());
-	  String[] gadgetUrls = createGadgetUrlsArr();
-	  JSONObject json = new JSONObject();
-	  Blip blip = e.getBlip();
-	  Gadget gadget = null;
-	  
-	  
-//	  if (!isDigestAdmin) {
-//	      LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " return!");
-//	      return; //only gadget proxy allowed to react
-//	    }else{
-//	    	LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
-//	    }
-	  LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
-	  int i = 0;
-	  String gadgetUrl = null;
-	  while(gadget == null && i < gadgetUrls.length){
-		  gadgetUrl = gadgetUrls[i];
-		  gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
-		  if(gadget!=null){
-			  handleGadgetRequest(e, json, blip, gadget);
-		  }
-		  i++;
-	  }
-	  
-  }
+//  @Override
+//  @Capability(contexts = {Context.SELF})
+//  public void onGadgetStateChanged(GadgetStateChangedEvent e) {
+//	  LOG.log(Level.INFO, "entering OnGadgetStateChanged: ");
+//	// If this is from the "*-digest" proxy, skip processing.
+//	  boolean isDigestAdmin = isDigestAdmin(e.getBundle().getProxyingFor());
+//	  String[] gadgetUrls = createGadgetUrlsArr();
+//	  JSONObject json = new JSONObject();
+//	  Blip blip = e.getBlip();
+//	  Gadget gadget = null;
+//	  
+//	  
+////	  if (!isDigestAdmin) {
+////	      LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " return!");
+////	      return; //only gadget proxy allowed to react
+////	    }else{
+////	    	LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
+////	    }
+//	  LOG.info("onGadgetStateChanged: "  + e.getBundle().getProxyingFor() + " process!");
+//	  int i = 0;
+//	  String gadgetUrl = null;
+//	  while(gadget == null && i < gadgetUrls.length){
+//		  gadgetUrl = gadgetUrls[i];
+//		  gadget = Gadget.class.cast(blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl)).value());
+//		  if(gadget!=null){
+//			  handleGadgetRequest(e, json, blip, gadget);
+//		  }
+//		  i++;
+//	  }
+//	  
+//  }
 
 public void handleGadgetRequest(GadgetStateChangedEvent e, JSONObject json,
 		Blip blip, Gadget gadget) {
