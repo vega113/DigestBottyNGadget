@@ -23,8 +23,8 @@ import com.google.wave.api.Wavelet;
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 public class ForumPost {
 	
-  @SuppressWarnings("unused")
-  @PrimaryKey
+	@Expose
+	@PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
   private Long primaryKey;
 	
@@ -40,6 +40,7 @@ public class ForumPost {
   @Persistent
   @Expose
   private String projectId = null;
+  @Persistent
   @Expose
   private String digestBlipId = null;
   @Persistent

@@ -56,6 +56,7 @@ import com.google.wave.api.Gadget;
 import com.google.wave.api.Image;
 import com.google.wave.api.JsonRpcResponse;
 import com.google.wave.api.ParticipantProfile;
+import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
 import com.google.wave.api.JsonRpcConstant.ParamsProperty;
 import com.google.wave.api.event.AbstractEvent;
@@ -182,25 +183,28 @@ private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
   public void onWaveletSelfAdded(WaveletSelfAddedEvent event) {
 	  LOG.log(Level.INFO, "onWaveletSelfAdded:" + event.toString());
 
-	  String projectId = getCurrentProjectId(event);
-	  String proxyFor = event.getBundle().getProxyingFor();
-	  Wavelet wavelet = event.getWavelet();
-	  Blip blip = event.getBlip();
+	  Set<String> projectIds = findProjectIdsFromPaticipants(event.getWavelet().getParticipants());
+	  for(String projectId : projectIds){
+		  String proxyFor = event.getBundle().getProxyingFor();
+		  Wavelet wavelet = event.getWavelet();
+		  Blip blip = event.getBlip();
 
-	  try {
-		actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
-	} catch (IOException e) {
-		LOG.log(Level.SEVERE,"",e);
-	}
-	  
-	  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
-		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
-		  if( adminConfig.isAdsEnabled()){
-			  appendAd2Blip(wavelet.getRootBlip(),wavelet.getRootBlip().getBlipId(), projectId, false);
+		  try {
+			actOnBottyAdded(projectId, proxyFor, wavelet, blip,null);
+		} catch (IOException e) {
+			LOG.log(Level.SEVERE,"",e);
+		}
+		  
+		  if(!isDigestAdmin(proxyFor) && wavelet.getRootBlip() != null && wavelet.getRootBlip().getContent().length() > 2){
+			  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+			  if( adminConfig.isAdsEnabled()){
+				  appendAd2Blip(wavelet.getRootBlip(),wavelet.getRootBlip().getBlipId(), projectId, false);
+			  }
+			  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
+			  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
 		  }
-		  ForumPost entry = forumPostDao.getForumPost(wavelet.getWaveId().getDomain(), wavelet.getWaveId().getId());
-		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
 	  }
+	  
   }
 
 	public void appendAd2Blip(Blip blip, String blipId, String projectId, boolean isAdReplyBlip) {
@@ -242,7 +246,7 @@ protected void actOnBottyAdded(String projectId,
 	  }else{
 		  LOG.log(Level.INFO, "actOnBottyAdded: project id: " + projectId);
 	  }
-
+	  
 	  // If this is from the "*-digest" proxy, skip processing.
 	  if (isDigestWave(proxyFor)) {
 		  return;
@@ -323,7 +327,7 @@ protected void submitWavelet(Wavelet wavelet) {
  */
 public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip blip, String modifiedBy) {
 	LOG.log(Level.INFO, "adding to digest: project id: " + projectId);
-	ForumPost entry = forumPostDao.getForumPost (wavelet.getDomain(), wavelet.getWaveId().getId());
+	ForumPost entry = forumPostDao.getForumPost (wavelet.getDomain(), wavelet.getWaveId().getId(), projectId);
 	// Update contributor list if this is not robot or agent
 
 	if (entry != null && entry.getProjectId().equals(projectId)) {
@@ -382,7 +386,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
   @Override
   @Capability(contexts = {Context.ROOT, Context.SELF})
   public void onBlipSubmitted(BlipSubmittedEvent event) {
-	  LOG.warning("Entering onBlipSubmitted");
+	  LOG.fine("Entering onBlipSubmitted");
 	  if(event.getBlip() == null || event.getBlip().getContent() == null || event.getBlip().getContent().length()  < 2){
 		  LOG.log(Level.FINE, "The content is not worthy, slipping processing");
 		  return;
@@ -412,59 +416,92 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 
     Wavelet wavelet = event.getWavelet();
    
-
-    String projectId = getCurrentProjectId(event);
-    if (projectId == null) {
-      LOG.log(Level.SEVERE, "onBlipSubmitted:Missing proxy-for project id");
+    Set<String> projectIds = findProjectIdsFromPaticipants(event.getWavelet().getParticipants());
+    
+//    String projectId = getCurrentProjectId(event);
+    if (projectIds.size() == 0) {
+    	//cannot be - 
+    	//or blip submitted in digest wave
+    	
+      LOG.log(Level.WARNING, "onBlipSubmitted:Missing (if not digest proxy) proxy-for project id" + ", waveId: " + event.getWavelet().getWaveId().toString() + ", proxyFor: " + event.getBundle().getProxyingFor());
       return;
     }
     
-    if(event.getBlip().isRoot()){
-    	List<String> participants = this.adminConfigDao.getAdminConfig(projectId).getDefaultParticipants();
-		  if(participants.size() == 0){
-			  LOG.warning("participants.size() == 0");
-		  }
-		  for (String participant : participants) {
-			  if(!wavelet.getParticipants().contains(participant)){
-				  wavelet.getParticipants().add(participant);
-			  }
-		  }
-		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
-		  if(adminConfig.isViewsTrackingEnabled()){
-			  appendViewsTrackingGadget(wavelet.getRootBlip(), projectId);
-		  }
-    }
-    
-    ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
+    for(String projectId : projectIds){
+    	LOG.info("Working on projectId: " + projectId);
+    	if(event.getBlip().isRoot()){
+        	List<String> participants = this.adminConfigDao.getAdminConfig(projectId).getDefaultParticipants();
+    		  if(participants.size() == 0){
+    			  LOG.warning("participants.size() == 0");
+    		  }
+    		  for (String participant : participants) {
+    			  if(!wavelet.getParticipants().contains(participant)){
+    				  wavelet.getParticipants().add(participant);
+    			  }
+    		  }
+    		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+    		  if(adminConfig.isViewsTrackingEnabled()){
+    			  appendViewsTrackingGadget(wavelet.getRootBlip(), projectId);
+    		  }
+        }
+        
+        ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
 
-  //here is the place to save blipSubmitted
-    saveBlipSubmitted(event.getModifiedBy(), event.getBlip(), projectId, entry.isDispayAtom());
-    
-    //check if there's link to Digest Wave in the Root Blip, if one missing add it with annotation.
-	  if(wavelet.getRootBlip() != null){
-		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
-		  if( adminConfig.isAdsEnabled() && adminConfig.getAdsense() != null && !"".equals(adminConfig.getAdsense().getValue())){ //if forum not linked to adsense code - do not insert ad
-			  appendAd2Blip(wavelet.getRootBlip(),wavelet.getRootBlip().getBlipId(), projectId, false);
-			  if(entry.getRootBlipsWithoutAdCount() >= 5){ //XXX - should be configurable from admin gadget
-				  appendAd2Blip(event.getBlip(),event.getBlip().getBlipId(), projectId, true);
-				  entry.setRootBlipsWithoutAdCount(entry.getRootBlipsWithoutAdCount() - 5);
-			  }
-		  }
-		  if(event.getBlip().getParentBlipId() == null)
-			  entry.setRootBlipsWithoutAdCount(entry.getRootBlipsWithoutAdCount() +1);
-		  
-		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
-		  try{ 
-			  forumPostDao.save(entry);
-		  }catch(Exception e){
-			  LOG.log(Level.SEVERE,"",e);
-		  }
-	  }
+      //here is the place to save blipSubmitted
+        saveBlipSubmitted(event.getModifiedBy(), event.getBlip(), projectId, entry.isDispayAtom());
+        
+        //check if there's link to Digest Wave in the Root Blip, if one missing add it with annotation.
+    	  if(wavelet.getRootBlip() != null){
+    		  AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+    		  if( adminConfig.isAdsEnabled() && adminConfig.getAdsense() != null && !"".equals(adminConfig.getAdsense().getValue())){ //if forum not linked to adsense code - do not insert ad
+    			  appendAd2Blip(wavelet.getRootBlip(),wavelet.getRootBlip().getBlipId(), projectId, false);
+    			  if(entry.getRootBlipsWithoutAdCount() >= 5){ //XXX - should be configurable from admin gadget
+    				  appendAd2Blip(event.getBlip(),event.getBlip().getBlipId(), projectId, true);
+    				  entry.setRootBlipsWithoutAdCount(entry.getRootBlipsWithoutAdCount() - 5);
+    			  }
+    		  }
+    		  if(event.getBlip().getParentBlipId() == null)
+    			  entry.setRootBlipsWithoutAdCount(entry.getRootBlipsWithoutAdCount() +1);
+    		  
+    		  addBack2Digest2RootBlip(projectId, wavelet.getRootBlip(), entry);
+    		  try{ 
+    			  forumPostDao.save(entry);
+    		  }catch(Exception e){
+    			  LOG.log(Level.SEVERE,"",e);
+    		  }
+    	  }
+    }
 	  
    
   }
 
-  public void addBack2Digest2RootBlip(String projectId,
+  private Set<String> findProjectIdsFromPaticipants(Participants participants) {
+	  Set<String> projectIds = new LinkedHashSet<String>();
+	  Set<String> blackListIds = new LinkedHashSet<String>();
+	  String appDomain = System.getProperty("APP_DOMAIN");
+	  for(String participant : participants){
+		  if(participant.startsWith(appDomain + "+") && participant.endsWith("@appspot.com")){
+			  if(participant.contains("-digest")){
+				  String blackListId = participant.replace("-digest", "");
+				  blackListIds.add(blackListId);
+				  if(projectIds.contains(blackListId)){
+					  projectIds.remove(blackListId);
+				  }
+				  continue;//skip
+			  }
+			  if(blackListIds.contains(participant)){
+				  continue;
+			  }
+			  int start = participant.indexOf("+");
+			  int end = participant.indexOf("@");
+			  String projectId = participant.substring(start +1, end);
+			  projectIds.add(projectId);
+		  }
+	  }
+	return projectIds;
+}
+
+public void addBack2Digest2RootBlip(String projectId,
 			Blip rootBlip, ForumPost entry) {
 		Annotations annotations = rootBlip.getAnnotations();
 		  String backtodigestAnnotationName = System.getProperty("APP_DOMAIN") + ".appspot.com/backtodigest#" + projectId;
@@ -477,6 +514,9 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 				  rootBlip.append("  ");
 				  String forumName = digestsList.size() > 0 ? digestsList.get(0).getName() : "";
 				  String back2digestWaveStr = makeBackStr(forumName);
+				  if(rootBlip.getContent().indexOf(back2digestWaveStr) > 0){
+					  return;
+				  }
 				  LOG.fine("content: " + rootBlip.getContent());
 				  BlipContentRefs rootBlipRef = rootBlip.at(rootBlip.getContent().length());
 				  String blipRef = "waveid://" + digestsList.get(0).getDomain() + "/" + digestsList.get(0).getWaveId() + "/~/conv+root/" + entry.getDigestBlipId();
@@ -565,11 +605,12 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 		  digest = entries.get(0);
 		  String digestWaveDomain = digest.getDomain();
 		  String digestWaveId = digest.getWaveId();
-		  LOG.log(Level.FINER, "digestWaveDomain: " + digestWaveDomain + ", digestWaveId: " + digestWaveId);
 		  try{
 			  digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), entry.getProjectId() + "-digest",  getRpcServerUrl());
 		  }catch (IOException e) {
-			  LOG.log(Level.INFO,"can happen if the robot was removed manually from the wave.",e);
+			  LOG.log(Level.WARNING,"can happen if the robot was removed manually from the wave. proxyFor: " + entry.getProjectId() + "-digest",e);
+			  LOG.log(Level.WARNING, "digestWaveDomain: " + digestWaveDomain + ", digestWaveId: " + digestWaveId);
+			  return;
 		  }
 		  String entryTitle = entry.getTitle();
 		  Blip blip = null;
@@ -619,7 +660,7 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 			  LOG.log(Level.SEVERE, "Not Found new blip id: " + entry.toString() );
 		  }
 		  //now update digestWave forumPost
-		  ForumPost digestForumPost = forumPostDao.getForumPost(digest.getId());
+		  ForumPost digestForumPost = forumPostDao.getForumPost(digest.getDomain(),digest.getWaveId(),digest.getProjectId());
 		  if(digestForumPost != null){
 			  digestForumPost.setBlipCount(digestForumPost.getBlipCount() + 1);
 		  }

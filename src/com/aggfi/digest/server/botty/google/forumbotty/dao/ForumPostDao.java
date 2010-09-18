@@ -30,4 +30,6 @@ public interface ForumPostDao {
 
   public abstract ForumPost remove(ForumPost entry);
 
+  public abstract ForumPost getForumPost(String domain, String waveId, String projectId);
+
 }

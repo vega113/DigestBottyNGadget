@@ -35,7 +35,7 @@ public class ForumPostDaoImpl implements ForumPostDao {
     	LOG.info("Saving forumPost before: " + entry.toString());
     	Long primaryKey = null;
     	if(entry.getPrimaryKey() == 0){
-    		primaryKey = new Long ((long)((Math.random() +1  * 10000) * (Math.random() + 1)));
+    		primaryKey = System.currentTimeMillis();
     		entry.setPrimaryKey(primaryKey);
     	}
     	String uuid = null;
@@ -107,6 +107,9 @@ public class ForumPostDaoImpl implements ForumPostDao {
     String[] split = id.split("!");
     return getForumPost(split[0], split[1]);
   }
+  
+  
+  
 
 private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, int i) {
 	ForumPost entry;
@@ -135,6 +138,29 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
       String filters = "domain == domain_ && waveId == waveId_";
       query.setFilter(filters);
       List<ForumPost> entries = (List<ForumPost>) query.execute(domain, waveId);
+      entries = (List<ForumPost>) pm.detachCopyAll(entries);
+      if (entries.size() > 0) {
+    	  entry = prepare4Ret(pm, entries, 0);
+        return entry;
+      }
+    } finally {
+      pm.close();
+    }
+
+    return entry;
+  }
+  
+  @Override
+  public ForumPost getForumPost(String domain, String waveId, String projectId) {
+    PersistenceManager pm = pmf.getPersistenceManager();
+    ForumPost entry = null;
+
+    try {
+      Query query = pm.newQuery(ForumPost.class);
+      query.declareParameters("String domain_, String waveId_, String projectId_");
+      String filters = "domain == domain_ && waveId == waveId_ && projectId == projectId_";
+      query.setFilter(filters);
+      List<ForumPost> entries = (List<ForumPost>) query.execute(domain, waveId,projectId);
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
       if (entries.size() > 0) {
     	  entry = prepare4Ret(pm, entries, 0);

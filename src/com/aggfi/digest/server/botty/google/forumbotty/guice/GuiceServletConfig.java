@@ -22,6 +22,7 @@ import com.aggfi.digest.server.botty.digestbotty.dao.TrackerEventDaoImpl;
 import com.aggfi.digest.server.botty.digestbotty.servlets.ServeAdGadgetServlet;
 import com.aggfi.digest.server.botty.digestbotty.servlets.ServeAdInstallerServlet;
 import com.aggfi.digest.server.botty.digestbotty.servlets.ServeEmbedServlet;
+import com.aggfi.digest.server.botty.digestbotty.servlets.UpdateDigestTitle;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallGadgetServlet;
 import com.aggfi.digest.server.botty.digestbotty.install.InstallServlet;
 import com.aggfi.digest.server.botty.google.forumbotty.ForumBotty;
@@ -69,6 +70,9 @@ public class GuiceServletConfig extends GuiceServletContextListener {
         serve("/gadgetRPC").with(GadgetRPCServlet.class); 
         serve("/embed").with(ServeEmbedServlet.class); 
         serve("/serveAdInstaller").with(ServeAdInstallerServlet.class);
+        
+        serve("/updateTitle").with(UpdateDigestTitle.class);
+        
         
         
         

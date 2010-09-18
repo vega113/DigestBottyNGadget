@@ -91,7 +91,13 @@ public class GetPostsByViews extends Command {
     	  TrackerEvent trackerEvent = trackerEventsMap.get(key);
     	ForumPost post = null;
     	try{
-    		post = forumPostDao.getForumPost(trackerEvent.getWaveId());
+    		String domain = trackerEvent.getWaveId().split("!")[0];
+    		String id = trackerEvent.getWaveId().split("!")[1];
+    		if(projectId != null){
+    			post = forumPostDao.getForumPost(domain,id,projectId);
+    		}else{
+    			post = forumPostDao.getForumPost(domain,id);
+    		}
     	}catch(Exception e){
     		LOG.log(Level.SEVERE,"there's views for wave without ForumPost : " + trackerEvent.toString() ,e);
     	}
