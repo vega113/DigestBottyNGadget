@@ -42,6 +42,7 @@ import com.google.wave.api.impl.DocumentModifyAction.BundledAnnotation;
 
 public class CreateDigest extends Command {
 
+	public static final String DIGEST_WAVE_STR = "digest wave";
 	private Logger LOG = Logger.getLogger(CreateDigest.class.getName());
 	private Util util;
 	private ExtDigestDao extDigestDao;
@@ -470,7 +471,7 @@ public class CreateDigest extends Command {
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 		
 		int startPos = newWavelet.getRootBlip().getContent().length();
-		String titleStr = projectName  + " digest wave";
+		String titleStr = projectName  + " " + DIGEST_WAVE_STR;
 		newWavelet.setTitle(titleStr);
 		
 		newWavelet.getRootBlip().range(startPos,titleStr.length()+1).annotate("style/fontSize","2em").annotate("style/fontWeight","bold");

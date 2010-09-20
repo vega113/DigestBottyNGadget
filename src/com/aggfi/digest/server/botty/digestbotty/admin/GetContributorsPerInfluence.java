@@ -177,6 +177,9 @@ public class GetContributorsPerInfluence extends Command {
         StringBuilder sb = new StringBuilder();
         int counter = 0;
         for(BlipDataSortHelper blipDataSortHelper : blipDataSortHelperlist){
+        	if(blipDataSortHelper.getParticipantId().contains("@appspot.com")){
+        		continue;
+        	}
         	if(counter == 20)
         		break;
         	JSONObject entry = new JSONObject();

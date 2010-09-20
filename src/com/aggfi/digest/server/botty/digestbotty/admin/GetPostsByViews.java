@@ -111,6 +111,7 @@ public class GetPostsByViews extends Command {
     	      entry.put("title", post.getTitle());
     	      entry.put("count", uniqueWavesViews.get(key));
     	      entry.put("link", post.getId());
+    	      entry.put("isDigest", post.getId());
     	    } catch (JSONException e) {
     	    	LOG.log(Level.SEVERE,"",e);
     	    }
@@ -120,6 +121,9 @@ public class GetPostsByViews extends Command {
       Collections.sort(jsonsList, new TrackerEventComparator());
       
       for(JSONObject jsonObj : jsonsList ){
+    	  if(String.valueOf(jsonObj.get("title")).contains(CreateDigest.DIGEST_WAVE_STR)){ //XXX not good - cannot base assumption that the wave is digest just on title
+    		  continue;
+    	  }
     	  if(count == 20)
     		  break;
     	  jsonArray.put(jsonObj);
