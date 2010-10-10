@@ -1107,10 +1107,13 @@ protected String[] createGadgetUrlsArr() {
 		LOG.info("appendViewsTrackingGadget: " + projectId + ", blipId: " + blip.getBlipId());
 		//check if blip already contains the add gadget. 
 		BlipContentRefs gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
-		if(gadgetRef == null || Gadget.class.cast(gadgetRef.value()) == null){
+		Boolean isGadgetAlreadyAppended = (Boolean)cache.get("isTrackingGadgetAlreadyAppended#" + blip.getBlipId() + "#projectId#" + projectId);
+		isGadgetAlreadyAppended = isGadgetAlreadyAppended== null ? false : isGadgetAlreadyAppended;
+		if(!isGadgetAlreadyAppended && (gadgetRef == null || Gadget.class.cast(gadgetRef.value()) == null)){
 			Gadget gadget = null;
 			gadget = new Gadget(gadgetUrl);
 			blip.at(blip.getContent().length()).insert(gadget);
+			cache.put("isTrackingGadgetAlreadyAppended#" + blip.getBlipId() + "#projectId#" + projectId, Boolean.TRUE);
 			Map<String,String> out = new HashMap<String, String>();
 		    out.put("projectId", projectId);
 		    out.put("domain", "http://" + System.getProperty("APP_DOMAIN") + ".appspot.com");

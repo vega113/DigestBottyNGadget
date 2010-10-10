@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -33,12 +34,12 @@ public class InstallServlet extends HttpServlet{
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter writer = response.getWriter();
+		String projectId = request.getParameter("id");
 		try{
 			String domain = request.getServerName();
 			boolean isLocal = "localhost".equals(domain);
 			int index = domain.indexOf(".");
 			String appId = isLocal? "localhost" : domain.substring(0, index);
-			String projectId = request.getParameter("id");
 			
 			if (util.isNullOrEmpty(projectId) ) {
 			  throw new IllegalArgumentException("Missing required param: id (Digest id)");
@@ -70,7 +71,7 @@ public class InstallServlet extends HttpServlet{
 			String projectName = digest.getName(); //0
 		    String profileImageUrl = digest.getInstallerThumbnailUrl();//1
 			String projectDescription = digest.getDescription();//2
-			String version = "0.5";//3
+			String version = createVersion(digest.getProjectId());//3
 			String infoUrl = digest.getForumSiteUrl();//4
 			String authorName = digest.getAuthor();//5
 			String triggerText = "New " + digest.getName() + " Post"; //6
@@ -100,14 +101,24 @@ public class InstallServlet extends HttpServlet{
 			
 			MessageFormat fmt = new MessageFormat(extensionStr);
 			String out = fmt.format(args);
+			LOG.info("installer.xml for: " + projectId);
 			writer.print(out);
 			writer.flush();
 		}catch(Exception e){
 			writer.print(e.getMessage());
 			e.printStackTrace(writer);
 			writer.flush();
-			LOG.severe(e.toString() + "\n" + e.getMessage());
+			LOG.log(Level.SEVERE, projectId,e);
 		}
+	}
+
+	private String createVersion(String projectId) {
+		if("vega113-googlewave-mailwavybeta1".equals(projectId)){
+			return "0.6";
+		}else{
+			return "0.5";
+		}
+		
 	}
 }
 
