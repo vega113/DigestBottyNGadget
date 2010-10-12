@@ -6,15 +6,22 @@ import com.aggfi.digest.client.constants.DigestMessages;
 import com.aggfi.digest.client.inject.DigestGinjector;
 import com.aggfi.digest.client.resources.GlobalResources;
 import com.aggfi.digest.client.service.DigestService;
+import com.aggfi.digest.client.ui.DigestCreateWidget.ClearWarningClickHandler;
 import com.vegalabs.general.client.utils.VegaUtils;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
@@ -22,9 +29,16 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TabPanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.HTMLTable.ColumnFormatter;
 import com.google.inject.Inject;
 
 public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
@@ -61,6 +75,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 	DigestAdminParticipantWidget digestAdminParticipantWidget = null;
 	AdsenseWidget adSenseWidget = null;
 	DigestTrackerWidget trackerWidget = null;
+	ForumUpdateWidget forumUpdateWidget = null;
 	
 	
 	@Inject
@@ -108,6 +123,9 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 									digestAdminGeneralWidget.getDigestAdminGeneralCallback().onSuccess(result);
 									trackerWidget.getDigestTrackerCallback().onSuccess(result);
 									adminSettingsTabPnl.selectTab(0);
+									
+									
+									
 									boolean isAdsEnabled = result.isObject().get("isAdsEnabled").isBoolean().booleanValue();
 									if(isAdsEnabled && adminSettingsTabPnl.getWidgetIndex(adSenseWidget) < 0){
 										adminSettingsTabPnl.add(adSenseWidget, constants.adsenseTabStr());
@@ -211,6 +229,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 			digestAdminParticipantWidget = ginjector.getDigestAdminParticipantWidget();
 			adSenseWidget = ginjector.getAdsenseWidget();
 			trackerWidget = ginjector.getDigestTrackerWidget();
+			forumUpdateWidget = ginjector.getForumUpdateWidget();
 			
 			adminSettingsTabPnl.setAnimationEnabled(true);
 			initAdminTabsOnPrjChange();
@@ -218,6 +237,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 			adminSettingsTabPnl.add(digestAdminGeneralWidget, constants.generalSettingsStr());
 			
 			adminSettingsTabPnl.add(trackerWidget, constants.trackerSettingsStr());
+//			adminSettingsTabPnl.add(forumUpdateWidget, constants.forumSettingsStr());
 			
 			adSenseWidget.setImgExplTitle(constants.forumAdSenseExpl());
 			adminSettingsTabPnl.selectTab(0);
@@ -266,11 +286,6 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 //		}
 		
 	}
-	
-	
-	
-	
-	
 	
 	
 	public void digestAlert(IllegalArgumentException e) {

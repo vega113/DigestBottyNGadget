@@ -247,7 +247,7 @@ public class CreateDigest extends Command {
 		}
 		
 		int startPos = newWavelet.getRootBlip().getContent().length();
-		String titleStr = projectName  + " [Installer and FAQ]";
+		String titleStr = projectName  + " [Forum installer and FAQ]";
 		newWavelet.setTitle(titleStr);
 		newWavelet.getRootBlip().range(startPos,titleStr.length()+1).annotate("style/fontSize","2em").annotate("style/fontWeight","bold");
 		

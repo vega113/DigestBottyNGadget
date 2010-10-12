@@ -13,6 +13,7 @@ import com.google.gwt.i18n.client.Constants.DefaultIntValue;
  */
 public interface DigestConstants extends Constants {
 	
+	String forumSettingsStr();
 	String createBtnStr();
 	String viewsCounterInstallerExpl();
 	String createViewsCounterInstallerQuestionStr();

@@ -22,6 +22,13 @@ s1.parentNode.insertBefore(s, s1);
 };
 </script>
 
+<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="js/json2.js"></script>
+<script type="text/javascript" src="js/jsonrpc.js"></script>
+<link rel="stylesheet" href="http://dev.jquery.com/view/trunk/plugins/autocomplete/demo/main.css" type="text/css" />
+  <link rel="stylesheet" href="js/jquery.autocomplete.css" type="text/css" />
+  <script type="text/javascript" src="js/jquery.autocomplete.js"></script>
+
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
 <script type="text/javascript">
 	var waveIdToLoad = null;
@@ -68,7 +75,7 @@ s1.parentNode.insertBefore(s, s1);
     	  if(description != null && description != ""){
     		  var forumDescription = document.getElementById("forumDescription");
     		  forumDescription.style.display="inline";
-    		  forumDescription.innerHTML="<b>Forum description</b>: " + description;
+    		  forumDescription.innerHTML="<b>Forum description</b>:<br> " + description;
     	  }else{
     		  var forumDescription = document.getElementById("forumDescription");
     		  forumDescription.style.display="none";
@@ -145,7 +152,8 @@ s1.parentNode.insertBefore(s, s1);
     						prjsMap[realPrjId] = prjsMap[prjId];
     					}
     					var autoCompleteData = prjValues.split("#");
-    					$("#forumIdInput").autocomplete(autoCompleteData); 
+    					//document.getElementById('forumIdInput').autocomplete(autoCompleteData);
+    					$("#forumIdInput").autocompleteArray(autoCompleteData); 
     					var forumId = "<%=request != null && request.getParameter("forumId") != null ? request.getParameter("forumId") : ""%>";
     					if(forumId != null && forumId != ""){
     						waveIdToLoad = prjsMap[forumId];
@@ -168,14 +176,7 @@ s1.parentNode.insertBefore(s, s1);
     google.setOnLoadCallback(initialize);
 </script>
 
-<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="js/json2.js"></script>
-<script type="text/javascript" src="js/jsonrpc.js"></script>
-<link rel="stylesheet" href="http://dev.jquery.com/view/trunk/plugins/autocomplete/demo/main.css" type="text/css" />
-  <link rel="stylesheet" href="http://dev.jquery.com/view/trunk/plugins/autocomplete/jquery.autocomplete.css" type="text/css" />
-  <script type="text/javascript" src="http://dev.jquery.com/view/trunk/plugins/autocomplete/lib/jquery.bgiframe.min.js"></script>
-  <script type="text/javascript" src="http://dev.jquery.com/view/trunk/plugins/autocomplete/lib/jquery.dimensions.js"></script>
-  <script type="text/javascript" src="http://dev.jquery.com/view/trunk/plugins/autocomplete/jquery.autocomplete.js"></script>
+
 <script type="text/javascript">
 var prjsMap = null;
 var json = null;

@@ -2,12 +2,14 @@
 
 package com.aggfi.digest.client.inject;
 
+import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.ui.AdsenseWidget;
 import com.aggfi.digest.client.ui.DigestAboutWidget;
 import com.aggfi.digest.client.ui.DigestAdminGeneralWidget;
 import com.aggfi.digest.client.ui.DigestAdminParticipantWidget;
 import com.aggfi.digest.client.ui.DigestTabPanel;
 import com.aggfi.digest.client.ui.DigestTrackerWidget;
+import com.aggfi.digest.client.ui.ForumUpdateWidget;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 
@@ -21,4 +23,7 @@ public interface DigestGinjector extends Ginjector {
 	DigestAdminParticipantWidget getDigestAdminParticipantWidget();
 	AdsenseWidget getAdsenseWidget();
 	DigestTrackerWidget getDigestTrackerWidget();
+	
+	DigestConstants getDigestConstants();
+	ForumUpdateWidget getForumUpdateWidget();
 }

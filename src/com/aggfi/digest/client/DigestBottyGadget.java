@@ -39,14 +39,13 @@ import com.google.inject.Provider;
 @ModulePrefs(title = "DigestBotty Admn Gadget",author="Yuri Zelikov",author_email="vega113+digestbottygadget@gmail.com", width=600, height=600)
 public class DigestBottyGadget	extends WaveGadget<UserPreferences> implements NeedsDynamicHeight, NeedsMiniMessages, NeedsGoogleAnalytics, NeedsViews{
 
-	
-	
+	static DigestGinjector ginjector;
 
 	@Override
 	protected void init(UserPreferences preferences) {
 		try{
 			waveFeature = getWave();
-			DigestGinjector ginjector = GWT.create(DigestGinjector.class);
+			ginjector = GWT.create(DigestGinjector.class);
 			DigestTabPanel widget = ginjector.getDigestCreatedTabPanel();
 			dhFeature.getContentDiv().add(widget);
 			initRemoteLogger(RootPanel.get());
@@ -158,7 +157,7 @@ static WaveFeature waveFeature;
 		@Override
 		public AppDomainId get() {
 			AppDomainId ad = new AppDomainId();
-			ad.setId("digestbotty");
+			ad.setId(ginjector.getDigestConstants().appDomain());
 			Log.info("The applicationId is: " + ad.getId());
 			return ad;
 		}

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import com.vegalabs.general.server.command.Command;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
@@ -18,6 +20,8 @@ import com.google.inject.Inject;
 
 @SuppressWarnings("unchecked")
 public class GetAllForumIds extends Command {
+	
+	private Logger LOG = Logger.getLogger(GetAllForumIds.class.getName());
 	private ExtDigestDao extDigestDao = null;
 	 private static Cache cache = null;
 	 private static final int CACHE_TIME_LIMIT = 60*60;
@@ -36,7 +40,8 @@ public class GetAllForumIds extends Command {
 	}
 
 	@Override
-	public JSONObject execute() throws JSONException {      
+	public JSONObject execute() throws JSONException {     
+		LOG.info("execute");
 		JSONObject json = new JSONObject();
 		Object o = cache.get("allForumIds");
 		Object oTitles = cache.get("allWaveTitles");

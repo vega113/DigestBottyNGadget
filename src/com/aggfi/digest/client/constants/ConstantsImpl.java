@@ -31,8 +31,6 @@ public interface ConstantsImpl extends Constants {
 	String postsByActivity14Days();
 	
 	
-	@DefaultStringValue(value="digestbotty")
-	String appDomain();
 	//urls
 	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252BVIL2ZrZkBSb")
 	String discussDigestBottyUrl();
