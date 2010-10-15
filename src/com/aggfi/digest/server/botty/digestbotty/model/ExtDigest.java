@@ -93,6 +93,14 @@ public class ExtDigest  extends Digest{
 	@Expose
 	@Persistent
 	private Text googleAdsenseCode = null;
+	
+	@Expose
+	@Persistent
+	private String faqWaveId = null;
+	
+	@Expose
+	@Persistent
+	private String postWaveId = null;
 
 	public String getDescription() {
 		return description;
@@ -109,7 +117,11 @@ public class ExtDigest  extends Digest{
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
+	/**
+	 * is the primary forum icon
+	 * @return
+	 */
 	public String getInstallerThumbnailUrl() {
 		return installerThumbnailUrl;
 	}
@@ -174,26 +186,17 @@ public class ExtDigest  extends Digest{
 		this.installerUrl = installerUrl;
 	}
 
-	@Override
-	public String toString() {
-		return "ExtDigest [author=" + author + ", description=" + description
-				+ ", forumSiteUrl=" + forumSiteUrl + ", googlegroupsId="
-				+ googlegroupsId + ", installerIconUrl=" + installerIconUrl
-				+ ", installerThumbnailUrl=" + installerThumbnailUrl
-				+ ", installerUrl=" + installerUrl
-				+ ", name=" + name + ", ownerId=" + ownerId
-				+ ", robotThumbnailUrl=" + robotThumbnailUrl
-				+ ", getCreated()=" + getCreated() + ", getDomain()="
-				+ getDomain() + ", getId()=" + getId() + ", getWaveId()="
-				+ getWaveId() + "]";
-	}
 
 	public String getLastDigestBlipId() {
 		return lastDigestBlipId;
 	}
 
 	public void setLastDigestBlipId(String lastDigestBlipId) {
-		this.lastDigestBlipId = lastDigestBlipId;
+		if(lastDigestBlipId == null){
+			return;
+		}else{
+			this.lastDigestBlipId = lastDigestBlipId;
+		}
 	}
 
 	public String getFirstDigestBlipId() {
@@ -221,5 +224,56 @@ public class ExtDigest  extends Digest{
 	@Deprecated
 	public void setGoogleAdsenseCode(Text code) {
 		this.googleAdsenseCode = code;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ExtDigest [description=");
+		builder.append(description);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", author=");
+		builder.append(author);
+		builder.append(", installerUrl=");
+		builder.append(installerUrl);
+		builder.append(", installerThumbnailUrl=");
+		builder.append(installerThumbnailUrl);
+		builder.append(", installerIconUrl=");
+		builder.append(installerIconUrl);
+		builder.append(", robotThumbnailUrl=");
+		builder.append(robotThumbnailUrl);
+		builder.append(", forumSiteUrl=");
+		builder.append(forumSiteUrl);
+		builder.append(", googlegroupsId=");
+		builder.append(googlegroupsId);
+		builder.append(", ownerId=");
+		builder.append(ownerId);
+		builder.append(", maxDigests=");
+		builder.append(maxDigests);
+		builder.append(", lastDigestBlipId=");
+		builder.append(lastDigestBlipId);
+		builder.append(", firstDigestBlipId=");
+		builder.append(firstDigestBlipId);
+		builder.append(", version=");
+		builder.append(version);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public String getFaqWaveId() {
+		return faqWaveId;
+	}
+
+	public void setFaqWaveId(String faqWaveId) {
+		this.faqWaveId = faqWaveId;
+	}
+
+	public String getPostWaveId() {
+		return postWaveId;
+	}
+
+	public void setPostWaveId(String postWaveId) {
+		this.postWaveId = postWaveId;
 	}
 }

@@ -1,0 +1,41 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field='res'
+		type='com.aggfi.digest.client.resources.GlobalResources' />
+	<ui:with field='constants2'
+		type='com.aggfi.digest.client.constants.ConstantsImpl' />
+	<ui:with field='constants'
+		type='com.aggfi.digest.client.constants.DigestConstants' />
+	<g:HTMLPanel>
+		<g:DecoratorPanel>
+			<g:VerticalPanel stylePrimaryName='{res.globalCSS.highlightRow}'
+				width='{constants.createWidthStr}'>
+				<g:cell>
+					<g:FlexTable ui:field="updateGadgetFlexTbl"></g:FlexTable>
+				</g:cell>
+				<g:cell>
+					<g:HorizontalPanel>
+						<g:HTMLPanel stylePrimaryName='{res.globalCSS.highlightRow}'>
+							<g:HorizontalPanel>
+								<g:HTML width='30px'></g:HTML>
+								<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
+								<g:DecoratorPanel>
+									<g:HorizontalPanel >
+										<g:HTML width='376px'></g:HTML>
+										<g:Image resource='{res.tooltip}' ui:field="img2" title='{constants.updateForumInfoBtnExpl}'/>
+										<g:HTML width="4px"></g:HTML>	
+										<g:PushButton ui:field="updateBtn" text='{constants.updateStr}'></g:PushButton>
+										<g:Image resource='{res.spinner}'
+											title='{constants.loadingStr}'
+											ui:field="spinnerImg" />
+									</g:HorizontalPanel>
+								</g:DecoratorPanel>
+							</g:HorizontalPanel>
+						</g:HTMLPanel>
+					</g:HorizontalPanel>
+				</g:cell>
+			</g:VerticalPanel>
+		</g:DecoratorPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 

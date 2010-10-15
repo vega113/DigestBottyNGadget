@@ -1,6 +1,8 @@
 package com.aggfi.digest.client.service;
 
 import java.util.Date;
+import java.util.Map;
+
 import com.aggfi.digest.client.constants.DigestConstants;
 import com.aggfi.digest.client.model.JsDigest;
 import com.vegalabs.general.client.request.RequestService;
@@ -27,7 +29,7 @@ public class DigestServiceImpl implements DigestService {
 	
 
 	@Override
-	public void retrTagsDistributions(String projectId,AsyncCallback<JSONValue> callback)throws RequestException {
+	public void retrTagsDistributions(String projectId,AsyncCallback<JSONValue> asyncCallback)throws RequestException {
 		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		
@@ -35,13 +37,12 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_TAG_COUNTS"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,callback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 	@Override
 	public void retrPrjectsPerUserId(String userId,
-			AsyncCallback<JSONValue> callback) throws RequestException { 
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException { 
 		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		
@@ -50,8 +51,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("senderId", new JSONString(userId));
 		postDataJson.put("method", new JSONString("GET_PROJECTS_PER_USER"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,callback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	@Override
 	public void retrPostCounts(String projectId,
@@ -63,8 +63,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_POST_COUNTS"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 	
@@ -78,14 +77,13 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("REMOVE_DEFAULT_PARTICIPANT"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 	
 
 	@Override
-	public void retrAdminConfig(String projectId,AsyncCallback<JSONValue> callback)throws RequestException {
+	public void retrAdminConfig(String projectId,AsyncCallback<JSONValue> asyncCallback)throws RequestException {
 		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		
@@ -93,8 +91,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_ADMIN_CONFIG"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,callback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 	@Override
@@ -109,8 +106,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("REMOVE_AUTO_TAG"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 
@@ -125,8 +121,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("REMOVE_DEFAULT_TAG"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 	
@@ -141,8 +136,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("REMOVE_DIGEST_MANAGER"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 	
@@ -156,8 +150,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_DIGEST_MANAGER"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 
@@ -171,8 +164,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_DEFAULT_PARTICIPANT"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 	
@@ -186,20 +178,19 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_DEFAULT_TAG"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 		
 	}
 
 
 	@Override
-	public void createDigest(JsDigest newDigest, AsyncCallback<JSONValue> callback) throws RequestException {
+	public void createDigest(JsDigest newDigest, AsyncCallback<JSONValue> asyncCallback) throws RequestException {
 		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject(newDigest);
 		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("CREATE_DIGEST"));
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,callback,params);
+		
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 
@@ -250,8 +241,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_BLIPS_COUNT"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 
@@ -264,8 +254,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_BLIPS_PER_CONTRIBUTOR"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 
@@ -279,8 +268,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_CONTRIBUTORS_PER_INFLUENCE"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 
@@ -295,8 +283,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_POST_BY_ACTIVITY"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 
@@ -313,8 +300,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("UPDATE_ATOM_FEED_PUBLIC"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	@Override
@@ -328,8 +314,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_SECURE_POST_GADGET"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 
 
@@ -350,8 +335,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("UPDATE_SOCIAL_BTNS_SETTINGS"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	@Override
@@ -369,8 +353,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_ADSENSE_CODE"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	@Override
@@ -385,8 +368,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("UPDATE_VIEWS_TRACKING"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 
@@ -402,8 +384,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_ADSENSE_CODE"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	@Override
@@ -415,8 +396,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_VIEWS_COUNT"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	
@@ -431,8 +411,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("GET_POSTS_BY_VIEWS"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	@Override
@@ -446,8 +425,7 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_ADSENSE_INSTALLER"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
 	
 	@Override
@@ -460,8 +438,82 @@ public class DigestServiceImpl implements DigestService {
 		postDataJson.put("params", paramsJson);
 		postDataJson.put("method", new JSONString("ADD_VIEWS_COUNTER_INSTALLER"));
 		
-		JavaScriptObject params = postDataJson.getJavaScriptObject();
-		requestService.makeRequest(url,asyncCallback,params);
+		makePreCall(postDataJson, asyncCallback);
 	}
+
+
+
+	@Override
+	public void retrDigestInfo(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_DIGEST_INFO"));
+		
+		makePreCall(postDataJson, asyncCallback);
+	}
+
+
+
+	@Override
+	public void updateDigestInfo(String projectId, String authorName,
+			String forumName, String description, String installerThumbnailUrl,
+			String forumSiteUrl, AsyncCallback<JSONValue> asyncCallback)
+			throws RequestException {
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		
+		paramsJson.put("projectId", new JSONString(projectId));
+		paramsJson.put("authorName", new JSONString(authorName));
+		paramsJson.put("forumName", new JSONString(forumName));
+		paramsJson.put("description", new JSONString(description));
+		paramsJson.put("installerThumbnailUrl", new JSONString(installerThumbnailUrl));
+		paramsJson.put("forumSiteUrl", new JSONString(forumSiteUrl));
+		
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("UPDATE_DIGEST_INFO"));
+		
+		makePreCall(postDataJson, asyncCallback);
+//		requestService.makeRequest(url,asyncCallback,params);
+	}
+	
+	private void makePreCall(final com.google.gwt.json.client.JSONObject paramsMap, final AsyncCallback<JSONValue> asyncCallback) throws RequestException{
+		com.google.gwt.json.client.JSONObject paramsJson = new JSONObject();
+		com.google.gwt.json.client.JSONObject postDataJson = new JSONObject();
+		String projectId = "none";
+		paramsJson.put("projectId", new JSONString(projectId));
+		postDataJson.put("params", paramsJson);
+		postDataJson.put("method", new JSONString("GET_VIEWS_COUNT"));
+		
+		JavaScriptObject params = postDataJson.getJavaScriptObject();//make a call to ensure that the JVM is on
+		requestService.makeRequest(url,new AsyncCallback<JSONValue>() {
+			
+			@Override
+			public void onSuccess(JSONValue result) {
+				makeActualCall(paramsMap, asyncCallback);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				makeActualCall(paramsMap, asyncCallback);
+			}
+
+			private void makeActualCall(final com.google.gwt.json.client.JSONObject postDataJson,
+					final AsyncCallback<JSONValue> asyncCallback) {
+				
+				JavaScriptObject params = postDataJson.getJavaScriptObject();
+				try {
+					requestService.makeRequest(url,asyncCallback,params);
+				} catch (RequestException e) {
+					asyncCallback.onFailure(e);
+				}
+			}
+		},params);
+	}
+
+
 	
 }

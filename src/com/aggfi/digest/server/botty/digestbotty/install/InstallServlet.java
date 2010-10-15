@@ -71,12 +71,12 @@ public class InstallServlet extends HttpServlet{
 			String projectName = digest.getName(); //0
 		    String profileImageUrl = digest.getInstallerThumbnailUrl();//1
 			String projectDescription = digest.getDescription();//2
-			String version = createVersion(digest.getProjectId());//3
+			String version = createVersion(digest.getProjectId(),digest.getVersion());//3
 			String infoUrl = digest.getForumSiteUrl();//4
 			String authorName = digest.getAuthor();//5
-			String triggerText = "New " + digest.getName() + " Post"; //6
+			String triggerText = "New " + digest.getName() + " forum post"; //6
 			String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com" ;//7
-			String menuText = "Add " + digest.getName();//8
+			String menuText = "Add " + digest.getName() + " forum robot";//8
 			String iconUrl = digest.getRobotThumbnailUrl();//9
 			Object[] args = {projectName, profileImageUrl, projectDescription,version,infoUrl,
 					authorName, triggerText,robotAddress,
@@ -101,7 +101,7 @@ public class InstallServlet extends HttpServlet{
 			
 			MessageFormat fmt = new MessageFormat(extensionStr);
 			String out = fmt.format(args);
-			LOG.info("installer.xml for: " + projectId);
+			LOG.info("installer.xml for: " + projectId + ", xml: " + out);
 			writer.print(out);
 			writer.flush();
 		}catch(Exception e){
@@ -112,11 +112,16 @@ public class InstallServlet extends HttpServlet{
 		}
 	}
 
-	private String createVersion(String projectId) {
+	private String createVersion(String projectId, Integer version) {
 		if("vega113-googlewave-mailwavybeta1".equals(projectId)){
 			return "0.6";
 		}else{
-			return "0.5";
+			if(version != null){
+				return version.toString();
+			}else{
+				return "0.5";
+			}
+			
 		}
 		
 	}

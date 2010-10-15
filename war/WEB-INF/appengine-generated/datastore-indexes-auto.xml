@@ -1,4 +1,11 @@
-<!-- Indices written at Mon, 11 Oct 2010 08:29:43 UTC -->
+<!-- Indices written at Fri, 15 Oct 2010 14:46:33 UTC -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 90 times in query history -->
+    <datastore-index kind="TrackerEvent" ancestor="false" source="auto">
+        <property name="projectId" direction="asc"/>
+        <property name="created" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

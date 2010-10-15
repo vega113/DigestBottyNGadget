@@ -74,7 +74,6 @@ public class ProjectSelectWidget extends Composite {
 		this.resources = resources;
 		this.utils = utils;
 		
-		prjList.setWidth("380px");
 		
 		refreshBtn = new PushButton(new Image(resources.refresh()));
 		//refreshBtn.setHeight("21px");

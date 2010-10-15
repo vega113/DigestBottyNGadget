@@ -13,6 +13,7 @@ import com.google.gwt.i18n.client.Constants.DefaultIntValue;
  */
 public interface DigestConstants extends Constants {
 	
+	String updateForumInfoBtnExpl();
 	String forumSettingsStr();
 	String createBtnStr();
 	String viewsCounterInstallerExpl();
@@ -244,7 +245,7 @@ public interface DigestConstants extends Constants {
 	
 	String loadingVisualizationsApiStr();
 	
-	@DefaultStringValue(value="digestbotty") //Change it when switching domains
+	@DefaultStringValue(value="aggfiwave") //Change it when switching domains
 	String appDomain();
 	//urls
 	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252B0R06HrZkBhE%252F")
@@ -288,6 +289,9 @@ public interface DigestConstants extends Constants {
 	String aboutTabScrollHeight();
 	@DefaultStringValue(value="300px")
 	String createPnlQuestionsWidth();
+	@DefaultStringValue(value="380px")
+	String reportListWidthStr();
+	
 	
 	
 }

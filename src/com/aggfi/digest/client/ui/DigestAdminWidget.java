@@ -237,7 +237,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 			adminSettingsTabPnl.add(digestAdminGeneralWidget, constants.generalSettingsStr());
 			
 			adminSettingsTabPnl.add(trackerWidget, constants.trackerSettingsStr());
-//			adminSettingsTabPnl.add(forumUpdateWidget, constants.forumSettingsStr());
+			adminSettingsTabPnl.add(forumUpdateWidget, constants.forumSettingsStr());
 			
 			adSenseWidget.setImgExplTitle(constants.forumAdSenseExpl());
 			adminSettingsTabPnl.selectTab(0);
@@ -254,6 +254,7 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 		digestAdminParticipantWidget.setOnProjectsLoadCallback(onProjectsLoadCallback);
 		digestAdminParticipantWidget.setProjectSelectWidget(projectSelectWidget);
 		trackerWidget.setProjectSelectWidget(projectSelectWidget);
+		forumUpdateWidget.setProjectSelectWidget(projectSelectWidget);
 		vegaUtils.adjustHeight();
 	}
 

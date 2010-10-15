@@ -49,7 +49,7 @@
 					<g:VerticalPanel>
 						<g:HTML height="21px"></g:HTML>
 						<g:HorizontalPanel>
-							<g:HTML width='160px'></g:HTML>
+							<g:HTML width='195px'></g:HTML>
 							<g:Button text='{constants.updateStr}' ui:field="updateTrackViewsBtn"></g:Button>
 						</g:HorizontalPanel>
 					</g:VerticalPanel>

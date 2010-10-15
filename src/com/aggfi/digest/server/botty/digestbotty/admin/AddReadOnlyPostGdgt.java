@@ -23,7 +23,8 @@ import com.google.wave.api.Participants;
 import com.google.wave.api.Wavelet;
 
 public class AddReadOnlyPostGdgt extends Command {
-	  private static final Logger LOG = Logger.getLogger(AddReadOnlyPostGdgt.class.getName());
+	  public static final String NEW_POST_GADGET = "New Secure Post";
+	private static final Logger LOG = Logger.getLogger(AddReadOnlyPostGdgt.class.getName());
 	  private Util util = null;
 	private ForumBotty robot = null;
 	private AdminConfigDao adminConfigDao = null;
@@ -61,7 +62,7 @@ public class AddReadOnlyPostGdgt extends Command {
 		} catch (IOException e) {
 			LOG.log(Level.SEVERE, "", e);
 		}
-		String title = "New Secure Post";
+		String title = NEW_POST_GADGET;
 		newWavelet.setTitle(title);
 		if(newWavelet.getParticipants().contains(System.getProperty("PUBLIC_GROUP"))){
 			newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
@@ -79,8 +80,6 @@ public class AddReadOnlyPostGdgt extends Command {
 		
 		  if(adminConfig.isViewsTrackingEnabled()){
 			  robot.appendViewsTrackingGadget(newWavelet.getRootBlip(), projectId);
-		  }else{
-			  LOG.warning("views tracking not enabled for: " + projectId);
 		  }
 		  
 		try {
@@ -90,11 +89,12 @@ public class AddReadOnlyPostGdgt extends Command {
 		}
 	    JSONObject json = new JSONObject();
 	    json.put("success", "true");
+	    json.put("postWaveId", newWavelet.getWaveId().getId());
 	    return json;
 	  }
 
 	public static void appendNewPostGadget(String projectId, Blip blip, String projectName) {
-		LOG.info("Appneding new post gadget: " + projectId);
+		LOG.fine("Appneding new post gadget: " + projectId);
 		String gadgetUrl = System.getProperty("READONLYPOST_GADGET_URL");
 		Gadget gadget = null;
 		gadget = new Gadget(gadgetUrl);

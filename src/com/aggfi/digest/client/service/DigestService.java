@@ -5,6 +5,7 @@ import com.aggfi.digest.client.model.JsDigest;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.TextBox;
 
 public interface DigestService {
 	void createDigest(JsDigest digest, AsyncCallback<JSONValue> callback) throws RequestException;
@@ -86,5 +87,12 @@ public interface DigestService {
 
 	void addAdSenseInstaller(String userId,
 			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+	
+	void retrDigestInfo(String projectId,
+			AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+	
+	void updateDigestInfo(String projectId,
+			String authorName, String forumName, String description, String installerThumbnailUrl, String forumSiteUrl, AsyncCallback<JSONValue> asyncCallback) throws RequestException;
+
 
 }

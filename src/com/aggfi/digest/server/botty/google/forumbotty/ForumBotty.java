@@ -73,7 +73,7 @@ import com.aggfi.digest.server.botty.google.forumbotty.admin.CommandType;
 @Singleton
 public class ForumBotty extends AbstractRobot {
   private static final String USE_HOME_END_KEYBOARD_KEYS = "(You can use HOME/END keyboard keys to navigate to top/bottom)";
-private static final String TO_BOTTOM = "Link to Bottom";
+public static final String TO_BOTTOM = "Link to Bottom";
 private static final String TO_TOP = "Link to Top";
 private static final Logger LOG = Logger.getLogger(ForumBotty.class.getName());
   private static final boolean DEBUG_MODE = false;
@@ -326,7 +326,7 @@ protected void submitWavelet(Wavelet wavelet) {
  * @return
  */
 public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip blip, String modifiedBy) {
-	LOG.log(Level.INFO, "adding to digest: project id: " + projectId);
+	LOG.log(Level.FINE, "adding to digest: project id: " + projectId);
 	ForumPost entry = forumPostDao.getForumPost (wavelet.getDomain(), wavelet.getWaveId().getId(), projectId);
 	// Update contributor list if this is not robot or agent
 
@@ -352,7 +352,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		
 		forumPostDao.save(entry);
 	} else {
-		LOG.info( " event.proxy: " + projectId);
+		LOG.fine( " event.proxy: " + projectId);
 		entry = new ForumPost(wavelet.getDomain(), wavelet);
 		entry.setProjectId(projectId);
 //		entry = forumPostDao.syncTags(projectId, entry, wavelet);
@@ -625,7 +625,7 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 		  
 		  
 		  StringBuilderAnnotater sba = new StringBuilderAnnotater(blip);
-		  sba.append(entryTitle, StringBuilderAnnotater.LINK_WAVE, entry.getId());
+		  sba.append(entryTitle, StringBuilderAnnotater.LINK_WAVE, entry.getId());//append link to post
 		  if(entry.getCreator() != null && !"".equals(entry.getCreator())){
 			  sba.append("\n", null, null);
 			  sba.append(" [", null, null);
@@ -636,29 +636,38 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 		 
 		  try {
 			  LOG.log(Level.FINER, "trying to get newBlipIs from JsonRpcResponse");
+			  String blipId = null;
 			  List<JsonRpcResponse> submitResponseList = submit(digestWavelet, getRpcServerUrl());
-			  
 			  for(JsonRpcResponse res : submitResponseList){
 				  Map<ParamsProperty, Object> dataMap = res.getData();
 				  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
-					  String blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
+					  blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
 					  entry.setDigestBlipId(blipId);
 					  digest.setLastDigestBlipId(blipId);
-					  if(!adminConfig.isAdsEnabled()){
-						  addOrUpdateLinkToBottomOrTopForDigestWave(digestWavelet.getRootBlip(), blipId, true, true); 
-					  }
 					  break;
 				  }
+			  }
+			  if(blipId == null){
+				  for(JsonRpcResponse res : submitResponseList){
+					  Map<ParamsProperty, Object> dataMap = res.getData();
+					  if(dataMap != null && dataMap.get(ParamsProperty.BLIP_ID)  != null){
+						  blipId = String.valueOf(dataMap.get(ParamsProperty.BLIP_ID));
+						  entry.setDigestBlipId(blipId);
+						  digest.setLastDigestBlipId(blipId);
+						  break;
+					  }
+				  }
+			  }
+			  if(!adminConfig.isAdsEnabled()){
+				  if(digest.getLastDigestBlipId() == null){
+					  digest.setLastDigestBlipId(blip.getBlipId());
+				  }
+				  addOrUpdateLinkToBottomOrTopForDigestWave(digestWavelet.getRootBlip(), digest.getLastDigestBlipId(), true, true); 
 			  }
 			  extDigestDao.save(digest);
 		  } catch (IOException e) {
 			  LOG.log(Level.SEVERE, "",e);
 		  }  
-		  if(entry.getDigestBlipId() != null){
-			  LOG.log(Level.INFO, "Created new entry in DIGEST_WAVE with: " + blip.getContent() + ", blipId: " + entry.getDigestBlipId());
-		  }else{
-			  LOG.log(Level.SEVERE, "Not Found new blip id: " + entry.toString() );
-		  }
 		  //now update digestWave forumPost
 		  ForumPost digestForumPost = forumPostDao.getForumPost(digest.getDomain(),digest.getWaveId(),digest.getProjectId());
 		  if(digestForumPost != null){
@@ -892,14 +901,15 @@ private void updateEntryInDigestWave(ForumPost entry) {
 	  profile = o != null ? ((SeriallizableParticipantProfile)o).getProfile() : null;
 	  if(profile != null)
 		  return profile;
-	  LOG.warning("Not found profile for: " + name);
+	  LOG.fine("Not found profile for: " + name);
 	  try {
 		  digests =  extDigestDao.retrDigestsByProjectId(name);
 	} catch (NullPointerException e) {
-		LOG.severe("In getCustomProfile,  extDigestDao: " + extDigestDao + ", name: " + name );
+		LOG.fine("In getCustomProfile,  extDigestDao: " + extDigestDao + ", name: " + name );
 	}
       if (digests != null && digests.size() > 0) {
     	  String digestWaveUrl = "https://wave.google.com/wave/waveref/googlewave.com/" + digests.get(0).getWaveId();
+//    	  String digestWaveUrl = digests.get(0).getForumSiteUrl();
     	  profile = new ParticipantProfile(digests.get(0).getName(),
 	    		  digests.get(0).getRobotThumbnailUrl() != null ? digests.get(0).getRobotThumbnailUrl() : getRobotAvatarUrl(),
 	    				  digestWaveUrl);
@@ -908,13 +918,16 @@ private void updateEntryInDigestWave(ForumPost entry) {
 	      cache.put(name, new SeriallizableParticipantProfile(profile.getImageUrl(),profile.getName(), profile.getProfileUrl()));
 	      return profile; 
       }else{
-    	  LOG.warning("Not found even DB profile for: " + name);
+    	  LOG.fine("Not found even DB profile for: " + name);
     	  return new ParticipantProfile(getRobotName(),
     			  getRobotAvatarUrl(),
     			  getRobotProfilePageUrl());
       }
   }
   
+  public void clearCustomProfileFromCache(String proxyFor){
+	  cache.put(proxyFor, null);
+  }
 
   @RequestScoped
   private static class ServletHelper {
@@ -1066,7 +1079,7 @@ protected String[] createGadgetUrlsArr() {
 			if(!isBottom){
 				blipToUpdate.append("\n");
 			}
-			LOG.warning(toLocationStr +" annotation not found - inserting new!");
+			LOG.fine(toLocationStr +" annotation not found - inserting new!");
 			  List<BundledAnnotation> baList = createToAnnotation(
 					  blipToUpdate, blipId, linkToAnnonationName);
 			  blipToUpdate.append("\n");
@@ -1098,7 +1111,7 @@ protected String[] createGadgetUrlsArr() {
 
 	public List<BundledAnnotation> createToAnnotation(Blip blipToUpdate, String blipId, String linkToAnnonationName) {
 		String blipRef = "waveid://" + blipToUpdate.getWaveId().getDomain() + "/" + blipToUpdate.getWaveId().getId() + "/~/conv+root/" + blipId;
-		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",linkToAnnonationName,"done");
+		  List<BundledAnnotation> baList = BundledAnnotation.listOf("link/manual",blipRef,"style/fontSize", "8pt",linkToAnnonationName,blipId);
 		return baList;
 	}
 
@@ -1164,6 +1177,21 @@ protected String[] createGadgetUrlsArr() {
 			}
 		}
 		
+	}
+	
+	public void updateGadgetState(Blip blip, String gadgetUrl,Map<String, String> out) {
+		Gadget gadget = extractGadgetFromBlip(gadgetUrl,blip);
+		gadget.getProperties().putAll(out);
+		blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadget.getUrl())).updateElement(gadget.getProperties());
+	}
+	
+	private Gadget extractGadgetFromBlip(String gadgetUrl, Blip blip){
+		BlipContentRefs gadgetRef = blip.first(ElementType.GADGET,Gadget.restrictByUrl(gadgetUrl));
+		if(gadgetRef == null || Gadget.class.cast(gadgetRef.value()) == null){
+			return null;
+		}else{
+			return Gadget.class.cast(gadgetRef.value());
+		}
 	}
 
   /*

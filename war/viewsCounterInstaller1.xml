@@ -5,6 +5,6 @@
 	<author name="Yuri Zelikov" />
 	<menuHook location="toolbar" text="Add Views counter"
 		iconUrl="http://lh3.ggpht.com/_tsWs83xehHE/TIvz10GA80I/AAAAAAAAFeM/gZpQWCuSe-I/views_counter_icon.png">
-		<insertGadget url="http://digestbotty.appspot.com/viewhits.xml" />
+		<insertGadget url="http://aggfiwave.appspot.com/viewhits.xml" />
 	</menuHook>
 </extension> 

@@ -10,7 +10,7 @@
 			<g:CaptionPanel captionText='{constants.selectDigestStr}' ui:field="outerCptnPnl" width='{constants.smallerBiggerWidthStr}'>
 					<g:HorizontalPanel>
 						<g:HTML width="10px"></g:HTML>
-						<g:ListBox ui:field="prjList"></g:ListBox>
+						<g:ListBox ui:field="prjList" width='{constants.reportListWidthStr}'></g:ListBox>
 						<g:HorizontalPanel ui:field="refresBtnhPnl">
 								<g:HTML width='15px'></g:HTML>
 						</g:HorizontalPanel>

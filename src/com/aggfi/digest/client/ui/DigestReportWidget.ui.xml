@@ -6,6 +6,8 @@
 		type='com.aggfi.digest.client.resources.GlobalResources' />
 	<ui:with field='constants'
 		type='com.aggfi.digest.client.constants.ConstantsImpl' /> 
+	<ui:with field='constants2'
+		type='com.aggfi.digest.client.constants.DigestConstants' />
 	<g:HTMLPanel>
 		<g:VerticalPanel width='{constants.basicWidthStr}' stylePrimaryName='{res.globalCSS.highlightRow}'>
 			<g:VerticalPanel>
@@ -14,7 +16,7 @@
 					<g:CaptionPanel captionText='{constants.selectReportTypeStr}' width='{constants.smallerBiggerWidthStr}'> 
 						<g:HorizontalPanel>
 							<g:HTML width="10px"></g:HTML>
-							<g:ListBox ui:field="reportTypesList"></g:ListBox>
+							<g:ListBox ui:field="reportTypesList" width='{constants2.reportListWidthStr}'></g:ListBox>
 							<g:HorizontalPanel ui:field="refresBtnhPnl">
 								<g:HTML width='15px'></g:HTML>
 							</g:HorizontalPanel>

@@ -13,6 +13,7 @@ import com.aggfi.digest.server.botty.digestbotty.admin.GetAllForumIds;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsCount;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetBlipsPerContributor;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetContributorsPerInfluence;
+import com.aggfi.digest.server.botty.digestbotty.admin.GetDigestInfo;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetNextPubPerProject;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetPostByActivity;
 import com.aggfi.digest.server.botty.digestbotty.admin.GetProjectsPerUser;
@@ -22,6 +23,7 @@ import com.aggfi.digest.server.botty.digestbotty.admin.RemoveDigestManager;
 import com.aggfi.digest.server.botty.digestbotty.admin.ReportAdView;
 import com.aggfi.digest.server.botty.digestbotty.admin.ReportPostView;
 import com.aggfi.digest.server.botty.digestbotty.admin.UpdateAtomFeedPublic;
+import com.aggfi.digest.server.botty.digestbotty.admin.UpdateDigestInfo;
 import com.aggfi.digest.server.botty.digestbotty.admin.UpdateSocialBtnsSettings;
 import com.aggfi.digest.server.botty.digestbotty.admin.UpdateViewsTracking;
 import com.aggfi.digest.server.botty.google.forumbotty.admin.AddAutoTag;
@@ -78,6 +80,8 @@ public enum CommandType {
   GET_VIEWS_COUNT_PER_WAVE(GetViewsCountPerWave.class),
   ADD_ADSENSE_INSTALLER(AddAdSenseInstaller.class),
   ADD_VIEWS_COUNTER_INSTALLER(AddViewsCounterInstaller.class),
+  GET_DIGEST_INFO(GetDigestInfo.class),
+  UPDATE_DIGEST_INFO(UpdateDigestInfo.class),
   CREATE_DIGEST(CreateDigest.class);
 
   private Class<? extends Command> clazz = null;

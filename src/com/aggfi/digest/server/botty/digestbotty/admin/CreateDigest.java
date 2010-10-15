@@ -43,7 +43,7 @@ import com.google.wave.api.impl.DocumentModifyAction.BundledAnnotation;
 public class CreateDigest extends Command {
 
 	public static final String DIGEST_WAVE_STR = "digest wave";
-	private Logger LOG = Logger.getLogger(CreateDigest.class.getName());
+	private static Logger LOG = Logger.getLogger(CreateDigest.class.getName());
 	private Util util;
 	private ExtDigestDao extDigestDao;
 	private ForumBotty robot;
@@ -147,11 +147,11 @@ public class CreateDigest extends Command {
 	    	
 	    	Wavelet digestWavelet = null;
 	    	try{
-	    		digestWavelet = createDigestWave(digestWaveDomain,ownerId,adminConfig,projectId,projectName,googlegroups, isPublicOnCreate,extDigest.getDescription(), extDigest.getInstallerThumbnailUrl(), extDigest.getForumSiteUrl());
+	    		digestWavelet = createDigestWave(adminConfig, extDigest);
 	    	}catch(IOException ioe){
 	    		if(ioe.getMessage().indexOf("Timeout") > -1){
 	    			//------------------------
-	    			digestWavelet = createDigestWave(digestWaveDomain,ownerId,adminConfig,projectId,projectName,googlegroups, isPublicOnCreate, extDigest.getDescription(), extDigest.getInstallerThumbnailUrl(), extDigest.getForumSiteUrl());
+	    			digestWavelet = createDigestWave(adminConfig, extDigest);
 	    			//----------------------------
 	    		}else{
 	    			throw ioe;
@@ -204,10 +204,13 @@ public class CreateDigest extends Command {
 		
 		//add new post gadget
 		  Command command = commandFetcher.fetchCommand("ADD_SECURE_POST_GADGET");
-		  String userId = System.getProperty("APP_DOMAIN") + "@" + System.getProperty("APP_DOMAIN") + "." + "appspot.com";
+		  String userId = System.getProperty("APP_DOMAIN") + "@" + "appspot.com";
 		  Map<String,String> params = ImmutableMap.of("projectId", extDigest.getProjectId(), "userId", userId);
 		  command.setParams(params);
-		  String outJson = command.execute().toString();
+		  JSONObject outJson = command.execute();
+		  String postWaveId = outJson.getString("postWaveId");
+		  extDigest.setPostWaveId(postWaveId);
+		  extDigestDao.save(extDigest);
 		  LOG.fine("Added new post gadget: " + outJson);
 		
 		return json;
@@ -222,7 +225,6 @@ public class CreateDigest extends Command {
     	String projectName= extDigest.getName();
     	String ownerId = extDigest.getOwnerId();
     	String googlegroups = extDigest.getGooglegroupsId();
-    	String installerUrl = "http://" + System.getProperty("APP_DOMAIN") + "." + "appspot.com" + "/installNew?id=" + projectId;
     	
 		String robotAddress = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
 		String rpcUrl = domain.equals(ForumBotty.PREVIEW_DOMAIN) ? ForumBotty.PREVIEW_RPC_URL : ForumBotty.SANDBOX_RPC_URL;
@@ -239,21 +241,22 @@ public class CreateDigest extends Command {
 			participants.add(System.getProperty("PUBLIC_GROUP"));
 		}
 		participants.add(ownerId);
-		LOG.info("IN createFAQ, robot name: " + robot.getRobotName() + ", " + robot.getRobotProfilePageUrl());
+		LOG.fine("IN createFAQ, robot name: " + robot.getRobotName() + ", " + robot.getRobotProfilePageUrl());
 		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_FAQ_CREATED_MSG","",rpcUrl);
+		
+		extDigest.setFaqWaveId(newWavelet.getWaveId().getId());
+		extDigestDao.save(extDigest);
+		
 		newWavelet.getParticipants().add(robotAddress);
 		if(isPublicOnCreate){
 			newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 		}
 		
-		int startPos = newWavelet.getRootBlip().getContent().length();
-		String titleStr = projectName  + " [Forum installer and FAQ]";
-		newWavelet.setTitle(titleStr);
-		newWavelet.getRootBlip().range(startPos,titleStr.length()+1).annotate("style/fontSize","2em").annotate("style/fontWeight","bold");
 		
-		newWavelet.getRootBlip().append(new Installer(installerUrl)); 
 		
-		appendFaq2blip(projectName,projectId, digestWavelet.getWaveId().getDomain() + "!" + digestWavelet.getWaveId().getId() ,ownerId, newWavelet);
+		AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
+		
+		appendFaq2blip(projectName,projectId, digestWavelet.getWaveId().getDomain() + "!" + digestWavelet.getWaveId().getId() ,ownerId, newWavelet,adminConfig, robot);
 		
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
 	
@@ -261,14 +264,22 @@ public class CreateDigest extends Command {
 		//add this post to the digest
 		robot.addOrUpdateDigestWave(projectId, newWavelet, null, null);
 		
-		 ForumPost forumPost = new ForumPost(domain, newWavelet);
-		  forumPost.setProjectId(projectId);
-		  forumPost.setBlipCount(0);
-		  forumPost.setDispayAtom(false);
-		  forumPostDao.save(forumPost);
+		ForumPost forumPost = new ForumPost(domain, newWavelet);
+		forumPost.setProjectId(projectId);
+		forumPost.setBlipCount(0);
+		forumPost.setDispayAtom(false);
+		forumPostDao.save(forumPost);
 	}
 
-	protected void appendFaq2blip(String projectName, String projectId,String digestWaveId,String ownerId,Wavelet newWavelet) {
+	public static  void appendFaq2blip(String projectName, String projectId,String digestWaveId,String ownerId,Wavelet newWavelet, AdminConfig adminConfig, ForumBotty robot) {
+		int startPos = newWavelet.getRootBlip().getContent().length();
+		String titleStr = projectName  + " [Forum installer and FAQ]";
+		newWavelet.setTitle(titleStr);
+		newWavelet.getRootBlip().range(startPos,titleStr.length()+1).annotate("style/fontSize","2em").annotate("style/fontWeight","bold");
+		
+		String installerUrl = "http://" + System.getProperty("APP_DOMAIN") + "." + "appspot.com" + "/installNew?id=" + projectId;
+		newWavelet.getRootBlip().append(new Installer(installerUrl)); 
+		
 		StringBuilderAnnotater sba = new StringBuilderAnnotater(newWavelet.getRootBlip());
 		
 		String styleFontWeight = "style/fontWeight";
@@ -359,7 +370,6 @@ public class CreateDigest extends Command {
 		
 		sba.flush2Blip();
 		
-		AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
 		 if(adminConfig.isViewsTrackingEnabled()){
 			  robot.appendViewsTrackingGadget(newWavelet.getRootBlip(), projectId);
 		  }
@@ -445,55 +455,62 @@ public class CreateDigest extends Command {
 		return digest;
 	}
 	
-	private Wavelet createDigestWave(String domain, String ownerId,AdminConfig adminConf, String projectId, String projectName, String googlegroups, boolean isPublicOnCreate,
-			String forumDescription, String iconUrl, String siteUrl) throws IOException {
+	private Wavelet createDigestWave(AdminConfig adminConf, ExtDigest extDigest) throws IOException {
 		Set<String> participants = new HashSet<String>(); 
-		participants.add(ownerId);
+		participants.add(extDigest.getOwnerId());
 		try{
-			if(!adminConf.getDefaultParticipants().contains(ownerId)){
-				adminConfigDao.addDefaultParticipant(projectId, ownerId);
+			if(!adminConf.getDefaultParticipants().contains(extDigest.getOwnerId())){
+				adminConfigDao.addDefaultParticipant(extDigest.getProjectId(), extDigest.getOwnerId());
 			}
 		}catch (Exception e) {
 			LOG.log(Level.SEVERE,"",e);
 		}
-		if(!util.isNullOrEmpty(googlegroups)){
-			participants.add(googlegroups);
+		if(!util.isNullOrEmpty(extDigest.getGooglegroupsId())){
+			participants.add(extDigest.getGooglegroupsId());
 			//add googlegroups to project default participants
-			adminConfigDao.addDefaultParticipant(projectId, googlegroups);
+			adminConfigDao.addDefaultParticipant(extDigest.getProjectId(), extDigest.getGooglegroupsId());
 		}
-		String rpcUrl = domain.equals(ForumBotty.PREVIEW_DOMAIN) ? ForumBotty.PREVIEW_RPC_URL : ForumBotty.SANDBOX_RPC_URL;
-		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_CREATED_MSG",projectId + "-digest",rpcUrl);
-		LOG.info("newWavelet -  id: " + newWavelet.getWaveletId() + ", root blip id: " + newWavelet.getRootBlipId());
-		if (isPublicOnCreate) {
+		
+		String rpcUrl = extDigest.getDomain().equals(ForumBotty.PREVIEW_DOMAIN) ? ForumBotty.PREVIEW_RPC_URL : ForumBotty.SANDBOX_RPC_URL;
+		Wavelet newWavelet = robot.newWave(extDigest.getDomain(), participants ,"NEW_FORUM_CREATED_MSG",extDigest.getProjectId() + "-digest",rpcUrl);
+		LOG.fine("newWavelet -  id: " + newWavelet.getWaveletId() + ", root blip id: " + newWavelet.getRootBlipId());
+		if (adminConf.isAtomFeedPublic()) {
 			newWavelet.getParticipants().add(System.getProperty("PUBLIC_GROUP"));
-			adminConfigDao.addDefaultParticipant(projectId, System.getProperty("PUBLIC_GROUP"));
+			adminConfigDao.addDefaultParticipant(extDigest.getProjectId(), System.getProperty("PUBLIC_GROUP"));
 		}
 		newWavelet.getParticipants().setParticipantRole(System.getProperty("PUBLIC_GROUP"), Participants.Role.READ_ONLY);
-		
-		int startPos = newWavelet.getRootBlip().getContent().length();
-		String titleStr = projectName  + " " + DIGEST_WAVE_STR;
-		newWavelet.setTitle(titleStr);
-		
-		newWavelet.getRootBlip().range(startPos,titleStr.length()+1).annotate("style/fontSize","2em").annotate("style/fontWeight","bold");
-		
-		//---------------
-		robot.appendPoweredBy(newWavelet.getRootBlip());
-		//-------------------------
-		
-		AdminConfig adminConfig = adminConfigDao.getAdminConfig(projectId);
-		Blip bottomBlip = null;
+
+		appendDigestContent(adminConf, extDigest, extDigestDao, robot, newWavelet,true,true);
+		ForumPost forumPost = new ForumPost(extDigest.getDomain(), newWavelet);
+		forumPost.setProjectId(extDigest.getProjectId());
+		forumPost.setBlipCount(0);
+		forumPost.setDispayAtom(false);
+		forumPostDao.save(forumPost);
+		return newWavelet;
+	}
+
+	public static void appendDigestContent( AdminConfig adminConf,ExtDigest extDigest,ExtDigestDao extDigestDao, ForumBotty arobot, Wavelet newWavelet, boolean isSubmit, boolean isCreateBottomAdBlip)
+			throws IOException {
+		String titleStr = extDigest.getName()  + " " + DIGEST_WAVE_STR;
 		Blip topBlip = newWavelet.getRootBlip();
+		Blip bottomBlip = null;
+		
+		int startPos = topBlip.getContent().length();
+		newWavelet.setTitle(titleStr);
+		topBlip.range(startPos,titleStr.length()+1).annotate("style/fontSize","2em").annotate("style/fontWeight","bold");
+		//---------------
+		arobot.appendPoweredBy(topBlip);
+		//-------------------------
 		//append forum icon
 		String defaultIconUrl = System.getProperty("WAVE_ICON_URL");
-		if(iconUrl != null && !iconUrl.equals(defaultIconUrl) && !"".equals(iconUrl)){
+		if(extDigest.getInstallerThumbnailUrl() != null && !extDigest.getInstallerThumbnailUrl().equals(defaultIconUrl) && !"".equals(extDigest.getInstallerThumbnailUrl())){
 			//appen forum icon
 			topBlip.append("\n\n");
-			Image forumIcon = new Image(iconUrl,80,80,projectName + " icon.");
+			Image forumIcon = new Image(extDigest.getInstallerThumbnailUrl(),80,80,extDigest.getName() + " icon.");
 			topBlip.append(forumIcon);
 		}
 		//append forum description
-		String description = forumDescription;
-		if(description != null && !"".equals(forumDescription)){
+		if(extDigest.getDescription() != null && !"".equals(extDigest.getDescription())){
 			topBlip.append("\n");
 			String fontSize = "12pt";
 			int s1 = topBlip.getContent().length();
@@ -501,17 +518,17 @@ public class CreateDigest extends Command {
 			topBlip.at(topBlip.getContent().length()).insert(ba1,  "Forum description: ");
 			
 			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize,"style/fontStyle", "italic");
-			topBlip.at(topBlip.getContent().length()).insert(ba2, description );
+			topBlip.at(topBlip.getContent().length()).insert(ba2, extDigest.getDescription() );
 			
 			int e1 = topBlip.getContent().length();
 			topBlip.range(s1, e1).annotate(System.getProperty("APP_DOMAIN") + ".appspot.com/forumDescription", "done");
 		}
-		//append forum site
-		if(siteUrl != null && !"".equals(siteUrl)){
+		//append forum site 
+		if(extDigest.getForumSiteUrl() != null && !"".equals(extDigest.getForumSiteUrl()) && !extDigest.getForumSiteUrl().startsWith("https://wave.google.com")){
 			topBlip.append("\n");
 			String fontSize = "12pt";
 			int s1 = topBlip.getContent().length();
-			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize, "link/manual", siteUrl, "style/fontStyle", "italic");
+			List<BundledAnnotation> ba1 = BundledAnnotation.listOf("style/fontSize", fontSize, "link/manual", extDigest.getForumSiteUrl(), "style/fontStyle", "italic");
 			topBlip.at(topBlip.getContent().length()).insert(ba1,  "Link to forum site");
 			
 //			List<BundledAnnotation> ba2 = BundledAnnotation.listOf("style/fontSize", fontSize);
@@ -521,52 +538,44 @@ public class CreateDigest extends Command {
 			topBlip.range(s1, e1).annotate(System.getProperty("APP_DOMAIN") + ".appspot.com/forumSite", "done");
 		}
 		
-		if(adminConf.isAdsEnabled()){
+		if(adminConf.isAdsEnabled() && isCreateBottomAdBlip){
 			topBlip.append("\n");
-			if(adminConfig.getAdsense() != null && !adminConfig.getAdsense().getValue().equals("")){
-				robot.appendAd2Blip(topBlip,topBlip.getBlipId(),projectId,false);
+			if(adminConf.getAdsense() != null && !adminConf.getAdsense().getValue().equals("")){
+				arobot.appendAd2Blip(topBlip,topBlip.getBlipId(),extDigest.getProjectId(),false);
 			}
 			bottomBlip = newWavelet.reply("\n");
 		}
-		boolean isSubmit = false;
+		boolean isSubmitLocal = false;
 		
 		 String blipId = null;
-		List<JsonRpcResponse> submitResponseList = robot.submit(newWavelet, rpcUrl);
+		List<JsonRpcResponse> submitResponseList = arobot.submit(newWavelet, arobot.getRpcServerUrl());
 		 for(JsonRpcResponse res : submitResponseList){
 			  Map<ParamsProperty, Object> dataMap = res.getData();
 			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
 				  blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));//blip id of the bottom blip
-				  robot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true,false);
-				  isSubmit = true;
-				
+				  arobot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true,false);
+				  extDigest.setLastDigestBlipId(blipId);
+				  extDigestDao.save(extDigest);
+				  isSubmitLocal = true;
 			  }
 		  }
-		 if(blipId == null){
-			 LOG.warning("No blip id - link to bottom blip!");
-		 }
-		  if(adminConf.isAdsEnabled()){
-			  robot.appendAd2Blip(bottomBlip,blipId,System.getProperty("BOTTY_OWNER_WAVE_ID"),false );
-			  robot.addOrUpdateLinkToBottomOrTopForDigestWave(bottomBlip, newWavelet.getRootBlipId(), false,false);
-			  isSubmit = true;
+		  if(adminConf.isAdsEnabled() && isCreateBottomAdBlip){
+			  arobot.appendAd2Blip(bottomBlip,blipId,System.getProperty("BOTTY_OWNER_WAVE_ID"),false );
+			  arobot.addOrUpdateLinkToBottomOrTopForDigestWave(bottomBlip, newWavelet.getRootBlipId(), false,false);
+			  isSubmitLocal = true;
 		  }
 		  if(adminConf.isViewsTrackingEnabled()){
 			  topBlip.append("\n");
-			  robot.appendViewsCounterGadget(topBlip);
-			  robot.appendViewsTrackingGadget(topBlip, projectId);
-			  isSubmit = true;
+			  arobot.appendViewsCounterGadget(topBlip);
+			  arobot.appendViewsTrackingGadget(topBlip, extDigest.getProjectId());
+			  isSubmitLocal = true;
 		  }else{
-			  LOG.warning("views tracking not enabled for: " + projectId);
+			  LOG.warning("views tracking not enabled for: " + extDigest.getProjectId());
 		  }
 		  
-		  ForumPost forumPost = new ForumPost(domain, newWavelet);
-		  forumPost.setProjectId(projectId);
-		  forumPost.setBlipCount(0);
-		  forumPost.setDispayAtom(false);
-		  forumPostDao.save(forumPost);
-		 if(isSubmit){
-			 robot.submit(newWavelet, rpcUrl);
+		 if(isSubmitLocal && isSubmit){
+			 arobot.submit(newWavelet, arobot.getRpcServerUrl());
 		 }
-		return newWavelet;
 	}
 
 }

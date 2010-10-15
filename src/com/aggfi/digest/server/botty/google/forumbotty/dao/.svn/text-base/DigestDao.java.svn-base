@@ -1,9 +1,0 @@
-package com.google.forumbotty.dao;
-
-import com.google.forumbotty.model.Digest;
-
-public interface DigestDao {
-  public abstract Digest save(Digest digest);
-
-  public abstract Digest getLatestDigest();
-}

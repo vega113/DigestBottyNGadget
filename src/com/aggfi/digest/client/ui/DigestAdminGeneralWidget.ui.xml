@@ -33,7 +33,7 @@
 							<g:Image resource='{res.tooltip}' title='{constants.addSecureGadgetExpl}'
 								ui:field="img10" />
 							<g:HorizontalPanel>
-								<g:HTML width='214px'></g:HTML>
+								<g:HTML width='210px'></g:HTML>
 								<g:Button text='{constants.addBtnName}' ui:field="addSecurePostGadgetBtn"></g:Button>
 							</g:HorizontalPanel>
 						</g:HorizontalPanel>
