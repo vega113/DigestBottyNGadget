@@ -5,6 +5,6 @@
 	<author name="Yuri Zelikov" />
 	<menuHook location="toolbar" text="Add Views tracker"
 		iconUrl="http://lh3.ggpht.com/_tsWs83xehHE/TIykFKku2JI/AAAAAAAAFeg/UctciqGXPQo/views_tracker_icon.png">
-		<insertGadget url="http://aggfiwave.appspot.com/tracker.xml" />
+		<insertGadget url="http://digestbotty.appspot.com/tracker.xml" />
 	</menuHook>
 </extension> 

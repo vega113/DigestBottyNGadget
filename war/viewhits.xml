@@ -65,7 +65,7 @@
 		
 		if (wave && wave.isInWaveContainer() && wave.getState() != null) {
 			
-			var domain = wave.getState().get('domain', 'http://aggfiwave.appspot.com');
+			var domain = wave.getState().get('domain', 'http://digestbotty.appspot.com');
 			var url = domain + JSON_RPC_URL + '?cachebust=' + (new Date()).getTime();
 			var p = {};
 			p.waveId = wave.getWaveId();

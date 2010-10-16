@@ -559,6 +559,7 @@ public class CreateDigest extends Command {
 			  Map<ParamsProperty, Object> dataMap = res.getData();
 			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
 				  blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));//blip id of the bottom blip
+				  LOG.info("blipId to bottom: " + blipId);
 				  arobot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true,false);
 				  if(!isCreateBottomAdBlip){
 					  extDigest.setLastDigestBlipId(blipId);
@@ -567,7 +568,7 @@ public class CreateDigest extends Command {
 				  isSubmitLocal = true;
 			  }
 		  }
-		  if(adminConf.isAdsEnabled() && isCreateBottomAdBlip){
+		  if(adminConf.isAdsEnabled() && isCreateBottomAdBlip){//isCreateBottomAdBlip - in case adsense enabled, but still don't need to create bottom blip
 			  arobot.appendAd2Blip(bottomBlip,blipId,System.getProperty("BOTTY_OWNER_WAVE_ID"),false );
 			  arobot.addOrUpdateLinkToBottomOrTopForDigestWave(bottomBlip, newWavelet.getRootBlipId(), false,false);
 			  isSubmitLocal = true;

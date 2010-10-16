@@ -18,7 +18,7 @@ function participantCallback(){
 		
 		
 		var projectId = wave.getState().get('projectId', 'none');
-		var domain = wave.getState().get('domain', 'http://aggfiwave.appspot.com');
+		var domain = wave.getState().get('domain', 'http://digestbotty.appspot.com');
 		var p = {};
 		p.projectId = projectId;
 		p.userId = viewerId;

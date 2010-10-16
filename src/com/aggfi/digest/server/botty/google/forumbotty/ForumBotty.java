@@ -645,10 +645,8 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 		  //check the digest version
 		  if(adminConfig.isAdsEnabled()){
 			  blip = digestWavelet.getRootBlip().reply();// ads enabled
-			  LOG.info("addEntry2DigestWave: added new digest blip - reply to rootblip: " + entry.getTitle());
 		  }else{
 			  blip = digestWavelet.reply("\n");// old  version
-			  LOG.info("addEntry2DigestWave: added new digest blip - reply to wavelet: " + entry.getTitle());
 		  }
 		  
 		  
@@ -663,7 +661,7 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 		  sba.flush2Blip();
 		 
 		  try {
-			  LOG.log(Level.FINER, "trying to get newBlipIs from JsonRpcResponse");
+			  LOG.log(Level.INFO, "trying to get newBlipIs from JsonRpcResponse");
 			  String blipId = null;
 			  List<JsonRpcResponse> submitResponseList = submit(digestWavelet, getRpcServerUrl());
 			  for(JsonRpcResponse res : submitResponseList){
@@ -686,7 +684,7 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 			  }
 			  if(!adminConfig.isAdsEnabled()){
 				  if(digest.getLastDigestBlipId() == null){
-					  digest.setLastDigestBlipId(blip.getBlipId());
+					  digest.setLastDigestBlipId(blipId);
 				  }
 				  addOrUpdateLinkToBottomOrTopForDigestWave(digestWavelet.getRootBlip(), digest.getLastDigestBlipId(), true, true); 
 			  }
@@ -1105,7 +1103,7 @@ protected String[] createGadgetUrlsArr() {
 			if(!isBottom){
 				blipToUpdate.append("\n");
 			}
-			LOG.fine(toLocationStr +" annotation not found - inserting new!");
+			LOG.info(toLocationStr +" annotation not found - inserting new! blipId: " + blipId);
 			  List<BundledAnnotation> baList = createToAnnotation(
 					  blipToUpdate, blipId, linkToAnnonationName);
 			  blipToUpdate.append("\n");
@@ -1114,7 +1112,9 @@ protected String[] createGadgetUrlsArr() {
 				List<BundledAnnotation> ba = BundledAnnotation.listOf("style/fontStyle","italic","style/fontSize", "8pt");
 				blipToUpdate.at(blipToUpdate.getContent().length()).insert(ba,USE_HOME_END_KEYBOARD_KEYS);
 		}
-		submit(blipToUpdate.getWavelet(), PREVIEW_RPC_URL);
+		if(isSubmit){
+			submit(blipToUpdate.getWavelet(), PREVIEW_RPC_URL);
+		}
 	}
 
 	public void appendPoweredBy(Blip blipToUpdate) {

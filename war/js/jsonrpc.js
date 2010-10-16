@@ -18,7 +18,7 @@ var jsonrpc = jsonrpc || {};
 
 // JSON-RPC endpoint
 var DOMAIN = "";
-DOMAIN = "http://aggfiwave.appspot.com";
+DOMAIN = "http://digestbotty.appspot.com";
 //DOMAIN = "http://localhost:8889";
 var JSON_RPC_URL = "/admin/jsonrpc";
 

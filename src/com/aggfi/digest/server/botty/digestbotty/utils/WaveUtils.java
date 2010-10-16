@@ -45,8 +45,10 @@ public class WaveUtils {
 				String linkValue = link.getValue();
 				if( linkContent.trim().equals(annonTxt.trim())){
 					int start = linkValue.indexOf("b+");
-					String blipId = linkValue.substring(start,linkValue.length());
-					return blipId;
+					if(start != -1){
+						String blipId = linkValue.substring(start,linkValue.length());
+						return blipId;
+					}
 				}
 			}
 			

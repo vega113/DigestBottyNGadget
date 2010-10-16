@@ -245,7 +245,7 @@ public interface DigestConstants extends Constants {
 	
 	String loadingVisualizationsApiStr();
 	
-	@DefaultStringValue(value="aggfiwave") //Change it when switching domains
+	@DefaultStringValue(value="digestbotty") //Change it when switching domains
 	String appDomain();
 	//urls
 	@DefaultStringValue(value="#restored:wave:googlewave.com%252Fw%252B0R06HrZkBhE%252F")

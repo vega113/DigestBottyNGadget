@@ -7,7 +7,7 @@
 	<Content type="html">
     <![CDATA[
     <script type="text/javascript">
-		document.write(unescape("%3Cscript src='" + "http://" + "aggfiwave.appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E"));
+		document.write(unescape("%3Cscript src='" + "http://" + "digestbotty.appspot.com/js/adtracker.js' type='text/javascript'%3E%3C/script%3E"));
 	</script>
      ]]>
 	</Content>
