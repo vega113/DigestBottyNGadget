@@ -13,23 +13,28 @@
   <datastore-index kind="ForumPost" ancestor="false">
         <property name="id" direction="asc"/>
         <property name="projectId" direction="asc"/>
+        <property name="isActive" direction="asc"/>
   </datastore-index>  
   
   
   <datastore-index kind="ForumPost" ancestor="false" source="auto">
         <property name="projectId" direction="asc"/>
         <property name="created" direction="asc"/>
+         <property name="isActive" direction="asc"/>
+          <property name="isActive" direction="asc"/>
   </datastore-index>  
   
   <datastore-index kind="ForumPost" ancestor="false">
         <property name="waveId" direction="asc"/>
         <property name="created" direction="desc"/>
+         <property name="isActive" direction="asc"/>
   </datastore-index>  
   
   <datastore-index kind="ForumPost" ancestor="false">
         <property name="domain" direction="asc"/>
         <property name="waveId" direction="asc"/>
         <property name="projectId" direction="asc"/>
+         <property name="isActive" direction="asc"/>
   </datastore-index>  
   
   <datastore-index kind="BlipSubmitted" ancestor="false" source="auto">

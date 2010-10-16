@@ -32,6 +32,7 @@ import com.aggfi.digest.server.botty.digestbotty.dao.ExtDigestDao;
 import com.aggfi.digest.server.botty.digestbotty.model.BlipSubmitted;
 import com.aggfi.digest.server.botty.digestbotty.model.ExtDigest;
 import com.aggfi.digest.server.botty.digestbotty.utils.StringBuilderAnnotater;
+import com.aggfi.digest.server.botty.digestbotty.utils.WaveUtils;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.AdminConfigDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.ForumPostDao;
 import com.aggfi.digest.server.botty.google.forumbotty.dao.UserNotificationDao;
@@ -64,6 +65,7 @@ import com.google.wave.api.event.BlipSubmittedEvent;
 import com.google.wave.api.event.GadgetStateChangedEvent;
 import com.google.wave.api.event.OperationErrorEvent;
 import com.google.wave.api.event.WaveletSelfAddedEvent;
+import com.google.wave.api.event.WaveletSelfRemovedEvent;
 import com.google.wave.api.impl.DocumentModifyAction.BundledAnnotation;
 import com.vegalabs.general.server.command.Command;
 import com.vegalabs.general.server.rpc.JsonRpcRequest;
@@ -343,7 +345,7 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
 		}
 		
 		// Existing wavelet in datastore
-		entry.setTitle(wavelet.getTitle());
+//		entry.setTitle(wavelet.getTitle());
 		entry.setLastUpdated(new Date());
 		applyAutoTags(blip, projectId);
 		entry = forumPostDao.syncTags(projectId, entry, wavelet);
@@ -446,6 +448,32 @@ public ForumPost addOrUpdateDigestWave(String projectId, Wavelet wavelet, Blip b
         }
         
         ForumPost entry = addOrUpdateDigestWave(projectId, wavelet, event.getBlip(),event.getModifiedBy());
+        
+        
+        try{
+        	if(!wavelet.getTitle().equals(entry.getTitle())){
+            	//update entry title in the digest wave
+            	List<ExtDigest> extList = extDigestDao.retrDigestsByProjectId(projectId);
+            	ExtDigest extDigest = extList.get(0);
+            	Wavelet digestWavelet = null;
+            	String digestWaveDomain = extDigest.getDomain();
+        	    String digestWaveId = extDigest.getWaveId();
+            	try {
+            		digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), extDigest.getProjectId() + "-digest", getRpcServerUrl());
+            	} catch (IOException e) {
+            		LOG.log(Level.SEVERE,"",e);
+            	}
+            	Blip ablip = digestWavelet.getBlip(entry.getDigestBlipId());
+            	WaveUtils.updateLinkTitleInDigestBlip(wavelet.getTitle(), entry.getTitle(), ablip, "link/wave");
+            	submit(digestWavelet, getRpcServerUrl());
+            	entry.setTitle(wavelet.getTitle());
+            	forumPostDao.save(entry);
+        	}
+        }catch(RuntimeException re){
+        	LOG.log(Level.SEVERE,"cannot update digest blip title from: " + entry.getTitle() + " to " + wavelet.getTitle(),re);
+        } catch (IOException e) {
+        	LOG.log(Level.SEVERE,"cannot update digest blip title from: " + entry.getTitle() + " to " + wavelet.getTitle(),e);
+		}
 
       //here is the place to save blipSubmitted
         saveBlipSubmitted(event.getModifiedBy(), event.getBlip(), projectId, entry.isDispayAtom());
@@ -643,7 +671,6 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 				  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
 					  blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));
 					  entry.setDigestBlipId(blipId);
-					  digest.setLastDigestBlipId(blipId);
 					  break;
 				  }
 			  }
@@ -653,7 +680,6 @@ private void saveBlipSubmitted(String modifier, Blip blip, String projectId, boo
 					  if(dataMap != null && dataMap.get(ParamsProperty.BLIP_ID)  != null){
 						  blipId = String.valueOf(dataMap.get(ParamsProperty.BLIP_ID));
 						  entry.setDigestBlipId(blipId);
-						  digest.setLastDigestBlipId(blipId);
 						  break;
 					  }
 				  }
@@ -1192,6 +1218,47 @@ protected String[] createGadgetUrlsArr() {
 		}else{
 			return Gadget.class.cast(gadgetRef.value());
 		}
+	}
+
+	@Override
+	public void onWaveletSelfRemoved(WaveletSelfRemovedEvent event) {
+		//remove the link to this wave from the digest
+		
+		Wavelet wavelet = event.getWavelet();
+		String projectId = event.getBundle().getProxyingFor();
+		ForumPost entry = forumPostDao.getForumPost (wavelet.getDomain(), wavelet.getWaveId().getId(), projectId);
+		LOG.info("Removed: " + projectId + " from: " + wavelet.getTitle());
+	        
+	        
+	        try{
+
+            	//update entry title in the digest wave
+            	List<ExtDigest> extList = extDigestDao.retrDigestsByProjectId(projectId);
+            	ExtDigest extDigest = extList.get(0);
+            	Wavelet digestWavelet = null;
+            	String digestWaveDomain = extDigest.getDomain();
+        	    String digestWaveId = extDigest.getWaveId();
+            	try {
+            		digestWavelet = fetchWavelet( new WaveId(digestWaveDomain, digestWaveId), new WaveletId(digestWaveDomain, "conv+root"), extDigest.getProjectId() + "-digest", getRpcServerUrl());
+            	} catch (IOException e) {
+            		LOG.log(Level.SEVERE,"",e);
+            	}
+            	Blip ablip = digestWavelet.getBlip(entry.getDigestBlipId());
+            	ablip.all().delete();
+            	ablip.append("deleted.");
+            	digestWavelet.delete(ablip);
+            	
+            	submit(digestWavelet, getRpcServerUrl());
+            	entry.setActive(false);
+            	entry.setLastUpdated(new Date());
+            	entry.setUpdater(event.getModifiedBy());
+            	forumPostDao.save(entry);
+        	
+	        }catch(RuntimeException re){
+	        	LOG.log(Level.SEVERE,"cannot update digest blip title from: " + entry.getTitle() + " to " + wavelet.getTitle(),re);
+	        } catch (IOException e) {
+	        	LOG.log(Level.SEVERE,"cannot update digest blip title from: " + entry.getTitle() + " to " + wavelet.getTitle(),e);
+			}
 	}
 
   /*

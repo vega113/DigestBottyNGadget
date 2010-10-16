@@ -204,7 +204,7 @@ public class CreateDigest extends Command {
 		
 		//add new post gadget
 		  Command command = commandFetcher.fetchCommand("ADD_SECURE_POST_GADGET");
-		  String userId = System.getProperty("APP_DOMAIN") + "@" + "appspot.com";
+		  String userId = extDigest.getOwnerId();
 		  Map<String,String> params = ImmutableMap.of("projectId", extDigest.getProjectId(), "userId", userId);
 		  command.setParams(params);
 		  JSONObject outJson = command.execute();
@@ -242,7 +242,7 @@ public class CreateDigest extends Command {
 		}
 		participants.add(ownerId);
 		LOG.fine("IN createFAQ, robot name: " + robot.getRobotName() + ", " + robot.getRobotProfilePageUrl());
-		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_FAQ_CREATED_MSG","",rpcUrl);
+		Wavelet newWavelet = robot.newWave(domain, participants ,"NEW_FORUM_FAQ_CREATED_MSG",projectId,rpcUrl);
 		
 		extDigest.setFaqWaveId(newWavelet.getWaveId().getId());
 		extDigestDao.save(extDigest);
@@ -338,21 +338,27 @@ public class CreateDigest extends Command {
 		String a5_1 = "A: You can import an existing wave by adding your forum robot, i.e. \"" +robotAddress + "\" to the wave you want to import - either manually, or by clicking on the robot icon on the toolbar while in edit mode.\n\n";
 		sba.append(a5_1, styleFontStyle, "italic");
 		//6
+		String q11 = "Q: How can I remove a wave from the Forum digest?\n";
+		sba.append(q11, styleFontWeight, "bold");
+		String robotAddress_11 = System.getProperty("APP_DOMAIN") + "+" + projectId +  "@appspot.com";
+		String a11_1 = "A: You can remove a wave from the forum digest by removing the forum robot, i.e. \"" +robotAddress_11 + "\" from the wave you want to remove - by clicking on the robot icon on the wave participants panel and then on the \"Remove\" option .\n\n";
+		sba.append(a11_1, styleFontStyle, "italic");
+		//7
 		String q7 = "Q: How do I search for Forum waves?\n";
 		sba.append(q7, styleFontWeight, "bold");
 		String a7_1 = "A: You can use the \"Saved Search\" that was installed along with the Forum. It is located on the \"Navigation\" panel on the top left of the Wave Client under the \"Searches\" category. To remove it - hover with the mouse over the search and then choose the \"delete\" option.\n\n";
 		sba.append(a7_1, styleFontStyle, "italic");
-		//7
+		//8
 		String q8 = "Q: How do I locate the forum Digest wave?\n";
 		sba.append(q8, styleFontWeight, "bold");
 		String a8_1 = "A: You can scroll up to the top of the post and click on the \"Back to " + projectName + " digest wave\" link which is located at the bottom of the root blip.  Another option is to click on the icon of the forum robot - and then on the \"Website\" link - this will redirect you to the Digest wave.\n\n";
 		sba.append(a8_1, styleFontStyle, "italic");
-		//8
+		//9
 		String q2 = "Q: Who is the Forum owner?\n";
 		sba.append(q2, styleFontWeight, "bold");
 		String a2 = "A: This forum was created by: " + ownerId + " , \"wave\" this id for all questions regarding the \"" +projectName + "\" forum.\n\n";
 		sba.append(a2, styleFontStyle, "italic");
-		//9
+		//10
 		String q3 = "Q: I have more questions regarding using forums created by DigestBotty, where can I ask them?\n";
 		sba.append(q3, styleFontWeight, "bold");
 		String a3_1 = "A: Please visit the DigestBotty digest wave ";
@@ -554,8 +560,10 @@ public class CreateDigest extends Command {
 			  if(dataMap != null && dataMap.get(ParamsProperty.NEW_BLIP_ID)  != null){
 				  blipId = String.valueOf(dataMap.get(ParamsProperty.NEW_BLIP_ID));//blip id of the bottom blip
 				  arobot.addOrUpdateLinkToBottomOrTopForDigestWave(newWavelet.getRootBlip(), blipId, true,false);
-				  extDigest.setLastDigestBlipId(blipId);
-				  extDigestDao.save(extDigest);
+				  if(!isCreateBottomAdBlip){
+					  extDigest.setLastDigestBlipId(blipId);
+					  extDigestDao.save(extDigest);
+				  }
 				  isSubmitLocal = true;
 			  }
 		  }

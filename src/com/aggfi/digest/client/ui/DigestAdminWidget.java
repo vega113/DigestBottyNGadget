@@ -183,15 +183,16 @@ public class DigestAdminWidget extends Composite implements RunnableOnTabSelect{
 //		clearAll();
 		if(projectSelectWidget == null){
 			this.projectSelectWidget = new ProjectSelectWidget(messages, constants, resources, digestService, onProjectsLoadCallback,vegaUtils);
+			projectSelectWidget.getPrjList().addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					handleOnSelectPrjList(event);
+				}
+			});
 		}
 		prjListContainer.clear();
 		prjListContainer.add(projectSelectWidget);
-		projectSelectWidget.getPrjList().addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				handleOnSelectPrjList(event);
-			}
-		});
+		
 		
 		adminSettingsTabPnl.addSelectionHandler(new SelectionHandler<Integer>() {
 			

@@ -48,9 +48,15 @@
 								<g:HTML width='30px'></g:HTML>
 								<g:HTML stylePrimaryName='{res.globalCSS.alignRight}'></g:HTML>
 								<g:DecoratorPanel>
-									<g:HTMLPanel>
+									<g:HorizontalPanel>
+										<g:HTMLPanel>
 										<g:PushButton ui:field="submitBtn"></g:PushButton>
 									</g:HTMLPanel>
+									<g:HTML width="3px"></g:HTML>
+									<g:Image resource='{res.spinner}'
+											title='{constants.loadingStr}'
+											ui:field="spinnerImg" />
+									</g:HorizontalPanel>
 								</g:DecoratorPanel>
 							</g:HorizontalPanel>
 						</g:HTMLPanel>

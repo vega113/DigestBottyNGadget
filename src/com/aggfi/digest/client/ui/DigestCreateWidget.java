@@ -83,6 +83,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 	CheckBox isCopyAdsBox;
 	@UiField
 	Image imgIsAdsEnabledCheckBox;
+	@UiField
+	Image spinnerImg;
 	
 	private VegaUtils vegaUtils;
 
@@ -113,6 +115,8 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 		this.digestService = digestService;
 		this.vegaUtils = vegaUtils;
 		this.constants = constants;
+		
+		spinnerImg.setVisible(false);
 		
 		initCreateGadgetFlexTbl(createGadgetFlexTbl,constants,resources);
 		submitBtn.setText(constants.submitBtnStr());
@@ -150,6 +154,7 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 					FieldVerifier.areValidDigestFields(digest,messages,constants);
 					encodeDigest(digest);
 					vegaUtils.showStaticMessage(messages.sentRequestForCreateMsg(digest.getName()));
+					spinnerImg.setVisible(true);
 					try {
 						digestService.createDigest(digest, new AsyncCallback<JSONValue>() {
 							
@@ -175,24 +180,27 @@ public class DigestCreateWidget extends Composite  implements RunnableOnTabSelec
 									vegaUtils.alert(warning);
 								}
 								vegaUtils.reportPageview("/createTab/forumCreationSuccess");
+								spinnerImg.setVisible(false);
 							}
 							
 							@Override
 							public void onFailure(Throwable caught) {
 								vegaUtils.dismissAllStaticMessages();
 								vegaUtils.alert(caught.getMessage());
+								spinnerImg.setVisible(false);
 							}
 						});
 					} catch (RequestException e) {
 						vegaUtils.dismissStaticMessage();
-						Log.error("",e);
+						Log.warn("",e);
+						spinnerImg.setVisible(false);
 					}
 				}catch(IllegalArgumentException e){
-					Log.error("should be verification error!",e);
+					Log.warn("should be verification error!",e);
 					vegaUtils.dismissStaticMessage();
 					vegaUtils.alert(e.getMessage());
 				}catch(Exception e){
-					Log.error("",e);
+					Log.warn("",e);
 					vegaUtils.dismissStaticMessage();
 					vegaUtils.alert(e.getMessage());
 				}

@@ -104,6 +104,8 @@ public class ForumUpdateWidget extends Composite implements RunnableOnTabSelect{
 						@Override
 						public void onSuccess(JSONValue result) {
 							spinnerImg.setVisible(false);
+							utils.showSuccessMessage(constants.successStr(), 3);
+							utils.showDismissibleMessage(constants.updateForumInfoBtnExpl());
 						}
 						
 						@Override

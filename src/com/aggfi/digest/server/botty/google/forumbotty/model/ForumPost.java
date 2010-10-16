@@ -80,6 +80,9 @@ public class ForumPost {
   @Persistent
   @Expose
   private Boolean isDispayAtom;
+  @Persistent
+  @Expose
+  Boolean isActive;
   
 
   public ForumPost(String domain, Wavelet wavelet) {
@@ -111,7 +114,7 @@ public class ForumPost {
 			}
 		}
    }
-    
+    this.isActive = true;
     this.lastUpdated = new Date();
     this.created = new Date();
     this.title = wavelet.getTitle();
@@ -330,6 +333,14 @@ public void setCreatedByRobot(Boolean isCreatedByRobot) {
 
 public Object getRealId() {
 	return id;
+}
+
+public Boolean isActive() {
+	return isActive;
+}
+
+public void setActive(Boolean isActive) {
+	this.isActive = isActive;
 }
 
 

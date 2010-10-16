@@ -95,6 +95,7 @@ public class ForumPostDaoImpl implements ForumPostDao {
       String filters = "projectId == projectId_ && created >= start && created <= end";      
       query.setFilter(filters);
       List<ForumPost> entries = (List<ForumPost>) query.execute(projectId, start, end);      
+      entries = filterNonActive(entries);
       count = entries.size();      
     } finally {
       pm.close();
@@ -138,6 +139,7 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
       String filters = "domain == domain_ && waveId == waveId_";
       query.setFilter(filters);
       List<ForumPost> entries = (List<ForumPost>) query.execute(domain, waveId);
+      entries = filterNonActive(entries);
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
       if (entries.size() > 0) {
     	  entry = prepare4Ret(pm, entries, 0);
@@ -162,6 +164,7 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
       query.setFilter(filters);
       List<ForumPost> entries = (List<ForumPost>) query.execute(domain, waveId,projectId);
       entries = (List<ForumPost>) pm.detachCopyAll(entries);
+      entries = filterNonActive(entries);
       if (entries.size() > 0) {
     	  entry = prepare4Ret(pm, entries, 0);
         return entry;
@@ -221,8 +224,9 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
       Query query = pm.newQuery(ForumPost.class);
       if(tag != null && !"".equals(tag)){
     	  query.declareParameters("String projectId_, String tag");
-          query.setFilter("projectId == projectId_ && tags.contains(tag)");
+          query.setFilter("projectId == projectId_ && tags.contains(tag) ");
           entries = (List<ForumPost>) query.execute(projectId, tag);
+          entries = filterNonActive(entries);
       }else{
     	  query.declareParameters("String projectId_");
           query.setFilter("projectId == projectId_");
@@ -256,8 +260,9 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
     try {
       Query query = pm.newQuery(ForumPost.class);
       query.declareParameters("String projectId_, String tag");
-      query.setFilter("projectId == projectId_ && tags.contains(tag)");
+      query.setFilter("projectId == projectId_ && tags.contains(tag) ");
       entries = (List<ForumPost>) query.execute(projectId, tag);
+      entries = filterNonActive(entries);
       return entries.size();
     } finally {
       pm.close();
@@ -272,9 +277,10 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
     try {
       Query query = pm.newQuery(ForumPost.class);
       query.declareParameters("String projectId_");
-      query.setFilter("projectId == projectId_");
+      query.setFilter("projectId == projectId_ ");
 
       entries = (List<ForumPost>) query.execute(projectId);
+      entries = filterNonActive(entries);
       if (limit > 0) {
         if (entries.size() > limit) {
           entries = entries.subList(0, limit);
@@ -303,10 +309,10 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
 	      Query query = pm.newQuery(ForumPost.class);
 	      query.declareImports("import java.util.Date");
 	      query.declareParameters("String projectId_, Date fromDate_");
-	      query.setFilter("projectId == projectId_ && lastUpdated >= fromDate_");
+	      query.setFilter("projectId == projectId_ && lastUpdated >= fromDate_ ");
 
 	      entries = (List<ForumPost>) query.execute(projectId,fromDate);
-	      
+	      entries = filterNonActive(entries);
 	      for(ForumPost p : entries){
 	    	  entries4Ret.add(pm.detachCopy(p));
 	      }
@@ -327,9 +333,10 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
       query.declareImports("import java.util.Date");
       query.setOrdering("lastUpdated desc");
       query.declareParameters("String projectId_");
-      query.setFilter("projectId == projectId_");
+      query.setFilter("projectId == projectId_ ");
 
       entries = (List<ForumPost>) query.execute(projectId);
+      entries = filterNonActive(entries);
       if (limit > 0) {
         if (entries.size() > limit) {
           entries = entries.subList(0, limit);
@@ -352,4 +359,14 @@ private ForumPost prepare4Ret(PersistenceManager pm, List<ForumPost> entries, in
     }
     return entries4Ret;
   }
+
+	private List<ForumPost> filterNonActive(List<ForumPost> entries) {
+		List<ForumPost> filteredEntries = new ArrayList<ForumPost>();
+		for(ForumPost entry : entries){
+			if(entry.isActive() == null || entry.isActive() == true ){
+				filteredEntries.add(entry);
+			}
+		}
+		return filteredEntries;
+	}
 }
